@@ -15,7 +15,6 @@ done
 
 declare -A WEB_SERVICES
 declare -a containers=( "sftpserver-service-dockerbunker" )
-declare -a add_to_network=( "sftpserver-service-dockerbunker" )
 declare -a volumes=( "sftpserver-data-vol-1" )
 declare -a networks=( )
 declare -A IMAGES=( [service]="atmoz/sftp:alpine-3.7" )
@@ -78,8 +77,8 @@ configure() {
 
 	[[ ! -d "${CONF_DIR}"/sftpserver/conf/ssh ]] && mkdir "${CONF_DIR}"/sftpserver/conf/ssh
 
-	[[ ! -f "${CONF_DIR}"/sftpserver/conf/ssh/ssh_host_ed25519_key ]] && ssh-keygen -t ed25519 -f "${CONF_DIR}"/sftpserver/conf/ssh/ssh_host_ed25519_key
-	[[ ! -f "${CONF_DIR}"/sftpserver/conf/ssh/ssh_host_rsa_key ]] && ssh-keygen -t rsa -b 4096 -f "${CONF_DIR}"/sftpserver/conf/ssh/ssh_host_rsa_key
+	[[ ! -f "${CONF_DIR}"/sftpserver/ssh/ssh_host_ed25519_key ]] && ssh-keygen -t ed25519 -f "${CONF_DIR}"/sftpserver/ssh/ssh_host_ed25519_key
+	[[ ! -f "${CONF_DIR}"/sftpserver/ssh/ssh_host_rsa_key ]] && ssh-keygen -t rsa -b 4096 -f "${CONF_DIR}"/sftpserver/ssh/ssh_host_rsa_key
 	post_configure_routine
 }
 
