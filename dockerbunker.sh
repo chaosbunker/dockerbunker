@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+
+# Find base dir
+while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
+
+source "${BASE_DIR}"/data/include/init.sh
+
+[[ -f "data/env/dockerbunker.env" ]] && source "data/env/dockerbunker.env" || init_dockerbunker
+
+unset AVAILABLE_SERVICES count
+# All available services
+declare -a ALL_SERVICES=( \
+	"Static HTML Site" \
+	"Bitbucket" \
+	"Cryptpad" \
+	"CS50 IDE" \
+	"Dillinger" \
+	"Ghost" \
+	"Gitea" \
+	"Gitlab CE" \
+	"Gogs" \
+	"Hastebin" \
+	"IPsec VPN Server" \
+	"Kanboard" \
+	"Mailcow Dockerized" \
+	"Mailpile" \
+	"Mastodon" \
+	"Nextcloud" \
+	"Open Project" \
+	"Piwik" \
+	"Seafile Pro" \
+	"Searx" \
+	"Send" \
+	"sFTP Server" \
+	"Wordpress" \
+	)
+
+# style menu according to what status service has
+declare -A SERVICES_ARR
+for service in "${ALL_SERVICES[@]}";do
+	service_name="$(echo -e "${service,,}" | tr -d '[:space:]')"
+	if [[ "${INSTALLED_SERVICES[@]}" =~ $service ]];then
+		[[ "${STOPPED_SERVICES[@]}" =~ $service ]] && service_status="$(printf "\e[32m${service}\e[0m \e[31m(Stopped)\e[0m")" || service_status="$(printf "\e[32m${service}\e[0m")"
+		SERVICES_ARR+=( [$service_status]="${service_name}" )
+		AVAILABLE_SERVICES+=( "$service_status" )
+	elif [[ "${CONFIGURED_SERVICES[@]}" =~ $service ]];then
+		service_status="$(printf "\e[33m${service}\e[0m")"
+		SERVICES_ARR+=( [$service_status]="${service_name}" )
+		AVAILABLE_SERVICES+=( "$service_status" )
+	else
+		service_status="$(printf "${service}")"
+		SERVICES_ARR+=( [$service_status]="${service_name}" )
+		AVAILABLE_SERVICES+=( "$service_status" )
+	fi
+done
+
+startall=$(printf "\e[1;4;33mStart all stopped containers\e[0m")
+stopall=$(printf "\e[1;4;33mStop all running containers\e[0m")
+startnginx=$(printf "\e[1;4;33mStart nginx container\e[0m")
+stopnginx=$(printf "\e[1;4;33mStop nginx container\e[0m")
+restartnginx=$(printf "\e[1;4;33mRestart nginx container\e[0m")
+restartall=$(printf "\e[1;4;33mRestart all containers\e[0m")
+destroyall=$(printf "\e[1;4;33mDestroy everything\e[0m")
+exitmenu=$(printf "\e[1;4;33mExit\e[0m")
+
+count=$((${#AVAILABLE_SERVICES[@]}+1))
+
+[[ ${STOPPED_SERVICES[0]} ]] \
+	&& AVAILABLE_SERVICES+=( "$startall" )
+
+[[ $(docker ps -q --filter "status=running" --filter name=^/nginx-dockerbunker$) ]] \
+	&& AVAILABLE_SERVICES+=( "$stopnginx" ) \
+	&& AVAILABLE_SERVICES+=( "$restartnginx") \
+	&& count=$(($count+2))
+
+[[ ${#INSTALLED_SERVICES[@]} > 0 \
+	|| ${#STATIC_SITES[@]} > 0 \
+	|| ${#CONFIGURED_SERVICES[@]} > 0 ]] \
+&& AVAILABLE_SERVICES+=( "$destroyall" ) &&  count=$(($count+1))
+
+[[ $(docker ps -q --filter "status=exited" --filter name=^/nginx-dockerbunker$) ]] \
+	&& AVAILABLE_SERVICES+=( "$startnginx" )
+
+
+[[ $(docker ps -q --filter "status=running" --filter name=dockerbunker) && ${#INSTALLED_SERVICES[@]} == 0 && -z ${STATIC_SITES[@]} ]] && AVAILABLE_SERVICES+=( "$destroyall" ) &&  count=$(($count+1))
+[[ $(docker ps -q --filter "status=running" --filter name=dockerbunker) && ${#INSTALLED_SERVICES[@]} > 1 ]] && AVAILABLE_SERVICES+=( "$stopall" ) &&  count=$(($count+1))
+[[ $(docker ps -q --filter "status=exited" --filter name=dockerbunker) && ${#STOPPED_SERVICES[@]} > 1 ]] && AVAILABLE_SERVICES+=( "$startall" ) && count=$(($count+1))
+[[ ${#INSTALLED_SERVICES[@]} > 1 ]] && AVAILABLE_SERVICES+=( "$restartall" ) && count=$(($count+1))
+echo ""
+echo "Please select the service you want to manage"
+echo ""
+[[ ${INSTALLED_SERVICES[@]} ]] && echo -e " \e[32mGreen\e[0m: Installed"
+[[ ${CONFIGURED_SERVICES[@]} ]] && echo -e " \e[33mOrange\e[0m: Configured"
+echo ""
+
+COLUMNS=12
+select choice in "${AVAILABLE_SERVICES[@]}"  "$exitmenu"
+do
+	case $choice in
+	"$exitmenu")
+		exit 0
+		;;
+	"$startnginx")
+		echo ""
+		start_nginx
+		say_done
+		sleep 1
+		break
+		;;
+	"$stopnginx")
+		echo ""
+		stop_nginx
+		say_done
+		sleep 1
+		break
+		;;
+	"$restartnginx")
+		prevent_nginx_restart=1
+		echo ""
+		restart_nginx
+		say_done
+		sleep 1
+		break
+		;;
+	"$startall")
+		prevent_nginx_restart=1
+		start_all
+		say_done
+		sleep 1
+		break
+		;;
+	"$stopall")
+		prevent_nginx_restart=1
+		stop_all
+		say_done
+		sleep 1
+		break
+		;;
+	"$destroyall")
+		echo -e "\n\e[3m\xe2\x86\x92 Destroy everything\e[0m"
+		echo ""
+		echo -e "\e[1mReset dockerbunker to its initial state\e[0m"
+		echo ""
+		echo "The following will be removed:"
+		echo ""
+		echo "- All dockerbunker container(s)"
+		echo "- All dockerbunker volume(s)"
+		echo "- All environment file(s)"
+		echo "- All nginx configuration files"
+		echo "- All self-signed certificates (Let's Encrypt certificates will be retained)"
+		echo ""
+		prompt_confirm "Continue?" \
+			&& destroy_all=1 destroy_all
+		say_done
+		exit 0
+		;;
+	$choice)
+		if [[ -z $choice ]];then
+			echo "Please choose a number from 1 to $count"
+		else
+			service="$(echo -e "${choice,,}" | tr -d '[:space:]')"
+			echo ""
+			echo -e "\n\e[3m\xe2\x86\x92 Checking service status"
+			echo ""
+			source "${BASE_DIR}"/data/services/${SERVICES_ARR[$choice]}/${SERVICES_ARR[$choice]}.sh
+			break
+		fi
+		;;
+	esac
+done
+

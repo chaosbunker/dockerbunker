@@ -1,0 +1,7 @@
+.gitmodules
+data/web/*
+data/env/*
+data/conf/*
+data/Dockerfiles/*
+data/docker-compose/*
+
