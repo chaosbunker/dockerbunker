@@ -1,28 +1,117 @@
-wordpress_db_dockerbunker() {
-	docker run -d \
-		--name=${FUNCNAME[0]//_/-} \
-		--restart=always \
-		--network dockerbunker-${SERVICE_NAME} --net-alias=db \
-		--env-file="${SERVICE_ENV}" \
-		-v wordpress-db-vol-1:/var/lib/mysql \
-		-v "${SERVICES_DIR}"/${SERVICE_NAME}/mysql/:/etc/mysql/conf.d/:ro \
-		--health-cmd="mysqladmin ping --host localhost --silent" --health-interval=10s --health-retries=5 --health-timeout=30s \
-	${IMAGES[db]} >/dev/null
+#!/usr/bin/env bash
+
+while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
+
+PROPER_NAME="Wordpress"
+SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
+PROMPT_SSL=1
+
+declare -a environment=( "data/env/dockerbunker.env" "data/include/init.sh" )
+
+for env in "${environment[@]}";do
+	[[ -f "${BASE_DIR}/$env" ]] && source "${BASE_DIR}/$env"
+done
+
+declare -A WEB_SERVICES
+declare -a containers=( "${SERVICE_NAME}-db-dockerbunker" "${SERVICE_NAME}-service-dockerbunker" )
+declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
+declare -a volumes=( "${SERVICE_NAME}-db-vol-1" "${SERVICE_NAME}-data-vol-1" )
+declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
+declare -A IMAGES=( [db]="mariadb:10.1" [service]="dockerbunker/${SERVICE_NAME}" )
+declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
+
+[[ -z $1 ]] && options_menu
+
+configure() {
+	pre_configure_routine
+
+	echo -e "# \e[4m${PROPER_NAME} Settings\e[0m"
+
+	set_domain
+
+	prompt_confirm "Use Basic Authentication to protect /wp-admin?"
+	if [[ $? == 0 ]];then
+		BASIC_AUTH="yes"
+		if [[ -z $HTUSER ]]; then
+			while [[ -z ${HTUSER} ]];do
+				read -p "Basic Auth Username: " -ei "" HTUSER
+			done
+		else
+			read -p "Basic Auth Username: " -ei "${HTUSER}" HTUSER
+		fi
+		unset HTPASSWD
+		while [[ "${#HTPASSWD}" -le 6 || "$HTPASSWD" != *[A-Z]* || "$HTPASSWD" != *[a-z]* || "$HTPASSWD" != *[0-9]* ]];do
+			if [ $VALIDATE ];then
+				echo -e "\n\e[31m  Password does not meet requirements\e[0m"
+			fi
+				stty_orig=$(stty -g)
+				stty -echo
+		  		read -p " $(printf "\n   \e[4mPassword requirements\e[0m\n   Minimum Length 6, Uppercase, Lowercase, Integer\n\n   Enter Password:") " -ei "" HTPASSWD
+				stty "$stty_orig"
+				echo ""
+			VALIDATE=1
+		done
+		unset VALIDATE
+		echo ""
+	else
+		AUTH_SWITCH="#"
+		BASIC_AUTH="no"
+	fi
+	
+	# avoid tr illegal byte sequence in macOS when generating random strings
+	if [[ $OSTYPE =~ "darwin" ]];then
+		if [[ $LC_ALL ]];then
+			oldLC_ALL=$LC_ALL
+			export LC_ALL=C
+		else
+			export LC_ALL=C
+		fi
+	fi
+	cat <<-EOF >> "${SERVICE_ENV}"
+	SERVICE_DOMAIN=${SERVICE_DOMAIN}
+	LE_EMAIL=${LE_EMAIL}
+	
+	# ------------------------------
+	# Security Settings
+	# ------------------------------
+	
+	SSL_CHOICE=${SSL_CHOICE}
+	BASIC_AUTH=${BASIC_AUTH}
+	AUTH_SWITCH=${AUTH_SWITCH}
+	HTUSER=${HTUSER}
+	HTPASSWD=${HTPASSWD}
+	
+	# ------------------------------
+	# SQL database configuration
+	# ------------------------------
+
+	MYSQL_DATABASE=wpdb
+	MYSQL_USER=wordpress
+	
+	# Please use long, random alphanumeric strings (A-Za-z0-9)
+	MYSQL_PASSWORD=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 28)
+	MYSQL_ROOT_PASSWORD=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 28)
+	EOF
+	if [[ $OSTYPE =~ "darwin" ]];then
+		[[ $oldLC_ALL ]] && export LC_ALL=$oldLC_ALL || unset LC_ALL
+	fi
+
+	post_configure_routine
+}
+setup() {
+	initial_setup_routine
+
+	SUBSTITUTE=( "\${SERVICE_DOMAIN}" "\${AUTH_SWITCH}" )
+	basic_nginx
+	
+	docker_run_all
+
+	post_setup_routine
 }
 
-wordpress_service_dockerbunker() {
-	docker run -d \
-		--name=${FUNCNAME[0]//_/-} \
-		--restart=always \
-		--network dockerbunker-${SERVICE_NAME} \
-		--env-file="${SERVICE_ENV}" \
-		--env WORDPRESS_DB_NAME=wpdb \
-		--env WORDPRESS_TABLE_PREFIX=wp_ \
-		--env WORDPRESS_DB_HOST=db:3306 \
-		--env WORDPRESS_DB_USER=${MYSQL_USER} \
-		--env WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD} \
-		-v "${SERVICES_DIR}"/${SERVICE_NAME}/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini \
-		-v wordpress-data-vol-1:/var/www/html/wp-content \
-	${IMAGES[service]} >/dev/null
-}
+if [[ $1 == "letsencrypt" ]];then
+	$1 $*
+else
+	$1
+fi
 
