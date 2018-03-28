@@ -59,6 +59,7 @@ stopall=$(printf "\e[1;4;33mStop all running containers\e[0m")
 startnginx=$(printf "\e[1;4;33mStart nginx container\e[0m")
 stopnginx=$(printf "\e[1;4;33mStop nginx container\e[0m")
 restartnginx=$(printf "\e[1;4;33mRestart nginx container\e[0m")
+renewcerts=$(printf "\e[1;4;33mRenew Let's Encrypt certificates\e[0m")
 restartall=$(printf "\e[1;4;33mRestart all containers\e[0m")
 destroyall=$(printf "\e[1;4;33mDestroy everything\e[0m")
 exitmenu=$(printf "\e[1;4;33mExit\e[0m")
@@ -72,6 +73,9 @@ count=$((${#AVAILABLE_SERVICES[@]}+1))
 	&& AVAILABLE_SERVICES+=( "$stopnginx" ) \
 	&& AVAILABLE_SERVICES+=( "$restartnginx") \
 	&& count=$(($count+2))
+
+[[ $(ls -A "${CONF_DIR}"/nginx/ssl/letsencrypt/live) ]] \
+	&& AVAILABLE_SERVICES+=( "$renewcerts" ) && cound=$(($count+1))
 
 [[ ${#INSTALLED_SERVICES[@]} > 0 \
 	|| ${#STATIC_SITES[@]} > 0 \
@@ -117,6 +121,14 @@ do
 	"$restartnginx")
 		prevent_nginx_restart=1
 		echo ""
+		restart_nginx
+		say_done
+		sleep 1
+		break
+		;;
+	"$renewcerts")
+		echo -e "\n\e[3m\xe2\x86\x92 Renew Let's Encrypt certificates\e[0m\n"
+		"${BASE_DIR}"/certbot.sh
 		restart_nginx
 		say_done
 		sleep 1
