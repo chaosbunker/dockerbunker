@@ -1,10 +1,10 @@
 # What is dockerbunker
 
-`dockerbunker` is a tool that helps configure, deploy and manage dockerized web-applications or static sites behind an nginx reverse proxy. The only requirement is docker.
+`dockerbunker` is a tool that helps configure, deploy and manage dockerized web-applications or static sites behind an nginx reverse proxy. Apps can easily be fully backed up or restored from a previous backup. The only requirement is docker.
 
 [![asciicast](preview.png "dockerbunker asciicast preview")](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWmh)
 
-##### Currently included:
+#### Currently included:
 
 | A - G        | H - O           | P - Z  |
 | :-------------: |:-------------:| :-----:|
@@ -16,9 +16,6 @@
 |[Gitea](https://gitea.io/en-us/)|[Mastodon](https://github.com/tootsuite/mastodon) (+ [Glitch Edition](https://github.com/glitch-soc/mastodon))|[Wordpress](https://wordpress.org/)|
 |[Gitlab CE](https://gitlab.com/)|[Nextcloud](https://github.com/nextcloud/docker)
 |[Gogs](https://gogs.io/)|[Open Project](https://www.openproject.org/)
-
-##### Planned:
- - Easy backup and restore of volumes and databases
 
 ## How to get started:
 
@@ -50,8 +47,10 @@ Nextcloud
 3) Obtain Let's Encrypt certificate (<-- only visible if using self-signed cert)
 4) Restart container(s)
 5) Stop container(s) (<- only visible when containers are running, otherwise offers "Start Containers"
-6) Upgrade Image(s)
-7) Destroy "Nextcloud"
+6) Backup Service
+7) Restore Service (<- only visible if backup(s) for service are found)
+8) Upgrade Image(s)
+9) Destroy "Nextcloud"
 ```
 
 When destroying a service everything related to the service will be removed. Only Let's Encrypt certificates will be retained.
@@ -64,8 +63,18 @@ If you choose to use [Let's Encrypt](https://letsencrypt.org/) during setup, cer
 
 It is possible to add additional domains to the certificate before obtaining the certificate and these domains will also automatically be added to the corresponding nginx configuration.
 
+#### Backup & Restore
+
+When backing up a service, a timestamped directory will be created in `data/backup/${SERVICE_NAME}`. The following things will get backed up into (or restored from) that directory: 
+
+- All volumes (will be compressed)
+- nginx configuration if service is accessible via web (from data/conf/nginx/conf.d/${SERVICE_DOMAIN})
+- other user-specific configuration files (from data/conf/${SERVICE_NAME})
+- environment file(s) (from data/env/${SERVICE_NAME}*)
+- ssl certificate" (from data/conf/nginx/ssl/${SERVICE_DOMAIN} and, if applicable data/conf/nginx/ssl/letsencrypt)
+
 #### Good to know:
-All credentials that are set by the user or that are automatically generated are stored in data/env/${SERVICE_NAME}.env
+All credentials that are set by the user or that are automatically generated are stored in data/env/${SERVICE_NAME}.env.
 
 Please refer to the documentation of each web-app (regarding default credentials, configuration etc.)
 
