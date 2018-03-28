@@ -17,7 +17,7 @@ declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" )
 declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
-declare -a volumes=( "${SERVICE_NAME}-data-vol-1" "${SERVICE_NAME}-data-vol-2" )
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/cryptpad/customize" [${SERVICE_NAME}-data-vol-2]="/cryptpad/datastore" )
 declare -a networks=( )
 
 [[ -z $1 ]] && options_menu

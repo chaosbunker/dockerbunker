@@ -4,6 +4,6 @@ hastebin_service_dockerbunker() {
 		--restart=always \
 		--network ${NETWORK} \
 		--env-file "${SERVICE_ENV}" \
-		-v ${SERVICE_NAME}-data-vol-1:/hastebin/data \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 	${IMAGES[service]} >/dev/null
 }

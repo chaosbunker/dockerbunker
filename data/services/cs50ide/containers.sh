@@ -8,6 +8,6 @@ cs50ide_service_dockerbunker() {
 		-p 5050:5050 \
 		-e "OFFLINE_PORT=5050" \
 		-e "OFFLINE_IP=127.0.0.1" \
-		-v ${SERVICE_NAME}-data-vol-1:/home/ubuntu/workspace \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 	${IMAGES[service]} >/dev/null
 }

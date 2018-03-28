@@ -17,7 +17,7 @@ declare -a containers=( "bitbucket-postgres-dockerbunker" "${SERVICE_NAME}-servi
 declare -a add_to_network=( "bitbucket-service-dockerbunker"  )
 declare -a networks=( )
 declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" )
-declare -a volumes=( "${SERVICE_NAME}-data-vol-1" "${SERVICE_NAME}-db-vol-1" )
+declare -A volumes=( [${SERVICE_NAME}-db-vol-1]="/var/lib/postgresql/data" [${SERVICE_NAME}-data-vol-1]="/var/atlassian/application-data/bitbucket" )
 declare -a networks=( "dockerbunker-bitbucket" )
 declare -A IMAGES=( [postgres]="postgres" [service]="atlassian/bitbucket-server:5" )
 

@@ -3,7 +3,7 @@ mailpile_service_dockerbunker() {
 		--name=${FUNCNAME[0]//_/-} \
 		--restart=always \
 		--network ${NETWORK} \
-		-v mailpile-data-vol-1:/mailpile-data \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-p ${PORT}:${PORT} \
 	${IMAGES[service]} ${COMMAND} >/dev/null
 }

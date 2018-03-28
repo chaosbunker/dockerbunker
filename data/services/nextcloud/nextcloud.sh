@@ -16,7 +16,7 @@ declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" "${SERVICE_NAME}-db-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -A IMAGES=( [service]="nextcloud:stable" [db]="mariadb:10.2" )
-declare -a volumes=( "${SERVICE_NAME}-data-vol-1" "${SERVICE_NAME}-data-vol-2" "${SERVICE_NAME}-data-vol-3" "${SERVICE_NAME}-data-vol-4" "${SERVICE_NAME}-db-vol-1" )
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/var/www/html/custom_apps" [${SERVICE_NAME}-data-vol-2]="/var/www/html/config" [${SERVICE_NAME}-data-vol-3]="/var/www/html/data" [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
 
 [[ -z $1 ]] && options_menu

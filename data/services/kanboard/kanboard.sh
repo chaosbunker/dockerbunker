@@ -15,8 +15,8 @@ done
 
 declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -a volumes=( "${SERVICE_NAME}-data-vol-1" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/var/www/app/data" [${SERVICE_NAME}-data-vol-2]="/var/www/app/plugins" )
 declare -a networks=( )
 declare -A IMAGES=( [service]="kanboard/kanboard:v1.2.1" )
 

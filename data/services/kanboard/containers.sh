@@ -3,7 +3,7 @@ kanboard_service_dockerbunker() {
 		--name=${FUNCNAME[0]//_/-} \
 		--restart=always \
 		--network ${NETWORK} \
-		-v ${SERVICE_NAME}-db-vol-1:/var/www/app/data \
-		-v ${SERVICE_NAME}-data-vol-1:/var/www/app/plugins \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
+		-v ${SERVICE_NAME}-db-vol-1:${volumes[${SERVICE_NAME}-db-vol-1]} \
 	${IMAGES[service]} >/dev/null
 }

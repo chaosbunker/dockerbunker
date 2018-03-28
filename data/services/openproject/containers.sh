@@ -4,8 +4,8 @@ openproject_service_dockerbunker() {
 		--restart=always \
 		--env-file "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env \
 		--env-file "${SERVICE_ENV}" \
-		-v openproject-pgdata-vol-1:/var/lib/postgresql/9.4/main \
-		-v openproject-logs-vol-1:/var/log/supervisor \
-		-v openproject-data-vol-1:/var/db/openproject \
+		-v ${SERVICE_NAME}-pgdata-vol-1:${volumes[${SERVICE_NAME}-pgdata-vol-1]} \
+		-v ${SERVICE_NAME}-logs-vol-1:${volumes[${SERVICE_NAME}-logs-vol-1]} \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 	${IMAGES[service]} >/dev/null
 }

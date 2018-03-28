@@ -4,7 +4,7 @@ nextcloud_db_dockerbunker() {
 		--restart=always \
 		--network dockerbunker-${SERVICE_NAME} --net-alias=db \
 		--env-file="${SERVICE_ENV}" \
-		-v nextcloud-db-vol-1:/var/lib/mysql \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-v "${SERVICES_DIR}"/${SERVICE_NAME}/mysql/:/etc/mysql/conf.d/:ro \
 		--health-cmd="mysqladmin ping --host localhost --silent" --health-interval=10s --health-retries=5 --health-timeout=30s \
 	${IMAGES[db]} >/dev/null
@@ -18,10 +18,9 @@ nextcloud_service_dockerbunker() {
 		--restart=always \
 		--network dockerbunker-${SERVICE_NAME} \
 		--env-file="${SERVICE_ENV}" \
-		-v nextcloud-data-vol-1:/var/www/html \
-		-v nextcloud-data-vol-2:/var/www/html/custom_apps \
-		-v nextcloud-data-vol-3:/var/www/html/config \
-		-v nextcloud-data-vol-4:/var/www/html/data \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
+		-v ${SERVICE_NAME}-data-vol-2:${volumes[${SERVICE_NAME}-data-vol-2]} \
+		-v ${SERVICE_NAME}-data-vol-3:${volumes[${SERVICE_NAME}-data-vol-3]} \
 	${IMAGES[service]} >/dev/null
 }
 

@@ -11,9 +11,9 @@ gitlabce_service_dockerbunker() {
 		--restart=always \
 		--network ${NETWORK} \
 		--env-file ${SERVICE_ENV} \
-		-v ${SERVICE_NAME}-conf-vol-1:/etc/gitlab \
-		-v ${SERVICE_NAME}-data-vol-1:/etc/opt/gitlab \
-		-v ${SERVICE_NAME}-log-vol-1:/var/log/gitlab \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
+		-v ${SERVICE_NAME}-conf-vol-1:${volumes[${SERVICE_NAME}-conf-vol-1]} \
+		-v ${SERVICE_NAME}-log-vol-1:${volumes[${SERVICE_NAME}-log-vol-1]} \
 	${IMAGES[service]} >/dev/null
 	exit_response
 }

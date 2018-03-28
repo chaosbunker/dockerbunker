@@ -15,7 +15,7 @@ done
 
 declare -A WEB_SERVICES
 declare -a containers=( "sftpserver-service-dockerbunker" )
-declare -a volumes=( "sftpserver-data-vol-1" )
+declare -a volumes=( )
 declare -a networks=( )
 declare -A IMAGES=( [service]="atmoz/sftp:alpine-3.7" )
 declare -a add_to_network=( "sftpserver-service-dockerbunker" )

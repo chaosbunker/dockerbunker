@@ -12,8 +12,8 @@ for env in "${environment[@]}";do
 done
 
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -a volumes=( "${SERVICE_NAME}-data-vol-1" )
 declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" )
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/lib/modules" )
 declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
 
 [[ -z $1 ]] && options_menu

@@ -14,7 +14,7 @@ done
 
 declare -a containers=( "${SERVICE_NAME}-postgres-dockerbunker" "${SERVICE_NAME}-redis-dockerbunker" "${SERVICE_NAME}-service-dockerbunker" "${SERVICE_NAME}-streaming-dockerbunker" "${SERVICE_NAME}-sidekiq-dockerbunker" "${SERVICE_NAME}-elasticsearch-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" "${SERVICE_NAME}-streaming-dockerbunker" )
-declare -a volumes=( "${SERVICE_NAME}-data-vol-1" "${SERVICE_NAME}-data-vol-2" "${SERVICE_NAME}-data-vol-3" "${SERVICE_NAME}-redis-data-vol-1" "${SERVICE_NAME}-elasticsearch-vol-1" "${SERVICE_NAME}-postgres-vol-1" "${SERVICE_NAME}-sidekiq-vol-1" "${SERVICE_NAME}-sidekiq-vol-2" )
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/mastodon/public/system" [${SERVICE_NAME}-data-vol-2]="/mastodon/public/assets" [${SERVICE_NAME}-data-vol-3]="/mastodon/public/packs" [${SERVICE_NAME}-postgres-vol-1]="/var/lib/postgresql/data" [${SERVICE_NAME}-elasticsearch-vol-1]="/usr/share/elasticsearch/data" [${SERVICE_NAME}-redis-vol-1]="/data" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
 declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" [redis]="redis:4.0-alpine" [postgres]="postgres" [elasticsearch]="docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.3" )
 declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}${GLITCH}]="${DOCKERFILES}/${SERVICE_NAME}${GLITCH}" )

@@ -15,7 +15,7 @@ done
 
 declare -A WEB_SERVICES
 declare -a containers=( "openproject-service-dockerbunker" )
-declare -a volumes=( "openproject-data-vol-1" "openproject-pgdata-vol-1" "openproject-logs-vol-1" )
+declare -A volumes=( [${SERVICE_NAME}-pgdata-vol-1]="/hastebin/data" [${SERVICE_NAME}-data-vol-1]="/var/db/openproject" [${SERVICE_NAME}-logs-vol-1]="/var/log/supervisor" )
 declare -a add_to_network=( "openproject-service-dockerbunker" )
 declare -a networks=( )
 declare -A IMAGES=( [service]="openproject/community" )

@@ -5,6 +5,6 @@ ipsecvpnserver_service_dockerbunker() {
 		-p 500:500/udp \
 		-p 4500:4500/udp \
 		--env-file ${SERVICE_ENV} \
-		-v ${SERVICE_NAME}-data-vol-1:/lib/modules:ro \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]}:ro \
 	${IMAGES[service]} >/dev/null
 }

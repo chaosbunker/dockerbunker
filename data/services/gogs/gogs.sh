@@ -15,7 +15,7 @@ done
 declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-db-dockerbunker" "${SERVICE_NAME}-service-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -a volumes=( "${SERVICE_NAME}-db-vol-1" "${SERVICE_NAME}-data-vol-1" )
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/data" [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" )
 declare -a networks=( "dockerbunker-gogs" )
 declare -A IMAGES=( [db]="mariadb:10.2" [service]="gogs/gogs" )
 declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )

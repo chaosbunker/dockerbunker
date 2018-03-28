@@ -15,7 +15,7 @@ done
 
 declare -A WEB_SERVICES
 declare -a containers=( "mailcowdockerized_acme-mailcow_1" "mailcowdockerized_rspamd-mailcow_1" "mailcowdockerized_nginx-mailcow_1" "mailcowdockerized_netfilter-mailcow_1" "mailcowdockerized_php-fpm-mailcow_1" "mailcowdockerized_redis-mailcow_1" "mailcowdockerized_unbound-mailcow_1" "mailcowdockerized_ipv6nat_1" "mailcowdockerized_postfix-mailcow_1" "mailcowdockerized_memcached-mailcow_1" "mailcowdockerized_sogo-mailcow_1" "mailcowdockerized_watchdog-mailcow_1" "mailcowdockerized_dockerapi-mailcow_1" "mailcowdockerized_clamd-mailcow_1" "mailcowdockerized_dovecot-mailcow_1" "mailcowdockerized_mysql-mailcow_1" )
-declare -a volumes=( "mailcowdockerized_crypt-vol-1" "mailcowdockerized_dkim-vol-1" "mailcowdockerized_mysql-vol-1" "mailcowdockerized_postfix-vol-1" "mailcowdockerized_redis-vol-1" "mailcowdockerized_rspamd-sock" "mailcowdockerized_rspamd-vol-1" "mailcowdockerized_vmail-vol-1" )
+declare -A volumes=( [mailcowdockerized_crypt-vol-1]="/var/lib/zeyple" [mailcowdockerized_mysql-vol-1]="/var/lib/mysql/" [mailcowdockerized_postfix-vol-1]="/var/spool/postfix" [mailcowdockerized_redis-vol-1]="/data" [mailcowdockerized_rspamd-sock]="/rspamd-sock" [mailcowdockerized_rspamd-vol-1]="/var/lib/rspamd" [mailcowdockerized_vmail-vol-1]="/var/vmail" )
 declare -a networks=( )
 declare -a add_to_network=( "mailcowdockerized_nginx-mailcow_1" )
 

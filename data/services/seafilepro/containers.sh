@@ -4,7 +4,7 @@ seafilepro_db_dockerbunker() {
 		--restart=always \
 		--network dockerbunker-${SERVICE_NAME} \
 		--net-alias=db \
-		-v seafilepro-db-vol-1:/var/lib/mysql \
+		-v ${SERVICE_NAME}-db-vol-1:${volumes[${SERVICE_NAME}-db-vol-1]} \
 		--env MYSQL_ROOT_PASSWORD=${DBROOT} \
 		--env MYSQL_USER=${DBUSER} \
 		--env MYSQL_PASSWORD=${DBPASS} \
@@ -29,7 +29,7 @@ seafilepro_setup_dockerbunker() {
 	docker run -it --rm \
 		--name=${FUNCNAME[0]//_/-} \
 		--network=dockerbunker-${SERVICE_NAME} \
-		-v seafilepro-data-vol-1:/seafile \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-v "${BASE_DIR}"/data/services/seafilepro/seafile-license.txt \
 	${IMAGES[service]} $1
 }
@@ -40,7 +40,7 @@ seafilepro_service_dockerbunker() {
 		--restart=always \
 		--network ${NETWORK} \
 		--network dockerbunker-seafilepro \
-		-v seafilepro-data-vol-1:/seafile \
+		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-v "${BASE_DIR}"/data/services/seafilepro/seafile-license.txt \
 	${IMAGES[service]} >/dev/null
 }

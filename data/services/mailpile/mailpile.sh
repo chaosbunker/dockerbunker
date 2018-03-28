@@ -14,7 +14,7 @@ done
 
 declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -a volumes=( "${SERVICE_NAME}-data-vol-1")
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/mailpile-data" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a networks=( )
 declare -A IMAGES=( [service]="dockerbunker/dillinger" )

@@ -15,8 +15,8 @@ done
 declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-db-dockerbunker" "${SERVICE_NAME}-service-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -a volumes=( "${SERVICE_NAME}-db-vol-1" "${SERVICE_NAME}-data-vol-1" )
 declare -a networks=( "dockerbunker-gitea" )
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/data" [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" )
 declare -A IMAGES=( [db]="mariadb:10.2" [service]="gitea/gitea:1.4" )
 declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
 

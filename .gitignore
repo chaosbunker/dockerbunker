@@ -2,6 +2,7 @@
 data/web/*
 data/env/*
 data/conf/*
+data/backup/*
 data/Dockerfiles/*
 data/docker-compose/*
 

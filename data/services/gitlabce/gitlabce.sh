@@ -14,8 +14,8 @@ done
 
 declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -a volumes=( "${SERVICE_NAME}-data-vol-1" "${SERVICE_NAME}-conf-vol-1" "${SERVICE_NAME}-log-vol-1" "${SERVICE_NAME}-log-vol-2" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/etc/opt/gitlab" [${SERVICE_NAME}-conf-vol-1]="/etc/gitlab" [${SERVICE_NAME}-log-vol-1]="/var/log/gitlab" )
 declare -a networks=( )
 declare -A IMAGES=( [service]="gitlab/gitlab-ce:latest" )
 
