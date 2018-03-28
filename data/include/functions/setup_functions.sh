@@ -258,6 +258,7 @@ connect_containers_to_network() {
 		&& return
 	for container in ${add_to_network};do
 		[[ $(docker ps -q --filter name=^/"${container}"$) ]] \
+			&& ! [[ $(docker network inspect dockerbunker-network | grep ${container}) ]] \
 			&& docker network connect ${NETWORK} ${container} >/dev/null
 	done
 }
