@@ -48,6 +48,9 @@ options_menu() {
 				&& $(ls -A "${ENV_DIR}"/static) ]] \
 				&& menu=( "Configure Site" "Manage Sites" "$exitmenu" ) \
 				|| menu=( "Configure Service" "$exitmenu" )
+			[[ "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
+				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
+				&& insert menu "Restore Service" 1
 		elif ! elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& ! elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}";then
 			menu=( "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
