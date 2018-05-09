@@ -25,7 +25,7 @@
 
 3. Clone the master branch of this repository and run `./dockerbunker.sh`
 
-    - `git clone https://github.com/chaosbunker/dockerbunker.git && dockerbunker`
+    - `git clone https://github.com/chaosbunker/dockerbunker.git && cd dockerbunker`
 	- `./dockerbunker.sh`
 
 4. Select a service and configure it (Set domain, etc..)
