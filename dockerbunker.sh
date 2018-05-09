@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if ! dpkg -l docker &>/dev/null;then
+	echo -e "\n\e[3m\xe2\x86\x92 \e[1mCould not find docker.\e[3m\n\nMost systems can install Docker by running:\n\nwget -qO- https://get.docker.com/ | sh\n";
+	exit 1
+fi
+
 # Find base dir
 while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
 
