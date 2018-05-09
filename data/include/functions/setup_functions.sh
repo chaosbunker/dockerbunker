@@ -170,9 +170,9 @@ initial_setup_routine() {
 	docker_build
 	docker_pull
 	
-	if [[ ${volumes[0]} ]];then
+	if [[ ${volumes[@]} ]];then
 		echo -e "\n\e[1mCreating volumes\e[0m"
-		for volume in "${volumes[@]}";do
+		for volume in "${!volumes[@]}";do
 			[[ ! $(docker volume ls -q --filter name=^${volume}$) ]] \
 				&& echo -en "- $volume" \
 				&& docker volume create $volume >/dev/null \

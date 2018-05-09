@@ -31,17 +31,19 @@ options_menu() {
 			insert menu "Restart container(s)" 3
 			insert menu "Stop container(s)" 4
 		fi
-		[[ $(ls -A "${BASE_DIR}/data/backup/${SERVICE_NAME}") ]] \
+		[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
+			&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 			&& insert menu "Restore Service" 6
 	elif [[ $RUNNING == "false" ]];then
 		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Start container(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
 		add_ssl_menuentry menu 2
-		[[ $(ls -A "${BASE_DIR}/data/backup/${SERVICE_NAME}") ]] \
+		[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
+			&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 			&& insert menu "Restore Service" 3
 	else
 		if ! elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& ! elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}" \
-		&& [[ ! -f "${ENV_DIR}/${SERVICE_NAME}.env" ]];then
+		&& [[ ! -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
 			[[ ${STATIC} \
 				&& $(ls -A "${ENV_DIR}"/static) ]] \
 				&& menu=( "Configure Site" "Manage Sites" "$exitmenu" ) \
@@ -49,19 +51,22 @@ options_menu() {
 		elif ! elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& ! elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}";then
 			menu=( "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
-			[[ $(ls -A "${BASE_DIR}/data/backup/${SERVICE_NAME}") ]] \
+			[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
+				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 				&& insert menu "Restore Service" 1
 			error="Environment file found but ${PROPER_NAME} is not marked as configured or installed. Please destroy first!"
 		elif elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
-		&& [[ ! -f "${ENV_DIR}/${SERVICE_NAME}.env" ]];then
+		&& [[ ! -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
 				error="Service marked as configured, but configuration file is missing. Please destroy first."
 				menu=( "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
-				[[ $(ls -A "${BASE_DIR}/data/backup/${SERVICE_NAME}") ]] \
+				[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
+					&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 					&& insert menu "Restore Service" 1
 		elif elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
-		&& [[ -f "${ENV_DIR}/${SERVICE_NAME}.env" ]];then
+		&& [[ -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
 			menu=( "Reconfigure service" "Setup service" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
-			[[ $(ls -A "${BASE_DIR}/data/backup/${SERVICE_NAME}") ]] \
+			[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
+				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 				&& insert menu "Restore Service" 2
 		fi
 	fi
@@ -447,17 +452,17 @@ remove_service_conf() {
 }
 
 remove_environment_files() {
-	[[ -f "${ENV_DIR}/${SERVICE_NAME}.env" ]] \
+	[[ -f "${ENV_DIR}"/${SERVICE_NAME}.env ]] \
 		&& echo -en "\n\e[1mRemoving ${SERVICE_NAME}.env\e[0m" \
-		&& rm "${ENV_DIR}/${SERVICE_NAME}.env" \
+		&& rm "${ENV_DIR}"/${SERVICE_NAME}.env \
 		&& exit_response
 
-	[[ ${SERVICE_SPECIFIC_MX} ]] && [[ -f "${ENV_DIR}/${SERVICE_SPECIFIC_MX}mx.env" ]] \
-		&& rm "${ENV_DIR}/${SERVICE_SPECIFIC_MX}mx.env"
+	[[ ${SERVICE_SPECIFIC_MX} ]] && [[ -f "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env ]] \
+		&& rm "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env
 
-	[[ ${STATIC} && -f "${ENV_DIR}/static/${SERVICE_DOMAIN[0]}.env" ]] \
+	[[ ${STATIC} && -f "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env ]] \
 		&& echo -en "\n\e[1mRemoving ${SERVICE_DOMAIN[0]}.env\e[0m" \
-		&& rm "${ENV_DIR}/static/${SERVICE_DOMAIN[0]}.env" \
+		&& rm "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env \
 		&& exit_response
 }
 
@@ -604,7 +609,7 @@ reconfigure() {
 	remove_environment_files
 	remove_service_conf
 
-	[[ $(grep "${PROPER_NAME}" "${ENV_DIR}/dockerbunker.env") ]] && echo -en "\n\e[1mRemoving ${PROPER_NAME} from dockerbunker.env\e[0m"
+	[[ $(grep "${PROPER_NAME}" "${ENV_DIR}"/dockerbunker.env) ]] && echo -en "\n\e[1mRemoving ${PROPER_NAME} from dockerbunker.env\e[0m"
 	remove_from_WEB_SERVICES
 	remove_from_CONFIGURED_SERVICES
 	remove_from_INSTALLED_SERVICES
@@ -621,7 +626,7 @@ start_all() {
 	start_nginx
 	for PROPER_NAME in "${STOPPED_SERVICES[@]}";do
 		SERVICE_NAME="$(echo -e "${service,,}" | tr -d '[:space:]')"
-		source "${ENV_DIR}/${SERVICE_NAME}.env"
+		source "${ENV_DIR}"/${SERVICE_NAME}.env
 		source "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
 	done
 	restart_nginx
@@ -670,9 +675,11 @@ if [[ "$i" == ${all_services[-1]} ]];then \
 			&& "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh destroy_service
 	done
 
-	[[ $(ls -A "${CONF_DIR}"/nginx/conf.inactive.d) ]] \
+	[[ -d "${CONF_DIR}"/nginx/conf.inactive.d ]] \
+		&& [[ $(ls -A "${CONF_DIR}"/nginx/conf.inactive.d) ]] \
 		&& rm -r "${CONF_DIR}"/nginx/conf.inactive.d/*
-	[[ $(ls -A "${CONF_DIR}"/nginx/conf.d) ]] \
+	[[ -d "${CONF_DIR}"/nginx/conf.d ]] \
+		&& [[ $(ls -A "${CONF_DIR}"/nginx/conf.d) ]] \
 		&& rm -r "${CONF_DIR}"/nginx/conf.d/*
 
 	for cert_dir in $(ls "${CONF_DIR}"/nginx/ssl/);do
@@ -680,7 +687,8 @@ if [[ "$i" == ${all_services[-1]} ]];then \
 			&& rm -r "${CONF_DIR}"/nginx/ssl/$cert_dir
 	done
 	
-	[[ $(ls -A "${ENV_DIR}"/static) ]] \
+	[[ -d "${ENV_DIR}"/static ]] \
+		&& [[ $(ls -A "${ENV_DIR}"/static) ]] \
 		&& rm "${ENV_DIR}"/static/*
 }
 
@@ -868,7 +876,7 @@ restore() {
 	## Close the parenthesis. $string is now @(backup1|backup2|...|backupN)
 	string+=")"
 	# only continue if backup directory is not empty
-	if [[ $(ls -A "${BASE_DIR}/data/backup/${SERVICE_NAME}") ]];then
+	if [[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] && [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]];then
 		echo ""
 		echo -e "\e[4mPlease choose a backup\e[0m"
 		

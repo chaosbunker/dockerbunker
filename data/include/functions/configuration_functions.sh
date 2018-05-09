@@ -69,9 +69,14 @@ configure_mx() {
 			else
 			  read -p "MX Hostname for email delivery (FQDN): " -ei "$MX_HOSTNAME" MX_HOSTNAME
 			fi
-			host -t mx ${MX_EMAIL#*@} | grep ${MX_HOSTNAME} >/dev/null \
-			&& unset invalid_mx \
-			|| echo -e "\n\e[31m${MX_HOSTNAME} not a valid mx entry for ${MX_EMAIL#*@}.\e[0m\n"
+			# only verify mx hostname if `host` found
+			if dpkg -l host &>/dev/null;then
+				host -t mx ${MX_EMAIL#*@} | grep ${MX_HOSTNAME} >/dev/null \
+				&& unset invalid_mx \
+				|| echo -e "\n\e[31m${MX_HOSTNAME} not a valid mx entry for ${MX_EMAIL#*@}.\e[0m\n"
+			else
+				unset invalid_mx
+			fi
 		done
 		cat <<-EOF >> "${ENV_DIR}/${SERVICE_SPECIFIC_MX}mx.env"
 		#MX
