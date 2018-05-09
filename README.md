@@ -13,8 +13,8 @@
 |[CS50 IDE](https://manual.cs50.net/ide/offline)|[Kanboard](https://kanboard.net/)|[Searx](https://github.com/asciimoo/searx.git)|
 |[Dillinger](https://dillinger.io/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)| [Mozilla send](https://send.firefox.com/)|
 |[Ghost Blog](https://ghost.org/)|[Mailpile](https://www.mailpile.is/)|[sFTP Server](https://github.com/atmoz/sftp)|
-|[Gitea](https://gitea.io/en-us/)|[Mastodon](https://github.com/tootsuite/mastodon) (+ [Glitch Edition](https://github.com/glitch-soc/mastodon))|[Wordpress](https://wordpress.org/)|
-|[Gitlab CE](https://gitlab.com/)|[Nextcloud](https://github.com/nextcloud/docker)
+|[Gitea](https://gitea.io/en-us/)|[Mastodon](https://github.com/tootsuite/mastodon) (+ [Glitch Edition](https://github.com/glitch-soc/mastodon))|[Wekan](https://wekan.github.io/)|
+|[Gitlab CE](https://gitlab.com/)|[Nextcloud](https://github.com/nextcloud/docker)|[Wordpress](https://wordpress.org/)
 |[Gogs](https://gogs.io/)|[Open Project](https://www.openproject.org/)
 
 ## How to get started:
