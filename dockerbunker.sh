@@ -74,7 +74,8 @@ count=$((${#AVAILABLE_SERVICES[@]}+1))
 	&& AVAILABLE_SERVICES+=( "$restartnginx") \
 	&& count=$(($count+2))
 
-[[ $(ls -A "${CONF_DIR}"/nginx/ssl/letsencrypt/live) ]] \
+[[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live ]] \
+	&& [[ $(ls -A "${CONF_DIR}"/nginx/ssl/letsencrypt/live) ]] \
 	&& AVAILABLE_SERVICES+=( "$renewcerts" ) && cound=$(($count+1))
 
 [[ ${#INSTALLED_SERVICES[@]} > 0 \
