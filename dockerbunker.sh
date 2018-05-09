@@ -37,6 +37,7 @@ declare -a ALL_SERVICES=( \
 	"Searx" \
 	"Send" \
 	"sFTP Server" \
+	"Wekan" \
 	"Wordpress" \
 	)
 
