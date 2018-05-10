@@ -48,7 +48,8 @@ options_menu() {
 				&& $(ls -A "${ENV_DIR}"/static) ]] \
 				&& menu=( "Configure Site" "Manage Sites" "$exitmenu" ) \
 				|| menu=( "Configure Service" "$exitmenu" )
-			[[ "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
+			[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
+				&& [[ "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 				&& insert menu "Restore Service" 1
 		elif ! elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
@@ -171,7 +172,7 @@ options_menu() {
 			;;
 			"Start container(s)")
 				echo -e "\n\e[3m\xe2\x86\x92 Start ${PROPER_NAME} Containers\e[0m"
-			${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
+				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
 				say_done
 				sleep 0.2
 				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh
@@ -190,10 +191,12 @@ options_menu() {
 				echo ""
 				echo "The following will be removed:"
 				echo ""
+
 				for container in ${containers[@]};do
 					[[ $(docker ps -a -q --filter name=^/${container}$) ]]  \
 					&& containers_found+=( $container )
 				done
+
 				[[ ${containers_found[0]} ]] \
 					&& echo "- ${PROPER_NAME} container(s)"
 
@@ -201,18 +204,28 @@ options_menu() {
 					[[ $(docker volume ls -q --filter name=^${volume}$) ]] \
 						&& volumes_found+=( $volume )
 				done
-				[[ ${volumes_found[0]} ]] && echo "- ${PROPER_NAME} volume(s)"
+
+				[[ ${volumes_found[0]} ]] \
+					&& echo "- ${PROPER_NAME} volume(s)"
 
 				[[ -f "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env \
 					|| -f "${ENV_DIR}"/${SERVICE_NAME}.env ]] \
 					&& echo "- ${PROPER_NAME} environment file(s)"
+
 				[[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf \
 					|| -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
 					&& echo "- nginx configuration of ${SERVICE_DOMAIN[0]}"
-				[[ ${SERVICE_DOMAIN[0]} && -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] \
+
+				[[ ${SERVICE_DOMAIN[0]} \
+					&& -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] \
 					&& echo "- self-signed certificate for ${SERVICE_DOMAIN[0]}"
+
 				echo ""
-				prompt_confirm "Continue?" && prompt_confirm "Are you sure?" && . "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh destroy_service
+
+				prompt_confirm "Continue?" \
+					&& prompt_confirm "Are you sure?" \
+					&& . "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh destroy_service
+
 				say_done
 				sleep 0.2
 				${BASE_DIR}/dockerbunker.sh
@@ -238,22 +251,21 @@ get_le_cert() {
 			sed -i "s/SSL_CHOICE=.*/SSL_CHOICE=le/" "${SERVICE_ENV}"
 			sed -i "s/LE_EMAIL=.*/LE_EMAIL="${LE_EMAIL}"/" "${SERVICE_ENV}"
 		fi
-		elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}" && "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
-		if [[ ${SERVICE_DOMAIN[0]} && -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} && ! -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
+		elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}" \
+			&& "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
+		if [[ ${SERVICE_DOMAIN[0]} && -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} \
+			&& ! -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
 			# Back up self-signed certificate
 			mv "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.{pem,pem.backup}
 			mv "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.{pem,pem.backup}
 			# Symlink letsencrypt certificate
 			ln -sf "/etc/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]}/fullchain.pem" "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem
 			ln -sf "/etc/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]}/privkey.pem" "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem
-			restart_nginx
-		else
-			letsencrypt issue
 		fi
+		letsencrypt issue
 	else
 		echo -e "\n\e[3m\xe2\x86\x92 Renew Let's Encrypt certificate\e[0m"
 		export prevent_nginx_restart=1
-		[[ -z ${STATIC} ]] && "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
 		bash "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh letsencrypt issue
 	fi
 }
@@ -351,7 +363,6 @@ start_containers() {
 			&& docker start $container >/dev/null 2>&1 \
 			&& exit_response
 	done
-	[[ $? == 1 ]]  && echo "  Nothing to do. Please configure & setup ${PROPER_NAME} first."
 	remove_from_STOPPED_SERVICES
 	activate_nginx_conf
 	[[ -z $prevent_nginx_restart ]] && restart_nginx
@@ -426,9 +437,11 @@ restart_containers() {
 	[[ $(docker ps -a -q --filter name=^/${NGINX_CONTAINER}$ 2> /dev/null) ]] \
 		|| bash -c "${SERVICES_DIR}"/nginx/nginx.sh setup
 	for container in "${containers[@]}";do
-		[[ $(docker ps -q --filter name=^/${container}$) ]] && ( echo -en "- $container";docker restart $container >/dev/null 2>&1;exit_response )
+		if [[ $(docker ps -q --filter name=^/${container}$) ]];then
+			echo -en "- $container";docker restart $container >/dev/null 2>&1
+			exit_response
+		fi
 	done
-	[[ $? == 1 ]]  && echo "  Nothing to do. Please configure & setup ${PROPER_NAME} first."
 	[[ -z $prevent_nginx_restart ]] && restart_nginx
 }
 
@@ -460,17 +473,20 @@ remove_environment_files() {
 		&& rm "${ENV_DIR}"/${SERVICE_NAME}.env \
 		&& exit_response
 
-	[[ ${SERVICE_SPECIFIC_MX} ]] && [[ -f "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env ]] \
+	[[ ${SERVICE_SPECIFIC_MX} ]] \
+		&& [[ -f "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env ]] \
 		&& rm "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env
 
-	[[ ${STATIC} && -f "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env ]] \
+	[[ ${STATIC} \
+		&& -f "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env ]] \
 		&& echo -en "\n\e[1mRemoving ${SERVICE_DOMAIN[0]}.env\e[0m" \
 		&& rm "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env \
 		&& exit_response
 }
 
 remove_ssl_certificate() {
-	if [[ ${SERVICE_DOMAIN[0]} ]] && [[ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]];then
+	if [[ ${SERVICE_DOMAIN[0]} ]] \
+		&& [[ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]];then
 		echo -en "\n\e[1mRemoving SSL Certificate\e[0m"
 		rm -r "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}
 		exit_response
@@ -511,6 +527,7 @@ destroy_service() {
 	[[ -z $destroy_all ]] \
 		&& [[ -z ${INSTALLED_SERVICES[@]} ]] \
 		&& [[ $(docker ps -q --filter name=^/${NGINX_CONTAINER}) ]] \
+		&& [[ -z $restoring ]] \
 		&& echo -e "\nNo remaining services running.\n" \
 		&& prompt_confirm  "Destroy nginx as well and completely reset dockerbunker?" \
 		&& bash "${SERVICES_DIR}"/nginx/nginx.sh destroy_service \
@@ -659,17 +676,19 @@ destroy_all() {
 	# destroy_service() is calling restart_nginx, we don't want this happening after each service is destroyed
 	export prevent_nginx_restart=1
 	export destroy_all=1
-	all_services=( "${INSTALLED_SERVICES[@]}" "${CONFIGURED_SERVICES[@]}" "nginx" )
-	echo -e "\nDestroying ${all_services[@]}\n"
-		printf "The following Services will be removed: \
+	all_services=( "${INSTALLED_SERVICES[@]}" "${CONFIGURED_SERVICES[@]}" )
+	[[ $(docker ps -q --filter name=^/nginx-dockerbunker$) ]] && all_services+=( "nginx" )
+	if [[ ${all_services[0]} ]];then
+			printf "\nThe following Services will be removed: \
 $(for i in "${all_services[@]}";do \
 if [[ "$i" == ${all_services[-1]} ]];then \
 (printf "\"\e[33m%s\e[0m\" " "$i" )
 			else
 (printf "\"\e[33m%s\e[0m\", " "$i" )
 			fi
-		done) \n"
-	prompt_confirm "Are you sure?"
+		done) \n\n"
+	fi
+	prompt_confirm "Continue?"
 	[[ $? == 1 ]] && echo "Exiting..." && exit 0
 	for service in "${all_services[@]}";do
 		SERVICE_NAME="$(echo -e "${service,,}" | tr -d '[:space:]')"
@@ -852,7 +871,8 @@ backup() {
 	if [ -f "${ENV_DIR}"/${SERVICE_NAME}.env ];then
 		echo -en "\n\e[1mBacking up environemt file(s)\e[0m"
 		sleep 0.2
-		[[ -f "{ENV_DIR}"/${SERVICE_NAME}_mx.env ]] && cp "${ENV_DIR}"/${SERVICE_NAME}_mx.env "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}
+		[[ -f "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env ]] \
+			&& cp "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}
 		cp "${ENV_DIR}"/${SERVICE_NAME}.env "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}
 		exit_response
 	else
@@ -861,6 +881,8 @@ backup() {
 }
 
 restore() {
+echo ${FUNCNAME[@]}
+	restoring=1
 	## Collect the backups in the array $backups
 	backups=( "${BASE_DIR}"/data/backup/${SERVICE_NAME}/* )
 	# strip path from directory names
@@ -879,7 +901,8 @@ restore() {
 	## Close the parenthesis. $string is now @(backup1|backup2|...|backupN)
 	string+=")"
 	# only continue if backup directory is not empty
-	if [[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] && [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]];then
+	if [[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
+		&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]];then
 		echo ""
 		echo -e "\e[4mPlease choose a backup\e[0m"
 		
@@ -900,6 +923,7 @@ restore() {
 
 				source "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env
 
+				! [[ $(docker ps -q --filter name=^/nginx-dockerbunker$) ]] && setup_nginx
 				echo -e "\n\e[3m\xe2\x86\x92 Restoring ${PROPER_NAME}\e[0m"
 				for volume in ${!volumes[@]};do
 					[[ $(docker volume ls --filter name=^${volume}$) ]] \
@@ -947,9 +971,10 @@ restore() {
 				fi
 
 				if [ -f "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env ];then
-					echo -en "\n\e[1mBacking up environemt file(s)\e[0m"
+					echo -en "\n\e[1mRestoring environemt file(s)\e[0m"
 					sleep 0.2
-					[[ -f "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}_mx.env ]] && cp "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}_mx.env "${ENV_DIR}"
+					[[ -f "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_SPECIFIC_MX}mx.env ]] \
+						&& cp "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_SPECIFIC_MX}mx.env "${ENV_DIR}"
 					cp "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env "${ENV_DIR}"
 					exit_response
 				fi

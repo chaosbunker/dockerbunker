@@ -1,6 +1,3 @@
-# Find base dir
-while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
-
 # On first run, generate the basic environment file. This file will collect and hold all information regarding dockerbunker.
 # It keeps track of which web-apps are configured, installed, which services' containers are stopped etc.
 init_dockerbunker() {

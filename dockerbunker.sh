@@ -6,8 +6,7 @@ if ! dpkg -l docker &>/dev/null;then
 fi
 
 # Find base dir
-while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
-
+BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${BASE_DIR}"/data/include/init.sh
 
 [[ -f "data/env/dockerbunker.env" ]] && source "data/env/dockerbunker.env" || init_dockerbunker
@@ -86,17 +85,28 @@ count=$((${#AVAILABLE_SERVICES[@]}+1))
 
 [[ ${#INSTALLED_SERVICES[@]} > 0 \
 	|| ${#STATIC_SITES[@]} > 0 \
-	|| ${#CONFIGURED_SERVICES[@]} > 0 ]] \
-&& AVAILABLE_SERVICES+=( "$destroyall" ) &&  count=$(($count+1))
+	|| ${#CONFIGURED_SERVICES[@]} > 0 \
+	|| -f "${BASE_DIR}"/data/env/dockerbunker.env ]] \
+	&& AVAILABLE_SERVICES+=( "$destroyall" ) \
+	&&  count=$(($count+1))
 
 [[ $(docker ps -q --filter "status=exited" --filter name=^/nginx-dockerbunker$) ]] \
 	&& AVAILABLE_SERVICES+=( "$startnginx" )
 
+[[ $(docker ps -q --filter "status=running" --filter name=dockerbunker) \
+	&& ${#INSTALLED_SERVICES[@]} > 1 ]] \
+	&& AVAILABLE_SERVICES+=( "$stopall" ) \
+	&&  count=$(($count+1))
 
-[[ $(docker ps -q --filter "status=running" --filter name=dockerbunker) && ${#INSTALLED_SERVICES[@]} == 0 && -z ${STATIC_SITES[@]} ]] && AVAILABLE_SERVICES+=( "$destroyall" ) &&  count=$(($count+1))
-[[ $(docker ps -q --filter "status=running" --filter name=dockerbunker) && ${#INSTALLED_SERVICES[@]} > 1 ]] && AVAILABLE_SERVICES+=( "$stopall" ) &&  count=$(($count+1))
-[[ $(docker ps -q --filter "status=exited" --filter name=dockerbunker) && ${#STOPPED_SERVICES[@]} > 1 ]] && AVAILABLE_SERVICES+=( "$startall" ) && count=$(($count+1))
-[[ ${#INSTALLED_SERVICES[@]} > 1 ]] && AVAILABLE_SERVICES+=( "$restartall" ) && count=$(($count+1))
+[[ $(docker ps -q --filter "status=exited" --filter name=dockerbunker) \
+	&& ${#STOPPED_SERVICES[@]} > 1 ]] \
+	&& AVAILABLE_SERVICES+=( "$startall" ) \
+	&& count=$(($count+1))
+
+[[ ${#INSTALLED_SERVICES[@]} > 1 ]] \
+	&& AVAILABLE_SERVICES+=( "$restartall" ) \
+	&& count=$(($count+1))
+
 echo ""
 echo "Please select the service you want to manage"
 echo ""
