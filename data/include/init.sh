@@ -1,11 +1,10 @@
 # On first run, generate the basic environment file. This file will collect and hold all information regarding dockerbunker.
 # It keeps track of which web-apps are configured, installed, which services' containers are stopped etc.
 init_dockerbunker() {
-	! [[ -d ${BASE_DIR}/data/conf/nginx/conf.d ]] && mkdir -p ${BASE_DIR}/data/conf/nginx/conf.d
-	! [[ -d ${BASE_DIR}/data/env/static ]] && mkdir ${BASE_DIR}/data/env/static
-
 	if [[ ! -f "${BASE_DIR}/data/env/dockerbunker.env" ]];then
-		[[ ! -d "${BASE_DIR}/data/env/" ]] && mkdir -p "${BASE_DIR}/data/env/"
+		! [[ -d "${BASE_DIR}/data/env/" ]] && mkdir -p "${BASE_DIR}/data/env/"
+		! [[ -d "${BASE_DIR}"/data/env/static ]] && mkdir -p "${BASE_DIR}"/data/env/static
+		! [[ -d "${BASE_DIR}"/data/conf/nginx/conf.d ]] && mkdir -p "${BASE_DIR}"/data/conf/nginx/conf.d
 		cat <<-EOF >> "${BASE_DIR}/data/env/dockerbunker.env"
 			BASE_DIR="${BASE_DIR}"
 			SERVICES_DIR="${BASE_DIR}/data/services"
@@ -26,6 +25,7 @@ init_dockerbunker() {
 			declare -a INSTALLED_SERVICES=()
 			declare -a STATIC_SITES=()
 		EOF
+
 	fi
 }
 
