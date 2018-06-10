@@ -18,18 +18,12 @@ declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/dillinger/data" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a networks=( )
-declare -A IMAGES=( [service]="dockerbunker/dillinger" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
+declare -A IMAGES=( [service]="joemccann/dillinger:3.24.3" )
 
 [[ -z $1 ]] && options_menu
 
 configure() {
 	pre_configure_routine
-	
-	! [[ -d "${BASE_DIR}"/data/Dockerfiles/dillinger ]] \
-	&& echo -n "Cloning Dillinger repository into data/Dockerfiles/dillinger" \
-	&& git submodule add -f https://github.com/joemccann/dillinger.git data/Dockerfiles/dillinger >/dev/null \
-	&& exit_response
 	
 	echo -e "# \e[4mDillinger Settings\e[0m"
 
