@@ -19,6 +19,7 @@ declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" )
 declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/cryptpad/customize" [${SERVICE_NAME}-data-vol-2]="/cryptpad/datastore" )
 declare -a networks=( )
+repoURL="https://github.com/xwiki-labs/cryptpad"
 
 [[ -z $1 ]] && options_menu
 
@@ -34,6 +35,10 @@ configure() {
 	SERVICE_NAME=${SERVICE_NAME}
 	SSL_CHOICE=${SSL_CHOICE}
 	LE_EMAIL=${LE_EMAIL}
+
+	USE_SSL=true
+	STORAGE='./storage/file'
+	LOG_TO_STDOUT=true
 
 	SERVICE_DOMAIN=${SERVICE_DOMAIN}
 	EOF
