@@ -9,18 +9,14 @@ seafilepro_db_dockerbunker() {
 		--env MYSQL_USER=${DBUSER} \
 		--env MYSQL_PASSWORD=${DBPASS} \
 	${IMAGES[db]} >/dev/null
+	exit_response
 
 	if [[ -z $keep_volumes ]];then
 		if ! docker exec seafilepro-db-dockerbunker mysqladmin ping -h"127.0.0.1" --silent;then
-			echo -en "Waiting for Seafile DB to be ready..."
+			echo -en "\n\e[3m\xe2\x86\x92 Waiting for Seafile DB to be ready...\n"
 			while ! docker exec seafilepro-db-dockerbunker mysqladmin ping -h"127.0.0.1" --silent;do
 				sleep 3
 			done
-			if [ $? != 1 ];then
-				echo -e " \e[32m\xE2\x9C\x94\e[0m"
-			else
-				echo  -e " \e[31mfailed\e[0m"
-			fi
 		fi
 	fi
 }
