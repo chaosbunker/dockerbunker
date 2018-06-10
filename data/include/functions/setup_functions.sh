@@ -153,6 +153,17 @@ delete_old_images() {
 	fi
 	rm "${BASE_DIR}"/.image_shas.tmp
 }
+
+add_submodule() {
+	if [[ ${repoURL} && ! -d "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME} ]];then
+		echo -n "Cloning "${PROPER_NAME}" repository into data/Dockerfiles/${SERVICE_NAME}"
+		git submodule add -f ${repoURL} data/Dockerfiles/${SERVICE_NAME} >/dev/null
+	elif [[ -d "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME} ]];then
+		git submodule update --remote data/Dockerfiles/${SERVICE_NAME}
+	fi
+	echo ""
+}
+
 setup_nginx() {
 	[[ ! $(docker ps -q --filter name=^/${NGINX_CONTAINER}$) ]] && bash "${SERVICES_DIR}"/nginx/nginx.sh setup
 }
@@ -167,6 +178,7 @@ initial_setup_routine() {
 		[[ ( $(docker inspect $container 2> /dev/null) &&  $? == 0 ) ]] && docker rm $container
 	done
 
+	[[ $repoURL ]] && add_submodule
 	docker_build
 	docker_pull
 	
