@@ -14,12 +14,16 @@ options_menu() {
 	if elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}";then
 		for container in "${containers[@]}";do
 			RUNNING=$(docker ps -a -q --filter name=^/${container}$)
-			while [[ -z ${RUNNING} ]];do
-				echo -e "\n\e[3m$container container missing\e[0m\n" \
-				&& prompt_confirm "Re-run container?" \
-				&& docker_run ${container//-/_}
+			if [[ -z ${RUNNING} ]];then
+				echo -e "\n\e[3m$container container missing\e[0m\n"
+				missingContainers=( "$container" )
+				prompt_confirm "Restore $container?"
+				if [[ $? == 0 ]];then
+					restore_container
+				fi
+			fi
 			RUNNING=$(docker ps -a -q --filter name=^/${container}$)
-			done
+			[[ ${RUNNING} ]] && missingContainers=( "${missingContainers[@]}/$container" )
 		done
 	fi
 	if [[ $RUNNING ]];then
@@ -34,9 +38,14 @@ options_menu() {
 		[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 			&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 			&& insert menu "Restore Service" 6
-	elif [[ $RUNNING == "false" ]];then
+	elif [[ -z $RUNNING ]];then
+		echo "ds ${missingContainers[@]}"
 		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Start container(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
 		add_ssl_menuentry menu 2
+		[[ ${missingContainers[@]} ]] \
+			&& echo -e "\n\n\e[3m\xe2\x86\x92 \e[3mThe following containers are missing\e[0m" \
+			&& for container in "${missingContainers[@]}";do echo -e "\n    - $container";done \
+			&& menu=( "Restore missing containers" "Reconfigure service" "Reinstall service" "Backup Service" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
 		[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 			&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 			&& insert menu "Restore Service" 3
@@ -122,6 +131,13 @@ options_menu() {
 				sleep 0.2
 				break
 			;;
+			"Restore missing containers")
+				echo -e "\n\e[3m\xe2\x86\x92 Restoring containers\e[0m"
+				for container in ${missingContainers[@]};do
+					restore_container
+				done
+				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh
+				;;
 			"Upgrade Image(s)")
 				echo -e "\n\e[3m\xe2\x86\x92 Upgrade ${PROPER_NAME} images\e[0m"
 				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh upgrade
@@ -379,6 +395,19 @@ stop_containers() {
 			|| echo "- $container (not running)"
 	done
 }
+
+restore_container() {
+	# build image if it does not exist locally
+	serviceName=$(echo $container | awk -F"-" '{print $2}')
+	if ! docker inspect --type=image ${IMAGES[$serviceName]} >/dev/null 2>&1;then
+		docker_build ${IMAGES[$serviceName]}
+	fi
+	docker_run ${container//-/_}
+	echo -en "\n- $container"
+	exit_response
+}
+
+
 
 remove_containers() {
 	for container in ${containers[@]};do
