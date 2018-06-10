@@ -38,14 +38,13 @@ options_menu() {
 		[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 			&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 			&& insert menu "Restore Service" 6
-	elif [[ -z $RUNNING ]];then
-		echo "ds ${missingContainers[@]}"
+	elif [[ ${missingContainers[@]} ]];then
+			echo -e "\n\n\e[3m\xe2\x86\x92 \e[3mThe following containers are missing\e[0m"
+			for container in "${missingContainers[@]}";do echo -e "\n    - $container";done
+			menu=( "Restore missing containers" "Reconfigure service" "Reinstall service" "Backup Service" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
+	elif [[ $RUNNING = false ]];then
 		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Start container(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
 		add_ssl_menuentry menu 2
-		[[ ${missingContainers[@]} ]] \
-			&& echo -e "\n\n\e[3m\xe2\x86\x92 \e[3mThe following containers are missing\e[0m" \
-			&& for container in "${missingContainers[@]}";do echo -e "\n    - $container";done \
-			&& menu=( "Restore missing containers" "Reconfigure service" "Reinstall service" "Backup Service" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
 		[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 			&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 			&& insert menu "Restore Service" 3
