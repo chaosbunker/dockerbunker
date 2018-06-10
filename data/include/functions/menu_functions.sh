@@ -855,9 +855,12 @@ static_menu() {
 backup() {
 	! [[ -d ${BASE_DIR}/data/backup/${SERVICE_NAME} ]] && mkdir -p ${BASE_DIR}/data/backup/${SERVICE_NAME}
 	NOW=$(date -d "today" +"%Y%m%d_%H%M")
+
+	# compressing volumes
+	echo -e "\n\e[1mCompressing volumes\e[0m"
 	for volume in ${!volumes[@]};do
 		docker run --rm -i -v ${volume}:/${volumes[$volume]##*/} -v ${BASE_DIR}/data/backup/${SERVICE_NAME}/${NOW}:/backup debian:jessie tar cvfz /backup/${volume}.tar.gz /${volumes[$volume]##*/} 2>/dev/null | cut -b1-$(tput cols) | sed -u 'i\\o033[2K' | stdbuf -o0 tr '\n' '\r';echo -e "\033[2K\c"
-		echo -en "\n\e[1mCompressing $volume\e[0m"
+		echo -en "- $volume"
 		exit_response
 	done
 
