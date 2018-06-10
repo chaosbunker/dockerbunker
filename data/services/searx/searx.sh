@@ -18,6 +18,7 @@ declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a networks=( )
 declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" )
 declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
+repoURL="https://github.com/asciimoo/searx.git"
 
 [[ -z $1 ]] && options_menu
 
@@ -42,11 +43,6 @@ upgrade() {
 
 configure() {
 	pre_configure_routine
-
-	! [[ -d "${BASE_DIR}/data/Dockerfiles/${SERVICE_NAME}" ]] \
-	&& echo -n "Cloning Searx repository into ${BASE_DIR}/data/Dockerfiles/${SERVICE_NAME}" \
-	&& git submodule add -f https://github.com/asciimoo/searx.git "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME} >/dev/null \
-	&& exit_response
 
 	echo -e "# \e[4mSearx Settings\e[0m"
 
