@@ -39,6 +39,7 @@ declare -a ALL_SERVICES=( \
 	"Mastodon" \
 	"Nextcloud" \
 	"Open Project" \
+	"Padlock Cloud" \
 	"Piwik" \
 	"Seafile Pro" \
 	"Searx" \
