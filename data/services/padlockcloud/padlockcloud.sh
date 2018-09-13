@@ -5,6 +5,7 @@ while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;b
 PROPER_NAME="Padlock Cloud"
 SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
 PROMPT_SSL=1
+safe_to_keep_volumes_when_reconfiguring=1
 
 declare -a environment=( "data/env/dockerbunker.env" "data/include/init.sh" )
 
@@ -17,7 +18,9 @@ declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a networks=( )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/padlock/db"  )
-declare -A IMAGES=( [service]="moritzheiber/padlock-cloud" )
+declare -A IMAGES=( [service]="dockerbunker/padlockcloud" )
+declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
+repoURL="https://github.com/chaosbunker/padlock-cloud-docker"
 
 [[ -z $1 ]] && options_menu
 
@@ -32,6 +35,14 @@ configure() {
 
 	configure_mx
 
+	[[ -f ${CONF_DIR}/padlockcloud/whitelist ]] && rm ${CONF_DIR}/padlockcloud/whitelist
+	! [[ -d ${CONF_DIR}/padlockcloud ]] && mkdir ${CONF_DIR}/padlockcloud
+	read -p "Enter E-Mail addresses to whitelist (separated by spaces): " whitelist
+	whitelist=( ${whitelist} )
+	for email in ${whitelist[@]};do
+		echo $email >> ${CONF_DIR}/padlockcloud/whitelist
+	done
+	
 	# avoid tr illegal byte sequence in macOS when generating random strings
 	if [[ $OSTYPE =~ "darwin" ]];then
 		if [[ $LC_ALL ]];then

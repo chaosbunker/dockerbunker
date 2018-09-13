@@ -9,7 +9,8 @@ padlockcloud_service_dockerbunker() {
 		--env EMAIL_SERVER=${MX_HOSTNAME} \
 		--env EMAIL_USER=${MX_EMAIL} \
 		--env EMAIL_PASSWORD=${MX_PASSWORD} \
-		--env EMAIL_FROM="mailbot@rodewyk.net" \
+		--env EMAIL_FROM="${MX_EMAIL}" \
+		-v ${CONF_DIR}/padlockcloud/whitelist:/padlock/whitelist \
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 	${IMAGES[service]} >/dev/null
 }
