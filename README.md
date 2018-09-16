@@ -10,12 +10,13 @@
 | :-------------: |:-------------:| :-----:|
 |[Bitbucket](https://www.atlassian.com/software/bitbucket)|[Hastebin](https://hastebin.com/about.md)|[Padlock Cloud](https://github.com/padlock/padlock-cloud)|
 |[cryptpad](https://cryptpad.fr/)|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server)|[Piwik](https://github.com/piwik/piwik)|
-|[CS50 IDE](https://manual.cs50.net/ide/offline)|[Kanboard](https://kanboard.net/)|[Seafile Pro](https://github.com/haiwen/seafile)|
-|[Dillinger](https://dillinger.io/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)| [Searx](https://github.com/asciimoo/searx.git)|
-|[Ghost Blog](https://ghost.org/)|[Mailpile](https://www.mailpile.is/)|[Mozilla send](https://send.firefox.com/)|
-|[Gitea](https://gitea.io/en-us/)|[Mastodon](https://github.com/tootsuite/mastodon) (+ [Glitch Edition](https://github.com/glitch-soc/mastodon))|[sFTP Server](https://github.com/atmoz/sftp)|
-|[Gitlab CE](https://gitlab.com/)|[Nextcloud](https://github.com/nextcloud/docker)|[Wekan](https://wekan.github.io/)
-|[Gogs](https://gogs.io/)|[Open Project](https://www.openproject.org/)|[Wordpress](https://wordpress.org/)
+|[CS50 IDE](https://manual.cs50.net/ide/offline)|[json-server](https://github.com/typicode/json-server)|[Seafile Pro](https://github.com/haiwen/seafile)|
+|[Dillinger](https://dillinger.io/)|[Kanboard](https://kanboard.net/)| [Searx](https://github.com/asciimoo/searx.git)|
+|[Ghost Blog](https://ghost.org/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[Mozilla send](https://send.firefox.com/)|
+|[Gitea](https://gitea.io/en-us/)|[Mailpile](https://www.mailpile.is/)|[sFTP Server](https://github.com/atmoz/sftp)|
+|[Gitlab CE](https://gitlab.com/)|[Mastodon](https://github.com/tootsuite/mastodon) (+ [Glitch Edition](https://github.com/glitch-soc/mastodon))|[Wekan](https://wekan.github.io/)
+|[Gogs](https://gogs.io/)|[Nextcloud](https://github.com/nextcloud/docker)|[Wordpress](https://wordpress.org/)
+||[Open Project](https://www.openproject.org/)||
 
 ## How to get started:
 
