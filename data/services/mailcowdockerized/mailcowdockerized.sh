@@ -3,8 +3,8 @@
 while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
 
 SERVICE_HOME="${BASE_DIR}"/data/docker-compose/mailcowdockerized
-PROPER_NAME="Mailcow Dockerized"
-SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
+PROPER_NAME="Mailcow (Dockerized)"
+SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -cd '[:alnum:]')"
 PROMPT_SSL=1
 
 declare -a environment=( "data/include/init.sh" "data/env/dockerbunker.env" "data/docker-compose/${SERVICE_NAME}/mailcow.conf" )
@@ -55,8 +55,7 @@ configure() {
 
 	pushd "${BASE_DIR}" >/dev/null
 	! [[ -d "${SERVICE_HOME}" ]] \
-	&& git clone https://github.com/mailcow/mailcow-dockerized.git data/docker-compose/mailcowdockerized >/dev/null \
-	&& exit_response
+	&& git clone https://github.com/mailcow/mailcow-dockerized.git data/docker-compose/mailcowdockerized >/dev/null
 	popd >/dev/null
 
 	echo -e "# \e[4mMailcow Dockerized Settings\e[0m"

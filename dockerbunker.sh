@@ -34,7 +34,7 @@ declare -a ALL_SERVICES=( \
 	"Hastebin" \
 	"IPsec VPN Server" \
 	"Kanboard" \
-	"Mailcow Dockerized" \
+	"Mailcow (Dockerized)" \
 	"Mailpile" \
 	"Mastodon" \
 	"Nextcloud" \
@@ -52,7 +52,7 @@ declare -a ALL_SERVICES=( \
 # style menu according to what status service has
 declare -A SERVICES_ARR
 for service in "${ALL_SERVICES[@]}";do
-	service_name="$(echo -e "${service,,}" | tr -d '[:space:]')"
+	service_name="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
 	if [[ "${INSTALLED_SERVICES[@]}" =~ $service ]];then
 		[[ "${STOPPED_SERVICES[@]}" =~ $service ]] && service_status="$(printf "\e[32m${service}\e[0m \e[31m(Stopped)\e[0m")" || service_status="$(printf "\e[32m${service}\e[0m")"
 		SERVICES_ARR+=( [$service_status]="${service_name}" )
