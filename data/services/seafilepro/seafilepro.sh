@@ -31,6 +31,8 @@ upgrade() {
 	stop_containers
 	remove_containers
 
+	docker_run seafilepro_db_dockerbunker
+
 	echo -e "\n\e[1mStarting up ${PROPER_NAME} upgrade container\e[0m" \
 		&& seafilepro_setup_dockerbunker "upgrade $SF_VERSION" \
 		&& exit_response
