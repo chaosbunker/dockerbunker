@@ -19,6 +19,7 @@ gitea_service_dockerbunker() {
 		--name=${FUNCNAME[0]//_/-} \
 		--restart=always \
 		--network dockerbunker-${SERVICE_NAME} \
+		-p 2222:2222 \
 		--env-file "${SERVICE_ENV}" \
 		--env-file "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env \
 		--env RUN_CROND=true \
