@@ -55,8 +55,7 @@ configure() {
 
 	pushd "${BASE_DIR}" >/dev/null
 	! [[ -d "${SERVICE_HOME}" ]] \
-	&& echo -n "Cloning Mailcow Dockerized repository into "${BASE_DIR}"/data/docker-compose/mailcowdockerized" \
-	&& git submodule add https://github.com/mailcow/mailcow-dockerized.git data/docker-compose/mailcowdockerized >/dev/null \
+	&& git clone https://github.com/mailcow/mailcow-dockerized.git data/docker-compose/mailcowdockerized >/dev/null \
 	&& exit_response
 	popd >/dev/null
 

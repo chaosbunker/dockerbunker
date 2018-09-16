@@ -80,10 +80,10 @@ configure() {
 		GLITCH=glitch
 		SERVICE_NAME=${SERVICE_NAME}glitch
 		! [[ -d "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME} ]] \
-			&& git submodule add -f https://github.com/glitch-soc/mastodon.git "data/Dockerfiles/mastodonglitch" >/dev/null
+			&& git clone https://github.com/glitch-soc/mastodon.git "data/Dockerfiles/mastodonglitch" >/dev/null
 	else
 		! [[ -d "${BASE_DIR}"/data/Dockerfiles/mastodon ]] \
-			&& git submodule add -f https://github.com/tootsuite/mastodon.git "data/Dockerfiles/${SERVICE_NAME}" >/dev/null
+			&& git clone https://github.com/tootsuite/mastodon.git "data/Dockerfiles/${SERVICE_NAME}" >/dev/null
 	fi
 
 	set_domain

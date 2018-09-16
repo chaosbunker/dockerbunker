@@ -22,7 +22,7 @@ configure() {
 	pre_configure_routine
 	
 	! [[ -d "${BASE_DIR}/data/Dockerfiles/ipsecvpnserver" ]] \
-	&& git submodule add -f https://github.com/hwdsl2/docker-ipsec-vpn-server.git data/Dockerfiles/ipsecvpnserver >/dev/null
+	&& git clone https://github.com/hwdsl2/docker-ipsec-vpn-server.git data/Dockerfiles/ipsecvpnserver >/dev/null
 
 	echo -e "\n# \e[4mIPsec VPN Server Settings\e[0m"
 	if [ -z "$VPN_USER" ]; then

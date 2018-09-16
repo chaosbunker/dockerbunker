@@ -26,8 +26,7 @@ configure() {
 	pre_configure_routine
 	
 	! [[ -d "${BASE_DIR}"/data/Dockerfiles/mailpile ]] \
-	&& echo -n "Cloning Mailpile repository into ${BASE_DIR}/data/Dockerfiles/mailpile" \
-	&& git submodule add https://github.com/mailpile/Mailpile.git "${BASE_DIR}"/data/Dockerfiles/mailpile >/dev/null \
+	&& git clone https://github.com/mailpile/Mailpile.git "${BASE_DIR}"/data/Dockerfiles/mailpile >/dev/null \
 	&& exit_response
 	
 	
