@@ -33,6 +33,7 @@ declare -a ALL_SERVICES=( \
 	"Gogs" \
 	"Hastebin" \
 	"IPsec VPN Server" \
+	"json-server" \
 	"Kanboard" \
 	"Mailcow (Dockerized)" \
 	"Mailpile" \

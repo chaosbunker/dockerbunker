@@ -1,0 +1,7 @@
+module.exports = (req, res, next) => {
+	if (req.header('${AUTH_REQ_HEADER_KEY}') != "${AUTH_REQ_HEADER_VALUE}" ) {
+		res.header('X-Unauthorized', 'Allyship Is A Verb, Not A Noun');
+		return res.status(401).send({ error: 'Unauthorized' });
+	} else
+		next();
+	}
