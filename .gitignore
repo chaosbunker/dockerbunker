@@ -3,5 +3,4 @@ data/web/*
 data/env/*
 data/conf/*
 data/backup/*
-data/docker-compose/*
 
