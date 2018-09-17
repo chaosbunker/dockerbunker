@@ -42,6 +42,7 @@ declare -a ALL_SERVICES=( \
 	"Open Project" \
 	"Padlock Cloud" \
 	"Piwik" \
+	"Rocket.Chat" \
 	"Seafile Pro" \
 	"Searx" \
 	"Send" \
