@@ -227,6 +227,9 @@ options_menu() {
 					|| -f "${ENV_DIR}"/${SERVICE_NAME}.env ]] \
 					&& echo "- ${PROPER_NAME} environment file(s)"
 
+				[[ -d "${CONF_DIR}"/${SERVICE_NAME} ]] \
+					&& echo "- ${PROPER_NAME} config file(s)"
+
 				[[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf \
 					|| -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
 					&& echo "- nginx configuration of ${SERVICE_DOMAIN[0]}"
@@ -243,7 +246,7 @@ options_menu() {
 
 				say_done
 				sleep 0.2
-				${BASE_DIR}/dockerbunker.sh
+				exec ${BASE_DIR}/dockerbunker.sh
 			;;
 			"$exitmenu")
 				exit 0
@@ -491,6 +494,7 @@ remove_images() {
 
 remove_service_conf() {
 	[[ -d "${CONF_DIR}/${SERVICE_NAME}" ]] \
+		&& echo -en "\n\e[1mRemoving ${CONF_DIR}/${SERVICE_NAME}\e[0m" \
 		&& rm -r "${CONF_DIR}/${SERVICE_NAME}" \
 
 }
