@@ -18,9 +18,7 @@ declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a networks=( )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/padlock/db"  )
-declare -A IMAGES=( [service]="dockerbunker/padlockcloud" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
-repoURL="https://github.com/chaosbunker/padlock-cloud-docker"
+declare -A IMAGES=( [service]="chaosbunker/padlock-cloud" )
 
 [[ -z $1 ]] && options_menu
 
