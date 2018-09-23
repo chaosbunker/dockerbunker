@@ -5,7 +5,6 @@ jsonserver_service_dockerbunker() {
 		--network ${NETWORK} \
 		--env-file "${SERVICE_ENV}" \
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
-		-v ${CONF_DIR}/jsonserver/db.json:/data/db.json \
-		-v ${CONF_DIR}/jsonserver/auth.js:/data/auth.js \
-	${IMAGES[service]} ${MIDDLEWARE} >/dev/null
+		-v ${CONF_DIR}/jsonserver:/json-server/data \
+	${IMAGES[service]} ${ARGUMENTS} >/dev/null
 }
