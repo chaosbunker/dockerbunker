@@ -18,10 +18,14 @@ setup() {
 
 	echo -e "\n\e[1mNo nginx container found\e[0m"
 	echo -e "\n\e[3m\xe2\x86\x92 Setup nginx\e[0m"
+
 	docker_pull
 
 	[[ ! $(docker network ls -q --filter name=^${NETWORK}$) ]] \
-		&& docker network create $NETWORK >/dev/null \
+		&& docker network create $NETWORK >/dev/null
+
+	[[ ! -d "${CONF_DIR}"/nginx/ssl ]] \
+		&& cp -r "${SERVICES_DIR}"/nginx/ssl "${CONF_DIR}"/nginx
 
 	[[ ! -d "${BASE_DIR}"/data/web ]] && mkdir "${BASE_DIR}"/data/web
 
