@@ -107,6 +107,7 @@ setup() {
 		echo ""
 	
 		echo -e "\n\e[1mStarting up ${PROPER_NAME} setup container\e[0m" \
+			&& docker_run seafilepro_db_dockerbunker \
 			&& seafilepro_setup_dockerbunker setup \
 			&& exit_response
 	fi
