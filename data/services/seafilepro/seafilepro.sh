@@ -18,14 +18,12 @@ declare -a containers=( "${SERVICE_NAME}-db-dockerbunker" "${SERVICE_NAME}-servi
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/seafile" [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
-declare -A IMAGES=( [db]="mariadb:10.2" [service]="dockerbunker/${SERVICE_NAME}" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
+declare -A IMAGES=( [db]="mariadb:10.3" [service]="chaosbunker/seafile-pro-docker" )
+current_version="6.3.4"
 
 [[ -z $1 ]] && options_menu
 
 upgrade() {
-	read -p "Please enter the Seafile Version number to upgrade to: " SF_VERSION
-
 	pull_and_compare
 
 	stop_containers
@@ -33,11 +31,18 @@ upgrade() {
 
 	docker_run seafilepro_db_dockerbunker
 
-	echo -e "\n\e[1mStarting up ${PROPER_NAME} upgrade container\e[0m" \
-		&& seafilepro_setup_dockerbunker "upgrade $SF_VERSION" \
-		&& exit_response
+	seafilepro_setup_dockerbunker "upgrade ${current_version}"
 
 	docker_run_all
+
+	[[ -z ${FILE_COMMENT_MIGRATED} ]] \
+		&& echo -e "\n\e[1mMigrate database table for file comments\e[0m" \
+		&& docker exec -it seafilepro-service-dockerbunker ./seahub.sh python-env seahub/manage.py migrate_file_comment \
+		&& exit_response \
+		&& echo "FILE_COMMENT_MIGRATED=1" >> "${ENV_DIR}"/${SERVICE_NAME}.env
+
+	echo -e "\n\e[1mRunning mysql_upgrade on all databases\e[0m"
+	docker exec -it seafilepro-db-dockerbunker mysql_upgrade -u root -p${DBROOT}
 }
 
 configure() {
@@ -59,25 +64,25 @@ configure() {
 	# ------------------------------
 	# General Settings
 	# ------------------------------
-	
+
 	PROPER_NAME="${PROPER_NAME}"
 	SERVICE_NAME=${SERVICE_NAME}
 	SSL_CHOICE=${SSL_CHOICE}
 	LE_EMAIL=${LE_EMAIL}
-	
+
 	SERVICE_DOMAIN=${SERVICE_DOMAIN}
 
 	# ------------------------------
 	# SQL database configuration
 	# ------------------------------
-	
+
 	DBUSER=seafile
-	
+
 	# Please use long, random alphanumeric strings (A-Za-z0-9)
 	DBROOT=$(</dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 	DBPASS=$(</dev/urandom tr -dc A-Za-z0-9 | head -c 28)
 	EOF
-	
+
 	if [[ $OSTYPE =~ "darwin" ]];then
 		unset LC_ALL
 	fi
@@ -95,7 +100,7 @@ setup() {
 		&& echo -en "\n\e[1mStarting up ${PROPER_NAME} database container\e[0m" \
 		&& seafilepro_db_dockerbunker \
 		&& exit_response
-	
+
 	if [[ -z $keep_volumes ]];then
 		echo "Starting interactive Seafile Pro setup"
 		echo ""
@@ -105,7 +110,7 @@ setup() {
 		prompt_confirm "Display MySQL root and user passwords"
 		[[ $? == 0 ]] && echo -e "MySQL root password:   ${DBROOT}\nMySQL user password:   ${DBPASS}" || echo -e "\e[33mPlease obtain the MySQL root password from ${SERVICE_ENV}\e[0m\n"
 		echo ""
-	
+
 		echo -e "\n\e[1mStarting up ${PROPER_NAME} setup container\e[0m" \
 			&& docker_run seafilepro_db_dockerbunker \
 			&& seafilepro_setup_dockerbunker setup \
