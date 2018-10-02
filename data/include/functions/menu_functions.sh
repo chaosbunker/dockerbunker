@@ -29,7 +29,7 @@ options_menu() {
 	if [[ $RUNNING ]];then
 		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Upgrade Image(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
 		add_ssl_menuentry menu 2
-		if elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES}";then
+		if elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}";then
 			insert menu "Start container(s)" 3
 		else
 			insert menu "Restart container(s)" 3
@@ -677,7 +677,7 @@ reconfigure() {
 start_all() {
 	start_nginx
 	for PROPER_NAME in "${STOPPED_SERVICES[@]}";do
-		SERVICE_NAME="$(echo -e "${service,,}" | tr -d '[:space:]')"
+		SERVICE_NAME="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
 		source "${ENV_DIR}"/${SERVICE_NAME}.env
 		source "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
 	done
@@ -686,7 +686,7 @@ start_all() {
 
 restart_all() {
 	for service in "${INSTALLED_SERVICES[@]}";do
-		service="$(echo -e "${service,,}" | tr -d '[:space:]')"
+		service="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
 		source "${SERVICE_ENV}"
 		source "${SERVICES_DIR}"/${service}/${service}.sh restart_containers
 	done
@@ -694,7 +694,7 @@ restart_all() {
 }
 stop_all() {
 	for service in "${INSTALLED_SERVICES[@]}";do
-		service="$(echo -e "${service,,}" | tr -d '[:space:]')"
+		service="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
 		if ! elementInArray "$service" "${STOPPED_SERVICES[@]}";then
 			source "${SERVICE_ENV}"
 			source "${SERVICES_DIR}"/${service}/${service}.sh stop_containers
@@ -723,7 +723,7 @@ if [[ "$i" == ${all_services[-1]} ]];then \
 	prompt_confirm "Continue?"
 	[[ $? == 1 ]] && echo "Exiting..." && exit 0
 	for service in "${all_services[@]}";do
-		SERVICE_NAME="$(echo -e "${service,,}" | tr -d '[:space:]')"
+		SERVICE_NAME="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
 		echo -e "\n\e[3m\xe2\x86\x92 Destroying $service\e[0m"
 		[[ -f "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh ]] \
 			&& "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh destroy_service

@@ -17,8 +17,7 @@ declare -a containers=( "${SERVICE_NAME}-db-dockerbunker" "${SERVICE_NAME}-servi
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -A volumes=( [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" [${SERVICE_NAME}-data-vol-1]="/var/www/html/wp-content" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
-declare -A IMAGES=( [db]="mariadb:10.2" [service]="dockerbunker/${SERVICE_NAME}" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
+declare -A IMAGES=( [db]="mariadb:10.3" [service]="chaosbunker/${SERVICE_NAME}-docker" )
 
 [[ -z $1 ]] && options_menu
 

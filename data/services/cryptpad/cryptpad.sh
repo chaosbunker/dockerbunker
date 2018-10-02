@@ -15,11 +15,9 @@ done
 declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
+declare -A IMAGES=( [service]="chaosbunker/${SERVICE_NAME}-docker" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/cryptpad/customize" [${SERVICE_NAME}-data-vol-2]="/cryptpad/datastore" )
 declare -a networks=( )
-repoURL="https://github.com/xwiki-labs/cryptpad"
 
 [[ -z $1 ]] && options_menu
 

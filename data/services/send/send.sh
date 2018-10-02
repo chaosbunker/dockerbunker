@@ -17,8 +17,7 @@ declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/send/data" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a networks=( )
-declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
+declare -A IMAGES=( [service]="chaosbunker/${SERVICE_NAME}-docker" )
 
 [[ -z $1 ]] && options_menu
 
