@@ -215,8 +215,8 @@ generate_certificate() {
 basic_nginx() {
 	if [[ -z $reinstall ]];then
 		[[ ! -d "${CONF_DIR}"/nginx/ssl ]] \
-			&& mkdir -p "${CONF_DIR}"/nginx/ssl \
-			&& cp -r "${SERVICES_DIR}"/nginx/* "${CONF_DIR}"/nginx/ssl \
+			&& mkdir -p "${CONF_DIR}"/nginx/ssl
+		[[ ! -f "${CONF_DIR}"/nginx/ssl/dhparam.pem ]] \
 			&& cp "${SERVICES_DIR}/nginx/ssl/dhparam.pem" "${CONF_DIR}"/nginx/ssl
 		[[ ! -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] && \
 			mkdir -p "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}

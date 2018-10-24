@@ -28,11 +28,13 @@ setup() {
 		&& docker network create $NETWORK >/dev/null
 
 	[[ ! -d "${CONF_DIR}"/nginx/ssl ]] \
-		&& mkdir -p "${CONF_DIR}"/nginx/ssl \
-		&& cp -r "${SERVICES_DIR}"/nginx/* "${CONF_DIR}"/nginx/ssl \
+		&& mkdir -p "${CONF_DIR}"/nginx/ssl
+
+	[[ ! -f "${CONF_DIR}"/nginx/ssl/dhparam.pem ]] \
 		&& cp "${SERVICES_DIR}/nginx/ssl/dhparam.pem" "${CONF_DIR}"/nginx/ssl
 
-	[[ ! -d "${BASE_DIR}"/data/web ]] && mkdir "${BASE_DIR}"/data/web
+	[[ ! -d "${BASE_DIR}"/data/web ]] \
+		&& mkdir "${BASE_DIR}"/data/web
 
 	docker_run nginx_dockerbunker
 }
