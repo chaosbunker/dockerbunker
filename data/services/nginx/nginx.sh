@@ -14,6 +14,9 @@ declare -a networks=( "dockerbunker-network" )
 declare -A IMAGES=( [service]="nginx:mainline-alpine" )
 
 setup() {
+
+	set +x
+
 	source "${ENV_DIR}"/dockerbunker.env
 
 	echo -e "\n\e[1mNo nginx container found\e[0m"
@@ -25,7 +28,9 @@ setup() {
 		&& docker network create $NETWORK >/dev/null
 
 	[[ ! -d "${CONF_DIR}"/nginx/ssl ]] \
-		&& cp -r "${SERVICES_DIR}"/nginx/ssl "${CONF_DIR}"/nginx
+		&& mkdir -p "${CONF_DIR}"/nginx/ssl \
+		&& cp -r "${SERVICES_DIR}"/nginx/* "${CONF_DIR}"/nginx/ssl \
+		&& cp "${SERVICES_DIR}/nginx/ssl/dhparam.pem" "${CONF_DIR}"/nginx/ssl
 
 	[[ ! -d "${BASE_DIR}"/data/web ]] && mkdir "${BASE_DIR}"/data/web
 
