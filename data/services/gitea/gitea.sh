@@ -17,8 +17,7 @@ declare -a containers=( "${SERVICE_NAME}-db-dockerbunker" "${SERVICE_NAME}-servi
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a networks=( "dockerbunker-gitea" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/data" [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" )
-declare -A IMAGES=( [db]="mariadb:10.2" [service]="gitea/gitea:1.4" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
+declare -A IMAGES=( [db]="mariadb:10.2" [service]="gitea/gitea:1.5" )
 
 [[ -z $1 ]] && options_menu
 
@@ -29,8 +28,8 @@ configure() {
 
 	set_domain
 
-	if [ "$GITEA_APP_NAME" ]; then
-	  read -p "Gitea Application Name: " -ei "$GITEA_APP_NAME" GITEA_APP_NAME
+	if [ "${GITEA_APP_NAME}" ]; then
+	  read -p "Gitea Application Name: " -ei "${GITEA_APP_NAME}" GITEA_APP_NAME
 	else
 	  read -p "Gitea Application Name: " -ei "Gitea Go Git Service" GITEA_APP_NAME
 	fi
@@ -39,30 +38,30 @@ configure() {
 	echo ""
 
 	unset GITEA_ADMIN
-	if [ "$GITEA_ADMIN" ]; then
-	  read -p "Gitea Admin User: " -ei "$GITEA_ADMIN" GITEA_ADMIN
+	if [ "${GITEA_ADMIN}" ]; then
+	  read -p "Gitea Admin User: " -ei "${GITEA_ADMIN}" GITEA_ADMIN
 	else
-		while [[ -z $GITEA_ADMIN || $GITEA_ADMIN == "admin" ]];do
-			read -p "Gitea Admin User: " -ei "$GITEA_ADMIN" GITEA_ADMIN
+		while [[ -z ${GITEA_ADMIN} || ${GITEA_ADMIN }== "admin" ]];do
+			read -p "Gitea Admin User: " -ei "${GITEA_ADMIN}" GITEA_ADMIN
 			[[ ${GITEA_ADMIN} == "admin" ]] && echo -e "\n\e[31mAdmin account setting is invalid: name is reserved [name: admin]\e[0m\n"
 		done
 	fi
 	
-	if [ "$GITEA_ADMIN_EMAIL" ]; then
-	  read -p "Gitea Admin E-Mail: " -ei "$GITEA_ADMIN_EMAIL" GITEA_ADMIN_EMAIL
+	if [ "${GITEA_ADMIN_EMAIL}" ]; then
+	  read -p "Gitea Admin E-Mail: " -ei "${GITEA_ADMIN_EMAIL}" GITEA_ADMIN_EMAIL
 	else
 	  read -p "Gitea Admin E-Mail: " GITEA_ADMIN_EMAIL
 	fi
 	
 	unset GITEA_ADMIN_PASSWORD
-	while [[ "${#GITEA_ADMIN_PASSWORD}" -le 6 || "$GITEA_ADMIN_PASSWORD" != *[A-Z]* || "$GITEA_ADMIN_PASSWORD" != *[a-z]* || "$GITEA_ADMIN_PASSWORD" != *[0-9]* ]];do
-		if [ $VALIDATE ];then
+	while [[ "${#GITEA_ADMIN_PASSWORD}" -le 6 || "${GITEA_ADMIN_PASSWORD}" != *[A-Z]* || "${GITEA_ADMIN_PASSWORD}" != *[a-z]* || "${GITEA_ADMIN_PASSWORD}" != *[0-9]* ]];do
+		if [ ${VALIDATE} ];then
 			echo -e "\n\e[31m  Password does not meet requirements\e[0m"
 		fi
 			stty_orig=$(stty -g)
 			stty -echo
 	  		read -p " $(printf "\n   \e[4mPassword requirements\e[0m\n   Minimum Length 6,Uppercase, Lowercase, Integer\n\n   Enter Password:") " -ei "" GITEA_ADMIN_PASSWORD
-			stty "$stty_orig"
+			stty "${stty_orig}"
 			echo ""
 		VALIDATE=1
 	done
@@ -77,6 +76,12 @@ configure() {
 	echo "# Server & Other  Service Settings"
 	echo ""
 	
+	if [ "${SSH_PORT}" ]; then
+	  read -p "SSH Port: " -ei "${SSH_PORT}" SSH_PORT
+	else
+	  read -p "SSH Port: " -ei "2222" SSH_PORT
+	fi
+
 	prompt_confirm "Enable Offline Mode?" && GITEA_OFFLINE_MODE="on" || GITEA_OFFLINE_MODE="off"
 	
 	prompt_confirm "Disable Gravatar Service?" && GITEA_DISABLE_GRAVATAR="on" || GITEA_DISABLE_GRAVATAR="off"
@@ -123,6 +128,7 @@ configure() {
 	
 	SERVICE_DOMAIN=${SERVICE_DOMAIN}
 	GITEA_APP_NAME="${GITEA_APP_NAME}"
+	SSH_PORT="${SSH_PORT}"
 	
 	GITEA_REGISTER_CONFIRM=${GITEA_REGISTER_CONFIRM}
 	GITEA_MAIL_NOTIFY=${GITEA_MAIL_NOTIFY}
