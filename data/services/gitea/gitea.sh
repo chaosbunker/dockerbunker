@@ -128,7 +128,7 @@ configure() {
 	
 	SERVICE_DOMAIN=${SERVICE_DOMAIN}
 	GITEA_APP_NAME="${GITEA_APP_NAME}"
-	SSH_PORT="${SSH_PORT}"
+	SSH_PORT=${SSH_PORT}
 	
 	GITEA_REGISTER_CONFIRM=${GITEA_REGISTER_CONFIRM}
 	GITEA_MAIL_NOTIFY=${GITEA_MAIL_NOTIFY}
@@ -209,7 +209,7 @@ curl -k \
 &repo_root_path=/data/git/gitea-repositories\
 &run_user=git\
 &domain=${SERVICE_DOMAIN}\
-&ssh_port=22\
+&ssh_port=${SSH_PORT}\
 &http_port=3000\
 &app_url=https://${SERVICE_DOMAIN}\
 &log_root_path=/app/gitea/log\

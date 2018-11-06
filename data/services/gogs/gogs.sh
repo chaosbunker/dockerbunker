@@ -128,7 +128,7 @@ configure() {
 	
 	SERVICE_DOMAIN=${SERVICE_DOMAIN}
 	GOGS_APP_NAME="${GOGS_APP_NAME}"
-	SSH_PORT="${SSH_PORT}"
+	SSH_PORT=${SSH_PORT}
 	
 	GOGS_REGISTER_CONFIRM=${GOGS_REGISTER_CONFIRM}
 	GOGS_MAIL_NOTIFY=${GOGS_MAIL_NOTIFY}
@@ -208,7 +208,7 @@ curl -k \
 &repo_root_path=/data/git/gogs-repositories\
 &run_user=git\
 &domain=${SERVICE_DOMAIN}\
-&ssh_port=22\
+&ssh_port=${SSH_PORT}\
 &http_port=3000\
 &app_url=https://${SERVICE_DOMAIN}\
 &log_root_path=/app/gogs/log\
