@@ -12,18 +12,14 @@ for env in "${environment[@]}";do
 done
 
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" )
+declare -A IMAGES=( [service]="hwdsl2/ipsec-vpn-server" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/lib/modules" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
 
 [[ -z $1 ]] && options_menu
 
 configure() {
 	pre_configure_routine
 	
-	! [[ -d "${BASE_DIR}/data/Dockerfiles/ipsecvpnserver" ]] \
-	&& git clone https://github.com/hwdsl2/docker-ipsec-vpn-server.git data/Dockerfiles/ipsecvpnserver >/dev/null
-
 	echo -e "\n# \e[4mIPsec VPN Server Settings\e[0m"
 	if [ -z "$VPN_USER" ]; then
 		read -p "VPN Username: " -ei "vpnuser" VPN_USER
@@ -37,14 +33,6 @@ configure() {
 	  	read -p "VPN Password: " -ei "" VPN_PASSWORD
 		stty $stty_orig
 		echo ""
-	fi
-
-	prompt_confirm "OK to use Google DNS?"
-	if [[ $? == 0 ]];then
-		read -p "Enter DNS 1: " dns1
-		read -p "Enter DNS 2: " dns2
-		sed -i 's/8\.8\.8\.8/${dns1}/' "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME}/run.sh
-		sed -i 's/8\.8\.4\.4/${dns2}/' "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME}/run.sh
 	fi
 
 	# avoid tr illegal byte sequence in macOS when generating random strings
