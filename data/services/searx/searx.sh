@@ -16,30 +16,9 @@ declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a networks=( )
-declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
-repoURL="https://github.com/asciimoo/searx.git"
+declare -A IMAGES=( [service]="chaosbunker/searx" )
 
 [[ -z $1 ]] && options_menu
-
-upgrade() {
-	get_current_images_sha256
-
-	sed -i "s/default_theme\ :.*/default_theme\ :\ ${THEME}/" data/Dockerfiles/${SERVICE_NAME}/${SERVICE_NAME}/settings.yml
-	sed -i "s/instance_name\ \:.*/instance_name\ \:\ \"${INSTANCE_NAME}\"/" data/Dockerfiles/${SERVICE_NAME}/${SERVICE_NAME}/settings.yml
-	
-	docker_build
-	docker_pull
-
-	stop_containers
-	remove_containers
-
-	docker_run_all
-
-	delete_old_images
-
-	restart_nginx
-}
 
 configure() {
 	pre_configure_routine
@@ -48,18 +27,6 @@ configure() {
 
 	set_domain
 	
-	if [ "$INSTANCE_NAME" ]; then
-	  read -p "Instance Name: " -ei "$INSTANCE_NAME" INSTANCE_NAME
-	else
-	  read -p "Instance Name: " -ei "${SERVICE_NAME}" INSTANCE_NAME
-	fi
-
-	if [ "$THEME" ]; then
-	  read -p "Theme [oscar, courgette, pix-art, simple]: " -ei "$THEME" THEME
-	else
-	  read -p "Theme [oscar, courgette, pix-art, simple]: " -ei "oscar" THEME
-	fi
-
 	cat <<-EOF >> "${SERVICE_ENV}"
 	#SEARX
 	## ------------------------------
@@ -70,8 +37,6 @@ configure() {
 	LE_EMAIL=${LE_EMAIL}
 
 	SERVICE_DOMAIN="${SERVICE_DOMAIN}"
-	INSTANCE_NAME="${INSTANCE_NAME}"
-	THEME="${THEME}"
 
 	## ------------------------------
 	#/SEARX
@@ -79,20 +44,6 @@ configure() {
 	EOF
 
 	post_configure_routine
-}
-setup() {
-
-	sed -i "s/default_theme\ :.*/default_theme\ :\ ${THEME}/" data/Dockerfiles/${SERVICE_NAME}/${SERVICE_NAME}/settings.yml
-	sed -i "s/instance_name\ \:.*/instance_name\ \:\ \"${INSTANCE_NAME}\"/" data/Dockerfiles/${SERVICE_NAME}/${SERVICE_NAME}/settings.yml
-
-	initial_setup_routine
-
-	SUBSTITUTE=( "\${SERVICE_DOMAIN}" )
-	basic_nginx
-
-	docker_run_all
-
-	post_setup_routine
 }
 
 if [[ $1 == "letsencrypt" ]];then
