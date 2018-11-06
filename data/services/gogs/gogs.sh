@@ -18,7 +18,6 @@ declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/data" [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" )
 declare -a networks=( "dockerbunker-gogs" )
 declare -A IMAGES=( [db]="mariadb:10.2" [service]="gogs/gogs" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}]="${DOCKERFILES}/${SERVICE_NAME}" )
 
 [[ -z $1 ]] && options_menu
 
@@ -29,8 +28,8 @@ configure() {
 
 	set_domain
 
-	if [ "$GOGS_APP_NAME" ]; then
-	  read -p "Gogs Application Name: " -ei "$GOGS_APP_NAME" GOGS_APP_NAME
+	if [ "${GOGS_APP_NAME}" ]; then
+	  read -p "Gogs Application Name: " -ei "${GOGS_APP_NAME}" GOGS_APP_NAME
 	else
 	  read -p "Gogs Application Name: " -ei "Gogs Go Git Service" GOGS_APP_NAME
 	fi
@@ -39,30 +38,30 @@ configure() {
 	echo ""
 
 	unset GOGS_ADMIN
-	if [ "$GOGS_ADMIN" ]; then
-	  read -p "Gogs Admin User: " -ei "$GOGS_ADMIN" GOGS_ADMIN
+	if [ "${GOGS_ADMIN}" ]; then
+	  read -p "Gogs Admin User: " -ei "${GOGS_ADMIN}" GOGS_ADMIN
 	else
-		while [[ -z $GOGS_ADMIN || $GOGS_ADMIN == "admin" ]];do
-			read -p "Gogs Admin User: " -ei "$GOGS_ADMIN" GOGS_ADMIN
-			[[ ${GOGS_ADMIN} == "admin" ]] && echo -e "\n\e[31mAdmin account setting is invalid: name is reserved [name: admin]\e[0m\n"
+		while [[ -z "${GOGS_ADMIN}" || "${GOGS_ADMIN}" == "admin" ]];do
+			read -p "Gogs Admin User: " -ei "${GOGS_ADMIN}" GOGS_ADMIN
+			[[ "${GOGS_ADMIN}" == "admin" ]] && echo -e "\n\e[31mAdmin account setting is invalid: name is reserved [name: admin]\e[0m\n"
 		done
 	fi
 	
-	if [ "$GOGS_ADMIN_EMAIL" ]; then
-	  read -p "Gogs Admin E-Mail: " -ei "$GOGS_ADMIN_EMAIL" GOGS_ADMIN_EMAIL
+	if [ "${GOGS_ADMIN_EMAIL}" ]; then
+	  read -p "Gogs Admin E-Mail: " -ei "${GOGS_ADMIN_EMAIL}" GOGS_ADMIN_EMAIL
 	else
 	  read -p "Gogs Admin E-Mail: " GOGS_ADMIN_EMAIL
 	fi
 	
 	unset GOGS_ADMIN_PASSWORD
-	while [[ "${#GOGS_ADMIN_PASSWORD}" -le 6 || "$GOGS_ADMIN_PASSWORD" != *[A-Z]* || "$GOGS_ADMIN_PASSWORD" != *[a-z]* || "$GOGS_ADMIN_PASSWORD" != *[0-9]* ]];do
-		if [ $VALIDATE ];then
+	while [[ "${#GOGS_ADMIN_PASSWORD}" -le 6 || "${GOGS_ADMIN_PASSWORD}" != *[A-Z]* || "${GOGS_ADMIN_PASSWORD}" != *[a-z]* || "${GOGS_ADMIN_PASSWORD}" != *[0-9]* ]];do
+		if [ ${VALIDATE} ];then
 			echo -e "\n\e[31m  Password does not meet requirements\e[0m"
 		fi
-			stty_orig=$(stty -g)
+			stty_orig="$(stty -g)"
 			stty -echo
 	  		read -p " $(printf "\n   \e[4mPassword requirements\e[0m\n   Minimum Length 6,Uppercase, Lowercase, Integer\n\n   Enter Password:") " -ei "" GOGS_ADMIN_PASSWORD
-			stty "$stty_orig"
+			stty "${stty_orig}"
 			echo ""
 		VALIDATE=1
 	done
@@ -77,6 +76,12 @@ configure() {
 	echo "# Server & Other  Service Settings"
 	echo ""
 	
+	if [ "${SSH_PORT}" ]; then
+	  read -p "SSH Port: " -ei "${SSH_PORT}" SSH_PORT
+	else
+	  read -p "SSH Port: " -ei "2223" SSH_PORT
+	fi
+
 	prompt_confirm "Enable Offline Mode?" && GOGS_OFFLINE_MODE="on" || GOGS_OFFLINE_MODE="off"
 	
 	prompt_confirm "Disable Gravatar Service?" && GOGS_DISABLE_GRAVATAR="on" || GOGS_DISABLE_GRAVATAR="off"
@@ -101,7 +106,7 @@ configure() {
 		fi
 	fi
 	cat <<-EOF >> "${SERVICE_ENV}"
-	PROPER_NAME=${PROPER_NAME}
+	PROPER_NAME="${PROPER_NAME}"
 	SERVICE_NAME=${SERVICE_NAME}
 	SSL_CHOICE=${SSL_CHOICE}
 	LE_EMAIL=${LE_EMAIL}
@@ -123,6 +128,7 @@ configure() {
 	
 	SERVICE_DOMAIN=${SERVICE_DOMAIN}
 	GOGS_APP_NAME="${GOGS_APP_NAME}"
+	SSH_PORT="${SSH_PORT}"
 	
 	GOGS_REGISTER_CONFIRM=${GOGS_REGISTER_CONFIRM}
 	GOGS_MAIL_NOTIFY=${GOGS_MAIL_NOTIFY}
