@@ -28,6 +28,7 @@ declare -a ALL_SERVICES=( \
 	"CS50 IDE" \
 	"Dillinger" \
 	"Ghost" \
+	"GitBucket" \
 	"Gitea" \
 	"Gitlab CE" \
 	"Gogs" \
