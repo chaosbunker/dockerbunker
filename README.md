@@ -13,10 +13,10 @@
 |[CS50 IDE](https://manual.cs50.net/ide/offline)|[json-server](https://github.com/typicode/json-server)|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)|
 |[Dillinger](https://dillinger.io/)|[Kanboard](https://kanboard.net/)|[Seafile Pro](https://github.com/haiwen/seafile)|
 |[Ghost Blog](https://ghost.org/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[Searx](https://github.com/asciimoo/searx.git)|
-|[Gitea](https://gitea.io/en-us/)|[Mailpile](https://www.mailpile.is/)|[Mozilla send](https://send.firefox.com/)|
-|[Gitlab CE](https://gitlab.com/)|[Mastodon](https://github.com/tootsuite/mastodon) (+ [Glitch Edition](https://github.com/glitch-soc/mastodon))|[sFTP Server](https://github.com/atmoz/sftp)|
-|[Gogs](https://gogs.io/)|[Nextcloud](https://github.com/nextcloud/docker)|[Wekan](https://wekan.github.io/)|
-||[Open Project](https://www.openproject.org/)|[Wordpress](https://wordpress.org/)|
+|[GitBucket](https://github.com/gitbucket/gitbucket)|[Mailpile](https://www.mailpile.is/)|[Mozilla send](https://send.firefox.com/)|
+|[Gitea](https://gitea.io/en-us/)|[Mastodon](https://github.com/tootsuite/mastodon) (+ [Glitch Edition](https://github.com/glitch-soc/mastodon))|[sFTP Server](https://github.com/atmoz/sftp)|
+|[Gitlab CE](https://gitlab.com/)|[Nextcloud](https://github.com/nextcloud/docker)|[Wekan](https://wekan.github.io/)|
+|[Gogs](https://gogs.io/)|[Open Project](https://www.openproject.org/)|[Wordpress](https://wordpress.org/)|
 
 ## How to get started:
 
