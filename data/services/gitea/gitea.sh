@@ -41,7 +41,7 @@ configure() {
 	if [ "${GITEA_ADMIN}" ]; then
 	  read -p "Gitea Admin User: " -ei "${GITEA_ADMIN}" GITEA_ADMIN
 	else
-		while [[ -z ${GITEA_ADMIN} || ${GITEA_ADMIN }== "admin" ]];do
+		while [[ -z ${GITEA_ADMIN} || ${GITEA_ADMIN } == "admin" ]];do
 			read -p "Gitea Admin User: " -ei "${GITEA_ADMIN}" GITEA_ADMIN
 			[[ ${GITEA_ADMIN} == "admin" ]] && echo -e "\n\e[31mAdmin account setting is invalid: name is reserved [name: admin]\e[0m\n"
 		done
