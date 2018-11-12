@@ -9,7 +9,7 @@ mastodon_service_dockerbunker() {
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-v ${SERVICE_NAME}-data-vol-2:${volumes[${SERVICE_NAME}-data-vol-2]} \
 		-v ${SERVICE_NAME}-data-vol-3:${volumes[${SERVICE_NAME}-data-vol-3]} \
-	${IMAGES[service]}${GLITCH} bundle exec rails s -p 3000 -b '0.0.0.0' >/dev/null
+	${IMAGES[service]} bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000 -b '0.0.0.0'" >/dev/null
 }
 
 mastodon_streaming_dockerbunker() {
@@ -20,7 +20,7 @@ mastodon_streaming_dockerbunker() {
 		--network dockerbunker-${SERVICE_NAME} \
 		--env RUN_DB_MIGRATIONS=true --env UID=991 --env GID=991 --env WEB_CONCURRENCY=16 --env MAX_THREADS=20 --env SIDEKIQ_WORKERS=25 \
 		--env-file "${SERVICE_ENV}" \
-	${IMAGES[service]}${GLITCH} npm run start >/dev/null
+	${IMAGES[service]}${GLITCH} yarn start >/dev/null
 }
 
 mastodon_sidekiq_dockerbunker() {
@@ -32,7 +32,7 @@ mastodon_sidekiq_dockerbunker() {
 		--env-file "${SERVICE_ENV}" \
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-v ${SERVICE_NAME}-data-vol-2:${volumes[${SERVICE_NAME}-data-vol-2]} \
-	${IMAGES[service]}${GLITCH} bundle exec sidekiq -q default -q mailers -q pull -q push >/dev/null
+	${IMAGES[service]}${GLITCH} bundle exec sidekiq >/dev/null
 }
 
 mastodon_redis_dockerbunker() {

@@ -16,8 +16,7 @@ declare -a containers=( "${SERVICE_NAME}-postgres-dockerbunker" "${SERVICE_NAME}
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" "${SERVICE_NAME}-streaming-dockerbunker" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/mastodon/public/system" [${SERVICE_NAME}-data-vol-2]="/mastodon/public/assets" [${SERVICE_NAME}-data-vol-3]="/mastodon/public/packs" [${SERVICE_NAME}-postgres-vol-1]="/var/lib/postgresql/data" [${SERVICE_NAME}-elasticsearch-vol-1]="/usr/share/elasticsearch/data" [${SERVICE_NAME}-redis-vol-1]="/data" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
-declare -A IMAGES=( [service]="dockerbunker/${SERVICE_NAME}" [redis]="redis:4.0-alpine" [postgres]="postgres" [elasticsearch]="docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.3" )
-declare -A BUILD_IMAGES=( [dockerbunker/${SERVICE_NAME}${GLITCH}]="${DOCKERFILES}/${SERVICE_NAME}${GLITCH}" )
+declare -A IMAGES=( [service]="tootsuite/mastodon:v2.6.1" [redis]="redis:4.0-alpine" [postgres]="postgres:9.6-alpine" [elasticsearch]="docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.3" )
 
 if [[ $1 == "make_admin" ]];then
 	if [[ -z $2 || $3 ]];then
@@ -35,28 +34,10 @@ upgrade() {
 
 	get_current_images_sha256
 
-	[[ -z $GLITCH ]] && current="Mastodon" alt="Mastodon Glitch Edition" \
-		|| current="Mastodon Glitch Edition" alt="Mastodon" \
-
-	prompt_confirm "You are currently using ${current}. Switch to ${alt}?"
-	
-	if [[ $? == 0 && -z $GLITCH ]];then
-		GLITCH=glitch
-		sed -i "s/GLITCH=.*/GLITCH=${GLITCH}/" "${SERVICE_ENV}"
-		# temporarily change service name to build image from mastodon glitch repo
-		SERVICE_NAME=mastodonglitch
-	else
-		GLITCH=""
-		sed -i "s/GLITCH=.*/GLITCH=/" "${SERVICE_ENV}"
-	fi
-
-	docker_build
 	docker_pull
 
 	stop_containers
 	remove_containers
-
-	[[ $GLITCH ]] && SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
 
 	mastodon_postgres_dockerbunker
 	mastodon_redis_dockerbunker
@@ -71,42 +52,12 @@ upgrade() {
 
 configure() {
 	pre_configure_routine
-	
-	echo -e "# \e[4mMastodon Settings\e[0m"
 
-	unset GLITCH
-	prompt_confirm "Deploy Glitch Edition (https://-soc.github.io/docs/)?"
-	if [[ $? == 0 ]];then
-		GLITCH=glitch
-		SERVICE_NAME=${SERVICE_NAME}glitch
-		! [[ -d "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME} ]] \
-			&& git clone https://github.com/glitch-soc/mastodon.git "data/Dockerfiles/mastodonglitch" >/dev/null
-	else
-		! [[ -d "${BASE_DIR}"/data/Dockerfiles/mastodon ]] \
-			&& git clone https://github.com/tootsuite/mastodon.git "data/Dockerfiles/${SERVICE_NAME}" >/dev/null
-	fi
+	echo -e "# \e[4mMastodon Settings\e[0m"
 
 	set_domain
 
-	### Increase number of characters / toot
-	sed -i -e 's/500/800/g' \
-	    "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME}/app/javascript/mastodon/features/compose/components/compose_form.js \
-	    "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME}/app/validators/status_length_validator.rb \
-		${BASE_DIR}/data/Dockerfiles/${SERVICE_NAME}/config/locales/*.yml
-	
-	### Increase bio length
-	sed -i -e 's/160/400/g' \
-	    "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME}/app/javascript/packs/public.js \
-	    "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME}/app/models/account.rb \
-	    "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME}/app/views/settings/profiles/show.html.haml
-	
-	### Cat emoji
-	sed -i -e 's/1f602/1f431/g' \
-		"${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME}/app/javascript/mastodon/features/compose/components/emoji_picker_dropdown.js
-
 	configure_mx
-
-	SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
 
 	# avoid tr illegal byte sequence in macOS when generating random strings
 	if [[ $OSTYPE =~ "darwin" ]];then
@@ -122,7 +73,6 @@ configure() {
 	SERVICE_NAME="${SERVICE_NAME}"
 	SSL_CHOICE=${SSL_CHOICE}
 	LE_EMAIL=${LE_EMAIL}
-	GLITCH=${GLITCH}
 
 	SERVICE_DOMAIN="${SERVICE_DOMAIN}"
 	LOCAL_DOMAIN=${SERVICE_DOMAIN}
@@ -157,8 +107,6 @@ configure() {
 		[[ $oldLC_ALL ]] && export LC_ALL=$oldLC_ALL || unset LC_ALL
 	fi
 
-	docker_build dockerbunker/mastodon${GLITCH}
-
 	mastodon_generatevapidkeys_dockerbunker
 	source "${ENV_DIR}"/${SERVICE_NAME}_tmp.env
 	rm "${ENV_DIR}"/${SERVICE_NAME}_tmp.env
@@ -170,11 +118,7 @@ configure() {
 }
 setup() {
 
-	[[ $GLITCH ]] && SERVICE_NAME=${SERVICE_NAME}${GLITCH}
-
 	initial_setup_routine
-
-	[[ $GLITCH ]] && SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
 
 	SUBSTITUTE=( "\${SERVICE_DOMAIN}" )
 	basic_nginx
