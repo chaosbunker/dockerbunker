@@ -22,7 +22,12 @@
 
 - Docker
 - Bash 4+
-- GNU grep (on macOS, via brew: `brew install grep --with-default-names`)
+
+
+	On macOS via [homebrew](https://brew.sh)
+	- Bash 4+ -> `brew install bash`
+	- GNU grep -> `brew install grep --with-default-names`
+	- GNU sed -> `brew install gnu-sed --default-names`
 
 ## How to get started:
 
