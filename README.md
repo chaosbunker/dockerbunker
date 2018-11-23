@@ -18,6 +18,11 @@
 |[Gitlab CE](https://gitlab.com/)|[Nextcloud](https://github.com/nextcloud/docker)|[Wekan](https://wekan.github.io/)|
 |[Gogs](https://gogs.io/)|[Open Project](https://www.openproject.org/)|[Wordpress](https://wordpress.org/)|
 
+## Prerequisites
+
+- Docker
+- Bash 4+
+
 ## How to get started:
 
 1. Get docker
