@@ -22,6 +22,7 @@
 
 - Docker
 - Bash 4+
+- GNU grep (on macOS, via brew: `brew install grep --with-default-names`)
 
 ## How to get started:
 
