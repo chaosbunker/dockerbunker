@@ -18,6 +18,17 @@
 |[Gitlab CE](https://gitlab.com/)|[Nextcloud](https://github.com/nextcloud/docker)|[Wekan](https://wekan.github.io/)|
 |[Gogs](https://gogs.io/)|[Open Project](https://www.openproject.org/)|[Wordpress](https://wordpress.org/)|
 
+## Prerequisites
+
+- Docker
+- Bash 4+
+
+
+	On macOS via [homebrew](https://brew.sh)
+	- Bash 4+ -> `brew install bash`
+	- GNU grep -> `brew install grep --with-default-names`
+	- GNU sed -> `brew install gnu-sed --default-names`
+
 ## How to get started:
 
 1. Get docker
