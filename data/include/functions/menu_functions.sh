@@ -767,7 +767,7 @@ add_ssl_menuentry() {
 }
 
 static_menu() {
-	[[ -z ${STATIC_SITES[0]} ]] \
+	! [[ ${STATIC_SITES[@]} ]] \
 		&& echo -e "\n\e[1mNo existing sites found\e[0m" \
 		&& exec "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh
 
