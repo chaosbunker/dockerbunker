@@ -27,7 +27,7 @@ options_menu() {
 		done
 	fi
 	if [[ $RUNNING ]];then
-		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Upgrade Image(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
+		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Upgrade Image(s)" "Destroy \"${PROPER_NAME}\"" "${returntopreviousmenu}" "$exitmenu" )
 		add_ssl_menuentry menu 2
 		if elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}";then
 			insert menu "Start container(s)" 3
@@ -247,6 +247,9 @@ options_menu() {
 				say_done
 				sleep 0.2
 				exec ${BASE_DIR}/dockerbunker.sh
+			;;
+			"$returntopreviousmenu")
+				exec ./dockerbunker.sh
 			;;
 			"$exitmenu")
 				exit 0
