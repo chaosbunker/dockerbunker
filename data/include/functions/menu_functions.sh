@@ -402,11 +402,6 @@ stop_containers() {
 }
 
 restore_container() {
-	# build image if it does not exist locally
-	serviceName=$(echo $container | awk -F"-" '{print $2}')
-	if ! docker inspect --type=image ${IMAGES[$serviceName]} >/dev/null 2>&1;then
-		docker_build ${IMAGES[$serviceName]}
-	fi
 	docker_run ${container//-/_}
 	echo -en "\n- $container"
 	exit_response
