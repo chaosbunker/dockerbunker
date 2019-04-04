@@ -40,7 +40,7 @@ configure() {
 	# ------------------------------
 
 	MONGO_URL=mongodb://db:27017/wekan
-	ROOT_URL=http://localhost
+	ROOT_URL=https://${SERVICE_DOMAIN}
 	
 	EOF
 	
