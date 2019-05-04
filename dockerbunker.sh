@@ -27,6 +27,7 @@ declare -a ALL_SERVICES=( \
 	"Cryptpad" \
 	"CS50 IDE" \
 	"Dillinger" \
+	"Drone CI" \
 	"Ghost" \
 	"GitBucket" \
 	"Gitea" \
