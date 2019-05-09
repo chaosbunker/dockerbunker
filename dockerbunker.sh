@@ -37,6 +37,7 @@ declare -a ALL_SERVICES=( \
 	"IPsec VPN Server" \
 	"json-server" \
 	"Kanboard" \
+	"Koken" \
 	"Mailcow (Dockerized)" \
 	"Mailpile" \
 	"Mastodon" \
