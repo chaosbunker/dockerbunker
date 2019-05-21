@@ -12,12 +12,12 @@
 |[cryptpad](https://cryptpad.fr/)|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server)|[Piwik](https://github.com/piwik/piwik)|
 |[CS50 IDE](https://manual.cs50.net/ide/offline)|[json-server](https://github.com/typicode/json-server)|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)|
 |[Dillinger](https://dillinger.io/)|[Kanboard](https://kanboard.net/)|[Seafile Pro](https://github.com/haiwen/seafile)|
-|[Drone CI](https://github.com/drone/drone)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[Searx](https://github.com/asciimoo/searx.git)|
-|[Ghost Blog](https://ghost.org/)|[Mailpile](https://www.mailpile.is/)|[Mozilla send](https://send.firefox.com/)|
-|[GitBucket](https://github.com/gitbucket/gitbucket)|[Mastodon](https://github.com/tootsuite/mastodon)|[sFTP Server](https://github.com/atmoz/sftp)|
-|[Gitea](https://gitea.io/en-us/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)
-|[Gitlab CE](https://gitlab.com/)|[Open Project](https://www.openproject.org/)|[Wordpress](https://wordpress.org/)|
-|[Gogs](https://gogs.io/)|||
+|[Drone CI](https://github.com/drone/drone)|[Koken](http://koken.me/)|[Searx](https://github.com/asciimoo/searx.git)|
+|[Ghost Blog](https://ghost.org/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[Mozilla send](https://send.firefox.com/)|
+|[GitBucket](https://github.com/gitbucket/gitbucket)|[Mailpile](https://www.mailpile.is/)|[sFTP Server](https://github.com/atmoz/sftp)|
+|[Gitea](https://gitea.io/en-us/)|[Mastodon](https://github.com/tootsuite/mastodon)|[Wekan](https://github.com/wekan/wekan)
+|[Gitlab CE](https://gitlab.com/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[Wordpress](https://wordpress.org/)|
+|[Gogs](https://gogs.io/)|[Open Project](https://www.openproject.org/)||
 
 ## Prerequisites
 
