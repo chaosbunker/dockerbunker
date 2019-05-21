@@ -71,7 +71,8 @@ configure() {
 	SERVICE_DOMAIN=${SERVICE_DOMAIN}
 	NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
 	NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
-
+	NEXTCLOUD_TRUSTED_DOMAINS=${SERVICE_DOMAIN}
+	
 	# ------------------------------
 	# SQL database configuration
 	# ------------------------------
