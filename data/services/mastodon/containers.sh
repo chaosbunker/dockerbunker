@@ -2,6 +2,8 @@ mastodon_service_dockerbunker() {
 	docker run -d --user mastodon \
 		--name=${FUNCNAME[0]//_/-} \
 		--restart=always \
+		--health-cmd="wget -q --spider --header 'x-forwarded-proto: https' --proxy=off localhost:3000/api/v1/instance || exit 1" \
+		--health-interval=30s \
 		--network ${NETWORK} \
 		--network dockerbunker-${SERVICE_NAME} \
 		--env RUN_DB_MIGRATIONS=true --env UID=991 --env GID=991 --env WEB_CONCURRENCY=16 --env MAX_THREADS=20 --env SIDEKIQ_WORKERS=25 \
@@ -16,6 +18,8 @@ mastodon_streaming_dockerbunker() {
 	docker run -d --user mastodon \
 		--name=${FUNCNAME[0]//_/-} \
 		--restart=always \
+		--health-cmd="wget -q --spider --header 'x-forwarded-proto: https' --proxy=off localhost:3000/api/v1/instance || exit 1" \
+		--health-interval=30s \
 		--network ${NETWORK} \
 		--network dockerbunker-${SERVICE_NAME} \
 		--env RUN_DB_MIGRATIONS=true --env UID=991 --env GID=991 --env WEB_CONCURRENCY=16 --env MAX_THREADS=20 --env SIDEKIQ_WORKERS=25 \
@@ -93,6 +97,6 @@ mastodon_makeadmin_dockerbunker() {
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-v ${SERVICE_NAME}-data-vol-2:${volumes[${SERVICE_NAME}-data-vol-2]} \
 		-v ${SERVICE_NAME}-data-vol-3:${volumes[${SERVICE_NAME}-data-vol-3]} \
-	${IMAGES[service]} bash -c "RAILS_ENV=production bundle exec rails mastodon:make_admin USERNAME=${1}" >/dev/null
+	${IMAGES[service]} bash -c "RAILS_ENV=production bin/tootctl accounts modify ${1} --role admin" >/dev/null
 	exit_response
 }

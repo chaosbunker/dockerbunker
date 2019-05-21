@@ -16,7 +16,7 @@ declare -a containers=( "${SERVICE_NAME}-postgres-dockerbunker" "${SERVICE_NAME}
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" "${SERVICE_NAME}-streaming-dockerbunker" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/mastodon/public/system" [${SERVICE_NAME}-data-vol-2]="/mastodon/public/assets" [${SERVICE_NAME}-data-vol-3]="/mastodon/public/packs" [${SERVICE_NAME}-postgres-vol-1]="/var/lib/postgresql/data" [${SERVICE_NAME}-elasticsearch-vol-1]="/usr/share/elasticsearch/data" [${SERVICE_NAME}-redis-vol-1]="/data" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
-declare -A IMAGES=( [service]="tootsuite/mastodon:v2.6.1" [redis]="redis:4.0-alpine" [postgres]="postgres:9.6-alpine" [elasticsearch]="docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.3" )
+declare -A IMAGES=( [service]="tootsuite/mastodon" [redis]="redis:5.0-alpine" [postgres]="postgres:9.6-alpine" [elasticsearch]="docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.3" )
 
 if [[ $1 == "make_admin" ]];then
 	if [[ -z $2 || $3 ]];then
@@ -43,7 +43,11 @@ upgrade() {
 	mastodon_redis_dockerbunker
 	mastodon_dbmigrateandprecompileassets_dockerbunker
 
-	docker_run_all
+	[[ ${ES_ENABLED} ]] && docker_run mastodon_elasticsearch_dockerbunker
+
+	docker_run mastodon_service_dockerbunker
+	docker_run mastodon_sidekiq_dockerbunker
+	docker_run mastodon_streaming_dockerbunker
 
 	delete_old_images
 
@@ -59,6 +63,12 @@ configure() {
 
 	configure_mx
 
+	if [ "${ES_ENABLED}" ]; then
+	  read -p "Enable Elasticsearch: " -ei "${ES_ENABLED}" ES_ENABLED
+	else
+	  read -p "Enable Elasticsearch: " -ei "false" ES_ENABLED
+	fi
+	
 	# avoid tr illegal byte sequence in macOS when generating random strings
 	if [[ $OSTYPE =~ "darwin" ]];then
 		if [[ $LC_ALL ]];then
@@ -88,7 +98,7 @@ configure() {
 	DB_NAME=postgres
 	DB_PASS=
 	DB_PORT=5432
-	ES_ENABLED=true
+	ES_ENABLED=${ES_ENABLED}
 	ES_HOST=es
 	ES_PORT=9200
 
@@ -106,6 +116,8 @@ configure() {
 	if [[ $OSTYPE =~ "darwin" ]];then
 		[[ $oldLC_ALL ]] && export LC_ALL=$oldLC_ALL || unset LC_ALL
 	fi
+
+	echo ""
 
 	mastodon_generatevapidkeys_dockerbunker
 	source "${ENV_DIR}"/${SERVICE_NAME}_tmp.env
@@ -127,7 +139,11 @@ setup() {
 	mastodon_redis_dockerbunker
 	mastodon_dbmigrateandprecompileassets_dockerbunker
 
-	docker_run_all
+	[[ ${ES_ENABLED} ]] && docker_run mastodon_elasticsearch_dockerbunker
+
+	docker_run mastodon_service_dockerbunker
+	docker_run mastodon_sidekiq_dockerbunker
+	docker_run mastodon_streaming_dockerbunker
 
 	post_setup_routine
 

@@ -10,16 +10,17 @@ for env in "${environment[@]}";do
 	[[ -f "${BASE_DIR}/$env" ]] && source "${BASE_DIR}/$env"
 done
 
-image=( "dockerbunker/mastodon${glitch}" )
+image=( "tootsuite/mastodon" )
 
 echo -en "Making ${2} admin..."
 docker run -it --rm \
-	--name=${SERVICE_NAME}-setup-dockerbunker \
+	--name=${SERVICE_NAME}-admin-dockerbunker \
 	--network dockerbunker-${SERVICE_NAME} \
 	--env-file "${SERVICE_ENV}" \
-	-v mastodonglitch-data-vol-1:/mastodon/public/system \
-	-v mastodonglitch-data-vol-2:/mastodon/public/assets \
-	-v mastodonglitch-data-vol-3:/mastodon/public/packs \
-${IMAGES[service]} bash -c "RAILS_ENV=production bundle exec rails mastodon:make_admin USERNAME=${2}" >/dev/null
+	--env user="${2}" \
+	-v mastodon-data-vol-1:/mastodon/public/system \
+	-v mastodon-data-vol-2:/mastodon/public/assets \
+	-v mastodon-data-vol-3:/mastodon/public/packs \
+${IMAGES[service]} bash -c "RAILS_ENV=production bin/tootctl accounts modify ${user} --role user"
 exit_response
 
