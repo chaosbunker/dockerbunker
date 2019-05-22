@@ -2,22 +2,24 @@
 
 `dockerbunker` is a tool that helps configure, deploy and manage dockerized web-applications or static sites behind an nginx reverse proxy. Apps can easily be fully backed up or restored from a previous backup. The only requirement is docker.
 
-[![asciicast](preview.png "dockerbunker asciicast preview")](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWmh)
+Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWmh) to see `dockerbunker`in action.
 
 #### Currently included:
 
 | A - G        | H - O           | P - Z  |
 | :-------------: |:-------------:| :-----:|
-|[Bitbucket](https://www.atlassian.com/software/bitbucket)|[Hastebin](https://hastebin.com/about.md)|[Padlock Cloud](https://github.com/padlock/padlock-cloud)|
+|[Bitbucket](https://www.atlassian.com/software/bitbucket)|[**Hastebin**](https://hastebin.com/about.md)|[**Padlock Cloud**](https://github.com/padlock/padlock-cloud)|
 |[cryptpad](https://cryptpad.fr/)|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server)|[Piwik](https://github.com/piwik/piwik)|
 |[CS50 IDE](https://manual.cs50.net/ide/offline)|[json-server](https://github.com/typicode/json-server)|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)|
-|[Dillinger](https://dillinger.io/)|[Kanboard](https://kanboard.net/)|[Seafile Pro](https://github.com/haiwen/seafile)|
-|[Drone CI](https://github.com/drone/drone)|[Koken](http://koken.me/)|[Searx](https://github.com/asciimoo/searx.git)|
-|[Ghost Blog](https://ghost.org/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[Mozilla send](https://send.firefox.com/)|
+|[Dillinger](https://dillinger.io/)|[Kanboard](https://kanboard.net/)|[**Seafile Pro**](https://github.com/haiwen/seafile)|
+|[**Drone CI**](https://github.com/drone/drone)|[Koken](http://koken.me/)|[**Searx**](https://github.com/asciimoo/searx.git)|
+|[**Ghost Blog**](https://ghost.org/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[**Mozilla send**](https://send.firefox.com/)|
 |[GitBucket](https://github.com/gitbucket/gitbucket)|[Mailpile](https://www.mailpile.is/)|[sFTP Server](https://github.com/atmoz/sftp)|
-|[Gitea](https://gitea.io/en-us/)|[Mastodon](https://github.com/tootsuite/mastodon)|[Wekan](https://github.com/wekan/wekan)
-|[Gitlab CE](https://gitlab.com/)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[Wordpress](https://wordpress.org/)|
-|[Gogs](https://gogs.io/)|[Open Project](https://www.openproject.org/)||
+|[**Gitea**](https://gitea.io/en-us/)|[**Mastodon**](https://github.com/tootsuite/mastodon)|[**Wekan**](https://github.com/wekan/wekan)
+|[Gitlab CE](https://gitlab.com/)|[**Nextcloud**](https://github.com/nextcloud/docker)|[**Wordpress**](https://wordpress.org/)|
+|[**Gogs**](https://gogs.io/)|[Open Project](https://www.openproject.org/)||
+
+**Fair warning:** While all services appeared fully functional at the time I implemented them, I cannot guarantee that they still all are functional. Sometimes I just added something I was playing around with and hadn't tested every part of it. If something turns out to be not working, it often times broke because of changes that were made to the software and it most cases it's trivial to make it work again. I **marked bold** all the apps I am personally using with `dockerbunker`, as well as those that I recently tested and expect to work without issues. That being said, use this at your own risk. And if you do use `dockerbunker` and notice that something doesn't work, please file an issue .. or even better, submit a pull request. Contributions are welcome:)
 
 ## Prerequisites
 
@@ -27,8 +29,17 @@
 
 	On macOS via [homebrew](https://brew.sh)
 	- Bash 4+ -> `brew install bash`
-	- GNU grep -> `brew install grep --with-default-names`
-	- GNU sed -> `brew install gnu-sed --default-names`
+	- GNU grep -> `brew install grep`
+	- GNU sed -> `brew install gnu-sed`
+	
+		```
+		ln -sv /usr/local/bin/ggrep /usr/local/bin/grep
+		ln -sv /usr/local/bin/gsed /usr/local/bin/sed
+		```
+
+		Make sure `/usr/local/bin`is added to your PATH! If it's not:
+        
+		`echo 'PATH="/usr/local/bin:$PATH"' >> ~/.bash_profile`
 
 ## How to get started:
 
@@ -46,13 +57,13 @@
 5. Set up the service. This will
 	- Create an internal network if necessary
 	- Create volumes
-	- Pull or buld images
+	- Pull images
 	- Run containers
 	- Obtain certificate from Let's Encrypt (if chosen during config)
 
 That's it.
 
-Now when selecting the same service again in the dockerbunker menu, there will be more options depending on the current state of the service. For example:
+Now when selecting the same service again in the `dockerbunker` menu, there will be more options depending on the current state of the service. For example:
 ```
 Nextcloud
 1) Reconfigure service
@@ -93,6 +104,6 @@ Please refer to the documentation of each web-app (regarding default credentials
 
 #### Why I made this
 
-I know that it is not really ideal and recommended to do something like this with bash alone. `dockerbunker` is an idea that went a bit out of control. It was inspired by [@DFabric's](https://github.com/DFabric/) [DPlatform-DockerShip](https://github.com/DFabric/DPlatform-DockerShip). You can read more about why I made dockerbunker [here](https://chaosbunker.com/projects/tech/dockerbunker) (tl;dr: I enjoyed the process)
+I know that it is not really ideal and recommended to do something like this with shell scripts. `dockerbunker` is an idea that went a bit out of control. It was inspired by [@DFabric's](https://github.com/DFabric/) [DPlatform-DockerShip](https://github.com/DFabric/DPlatform-DockerShip). You can read more about why I made dockerbunker [here](https://chaosbunker.com/post/dockerbunker) (tl;dr: I enjoyed the process)
 
 **Important: Please make sure you agree with the license(s) of the open source software you are installing via dockerbunker. Any part of dockerbunker itself is released under the MIT License.**
