@@ -54,9 +54,14 @@ declare -a ALL_SERVICES=( \
 	"Wordpress" \
 	)
 
+[[ -f "${ENV_DIR}"/custom.env ]] \
+	&& . "${ENV_DIR}"/custom.env
+
+IFS=$'\n' sorted=($(printf '%s\n' "${ALL_SERVICES[@]}"|sort))
+
 # style menu according to what status service has
 declare -A SERVICES_ARR
-for service in "${ALL_SERVICES[@]}";do
+for service in "${sorted[@]}";do
 	service_name="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
 	if [[ "${INSTALLED_SERVICES[@]}" =~ $service ]];then
 		[[ "${STOPPED_SERVICES[@]}" =~ $service ]] && service_status="$(printf "\e[32m${service}\e[0m \e[31m(Stopped)\e[0m")" || service_status="$(printf "\e[32m${service}\e[0m")"
