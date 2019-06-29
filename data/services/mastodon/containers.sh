@@ -18,7 +18,7 @@ mastodon_streaming_dockerbunker() {
 	docker run -d --user mastodon \
 		--name=${FUNCNAME[0]//_/-} \
 		--restart=always \
-		--health-cmd="wget -q --spider --header 'x-forwarded-proto: https' --proxy=off localhost:3000/api/v1/instance || exit 1" \
+		--health-cmd="wget -q --spider --header 'x-forwarded-proto: https' --proxy=off localhost:4000/api/v1/instance || exit 1" \
 		--health-interval=30s \
 		--network ${NETWORK} \
 		--network dockerbunker-${SERVICE_NAME} \
