@@ -1,28 +1,5 @@
 # All functions used during setup of a service
 
-docker_build() {
-	if [[ -z $1 ]];then
-		for key in ${!BUILD_IMAGES[@]};do
-			if [[ -f "${BUILD_IMAGES[$key]}/Dockerfile" ]];then
-				if [[ $(docker images | grep "\<${key}\>") ]];then
-					echo ""
-					prompt_confirm "Existing image found for ${key}. Rebuild image?" || return
-				fi
-				echo -e "\n\e[1mBuilding image ${1}\e[0m"
-				docker build -t $key "${BUILD_IMAGES[$key]}"
-			fi
-		done
-	else
-		if [[ -f "${BUILD_IMAGES[$1]}/Dockerfile" ]];then
-				if [[ $(docker images | grep "\<${1}\>") ]];then
-					prompt_confirm "Existing image found for ${1}. Rebuild image?" || return
-				fi
-				echo -e "\n\e[1mBuilding image ${1}\e[0m"
-				docker build -t $1 "${BUILD_IMAGES[$1]}"
-		fi
-	fi
-}
-
 docker_pull() {
 	for image in ${IMAGES[@]};do
 		[[ "$image" != "dockerbunker/${SERVICE_NAME}" ]] \
@@ -83,7 +60,6 @@ pull_and_compare() {
 		echo ""
 		docker-compose pull
 	else
-		docker_build
 		docker_pull
 	fi
 
@@ -134,7 +110,7 @@ delete_old_images() {
 	fi
 
 	[[ -z ${old_images_to_delete[0]} ]] \
-		&& echo -e "\n\e[1mImages did not change.\e[0m" \
+		&& echo -e "\n\e[1mImage(s) did not change.\e[0m" \
 		&& rm "${BASE_DIR}"/.image_shas.tmp \
 		&& return
 
@@ -154,16 +130,6 @@ delete_old_images() {
 	rm "${BASE_DIR}"/.image_shas.tmp
 }
 
-add_submodule() {
-	if [[ ${repoURL} && ! -d "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME} ]];then
-		echo -n "Cloning "${PROPER_NAME}" repository into data/Dockerfiles/${SERVICE_NAME}"
-		git submodule add -f ${repoURL} data/Dockerfiles/${SERVICE_NAME} >/dev/null
-	elif [[ -d "${BASE_DIR}"/data/Dockerfiles/${SERVICE_NAME} ]];then
-		git submodule update --remote data/Dockerfiles/${SERVICE_NAME}
-	fi
-	echo ""
-}
-
 setup_nginx() {
 	[[ ! $(docker ps -q --filter name=^/${NGINX_CONTAINER}$) ]] && bash "${SERVICES_DIR}"/nginx/nginx.sh setup
 }
@@ -178,8 +144,6 @@ initial_setup_routine() {
 		[[ ( $(docker inspect $container 2> /dev/null) &&  $? == 0 ) ]] && docker rm $container
 	done
 
-	[[ $repoURL ]] && add_submodule
-	docker_build
 	docker_pull
 	
 	if [[ ${volumes[@]} ]];then

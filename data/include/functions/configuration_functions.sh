@@ -5,8 +5,6 @@ pre_configure_routine() {
 	if [[ "${CONFIGURED_SERVICES[@]}" =~ ${PROPER_NAME} ]] || [[ -f "${ENV_DIR}/${SERVICE_NAME}" ]]|| [[ "${INSTALLED_SERVICES[@]}" =~ ${PROPER_NAME} ]];then
 		prompt_confirm  "Existing configuration found. Destroy containers and reconfigure?" && destroy || echo "Exiting..";exit
 	fi
-
-	[[ ${repoURL} ]] && add_submodule
 }
 
 # Ask the user what fqdn to use for the service

@@ -41,7 +41,7 @@ options_menu() {
 	elif [[ ${missingContainers[@]} ]];then
 			echo -e "\n\n\e[3m\xe2\x86\x92 \e[3mThe following containers are missing\e[0m"
 			for container in "${missingContainers[@]}";do echo -e "\n    - $container";done
-			menu=( "Restore missing containers" "Reconfigure service" "Reinstall service" "Backup Service" "Upgrade Image(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
+			menu=( "Restore missing containers" "Reconfigure service" "Start container(s)" "Stop container(s)" "Reinstall service" "Backup Service" "Restore Service" "Upgrade Image(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
 	elif [[ $RUNNING = false ]];then
 		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Start container(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
 		add_ssl_menuentry menu 2
@@ -687,7 +687,7 @@ start_all() {
 restart_all() {
 	for service in "${INSTALLED_SERVICES[@]}";do
 		service="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
-		source "${SERVICE_ENV}"
+		source "${ENV_DIR}/${service}.env"
 		source "${SERVICES_DIR}"/${service}/${service}.sh restart_containers
 	done
 	restart_nginx
