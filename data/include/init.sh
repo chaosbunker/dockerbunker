@@ -12,7 +12,6 @@ init_dockerbunker() {
 			CONF_DIR="${BASE_DIR}/data/conf"
 			ENV_DIR="${BASE_DIR}/data/env"
 			SERVICE_ENV="\${ENV_DIR}/\${SERVICE_NAME}.env"
-			DOCKERFILES="${BASE_DIR}/data/Dockerfiles"
 			CONTAINERS=\${SERVICE_DIR}/containers.sh
 
 			LE_EMAIL=
