@@ -41,6 +41,7 @@ declare -a ALL_SERVICES=( \
 	"Mailcow (Dockerized)" \
 	"Mailpile" \
 	"Mastodon" \
+	"Matomo" \
 	"Nextcloud" \
 	"Open Project" \
 	"Padlock Cloud" \
