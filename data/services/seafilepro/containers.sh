@@ -29,7 +29,7 @@ seafilepro_setup_dockerbunker() {
 }
 
 seafilepro_service_dockerbunker() {
-	docker run -d \
+	docker run -e TZ=Europe/Amsterdam -d \
 		--name=${FUNCNAME[0]//_/-} \
 		--restart=always \
 		--network ${NETWORK} \

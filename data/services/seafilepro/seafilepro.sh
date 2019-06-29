@@ -19,7 +19,7 @@ declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/seafile" [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
 declare -A IMAGES=( [db]="mariadb:10.3" [service]="chaosbunker/seafile-pro-docker" )
-current_version="6.3.4"
+current_version="6.3.14"
 
 [[ -z $1 ]] && options_menu
 
