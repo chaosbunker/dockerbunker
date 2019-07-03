@@ -15,7 +15,7 @@ done
 
 declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" "${SERVICE_NAME}-db-dockerbunker" )
-declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/var/www/html" [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" )
+declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/var/www/html/config" [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
 declare -A IMAGES=( [service]="matomo" [db]="mariadb:10.2" )
