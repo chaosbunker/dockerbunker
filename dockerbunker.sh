@@ -28,6 +28,7 @@ declare -a ALL_SERVICES=( \
 	"CS50 IDE" \
 	"Dillinger" \
 	"Drone CI" \
+	"Firefly III" \
 	"Ghost" \
 	"GitBucket" \
 	"Gitea" \
