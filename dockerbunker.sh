@@ -29,6 +29,7 @@ declare -a ALL_SERVICES=( \
 	"Dillinger" \
 	"Drone CI" \
 	"Firefly III" \
+	"Firefox Sync" \
 	"Ghost" \
 	"GitBucket" \
 	"Gitea" \
