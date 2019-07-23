@@ -66,17 +66,17 @@ IFS=$'\n' sorted=($(printf '%s\n' "${ALL_SERVICES[@]}"|sort))
 declare -A SERVICES_ARR
 for service in "${sorted[@]}";do
 	service_name="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
-	if [[ "${INSTALLED_SERVICES[@]}" =~ $service ]];then
-		[[ "${STOPPED_SERVICES[@]}" =~ $service ]] && service_status="$(printf "\e[32m${service}\e[0m \e[31m(Stopped)\e[0m")" || service_status="$(printf "\e[32m${service}\e[0m")"
-		SERVICES_ARR+=( [$service_status]="${service_name}" )
+	if [[ "${INSTALLED_SERVICES[@]}" =~ "$service" ]];then
+		[[ "${STOPPED_SERVICES[@]}" =~ "$service" ]] && service_status="$(printf "\e[32m${service}\e[0m \e[31m(Stopped)\e[0m")" || service_status="$(printf "\e[32m${service}\e[0m")"
+		SERVICES_ARR+=( ["$service_status"]="${service_name}" )
 		AVAILABLE_SERVICES+=( "$service_status" )
-	elif [[ "${CONFIGURED_SERVICES[@]}" =~ $service ]];then
+	elif [[ "${CONFIGURED_SERVICES[@]}" =~ "$service" ]];then
 		service_status="$(printf "\e[33m${service}\e[0m")"
-		SERVICES_ARR+=( [$service_status]="${service_name}" )
+		SERVICES_ARR+=( ["$service_status"]="${service_name}" )
 		AVAILABLE_SERVICES+=( "$service_status" )
 	else
 		service_status="$(printf "${service}")"
-		SERVICES_ARR+=( [$service_status]="${service_name}" )
+		SERVICES_ARR+=( ["$service_status"]="${service_name}" )
 		AVAILABLE_SERVICES+=( "$service_status" )
 	fi
 done
