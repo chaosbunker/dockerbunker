@@ -20,7 +20,7 @@ declare -A IMAGES=( [service]="tootsuite/mastodon:v2.9.2" [redis]="redis:5.0-alp
 
 if [[ $1 == "make_admin" ]];then
 	if [[ -z $2 || $3 ]];then
-		echo "Usage: ./mastodon.sh make_admin username"
+		echo "Usage: "${BASE_DIR}"/data/services/mastodon/mastodon.sh make_admin username"
 		exit 1
 	else
 		mastodon_makeadmin_dockerbunker $2
@@ -69,12 +69,6 @@ configure() {
 	set_domain
 
 	configure_mx
-
-	if [ "${ES_ENABLED}" ]; then
-	  read -p "Enable Elasticsearch: " -ei "${ES_ENABLED}" ES_ENABLED
-	else
-	  read -p "Enable Elasticsearch: " -ei "false" ES_ENABLED
-	fi
 	
 	# avoid tr illegal byte sequence in macOS when generating random strings
 	if [[ $OSTYPE =~ "darwin" ]];then
@@ -105,7 +99,6 @@ configure() {
 	DB_NAME=postgres
 	DB_PASS=
 	DB_PORT=5432
-	ES_ENABLED=${ES_ENABLED}
 	ES_HOST=es
 	ES_PORT=9200
 
@@ -146,16 +139,15 @@ setup() {
 	mastodon_redis_dockerbunker
 	mastodon_dbmigrateandprecompileassets_dockerbunker
 
-	[[ ${ES_ENABLED} ]] && docker_run mastodon_elasticsearch_dockerbunker
-
+	docker_run mastodon_elasticsearch_dockerbunker
+	docker_run mastodon_streaming_dockerbunker
 	docker_run mastodon_service_dockerbunker
 	docker_run mastodon_sidekiq_dockerbunker
-	docker_run mastodon_streaming_dockerbunker
 
 	post_setup_routine
 
 	echo -e "\nAfter signing up on ${SERVICE_DOMAIN} make your user an admin by running\n\n\
-${SERVICES_DIR}/${SERVICE_NAME}/./make_admin.sh username\n"
+${SERVICES_DIR}/${SERVICE_NAME}/./mastodon.sh make_admin username\n"
 
 }
 
@@ -164,3 +156,4 @@ if [[ $1 == "letsencrypt" ]];then
 else
 	$1
 fi
+
