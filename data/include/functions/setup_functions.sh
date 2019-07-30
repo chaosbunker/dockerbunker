@@ -21,17 +21,7 @@ docker_run_all() {
 			&& exit_response \
 			|| echo "- $container (already running)"
 	done
-
-
-	if elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}";then
-		remove_from_STOPPED_SERVICES
-	fi
-
 	connect_containers_to_network
-
-	activate_nginx_conf
-
-	restart_nginx
 }
 
 get_current_images_sha256() {
@@ -83,7 +73,7 @@ pull_and_compare() {
 			unchanged_images_to_keep+=( ${CURRENT_IMAGES_SHA256[$key]} )
 		fi
 	done
-		
+
 	if [[ ${DOCKER_COMPOSE} ]] \
 	&& [[ ${old_images_to_delete[0]} ]];then
 		pushd "${SERVICE_HOME}" >/dev/null
@@ -91,14 +81,18 @@ pull_and_compare() {
 		docker-compose down
 		echo -e "\n\e[1mBringing ${PROPER_NAME} back up\e[0m"
 		docker-compose up -d
-		connect_containers_to_network
 		popd >/dev/null
 	fi
-
+	
 	[[ ${old_images_to_delete[0]} ]] \
 		&& declare -p old_images_to_delete >> "${BASE_DIR}"/.image_shas.tmp
 	[[ ${unchanged_images_to_keep[0]} ]] \
 		&& declare -p unchanged_images_to_keep >> "${BASE_DIR}"/.image_shas.tmp
+
+	[[ -z ${old_images_to_delete[0]} ]] \
+		&& echo -e "\n\e[1mImage(s) did not change.\e[0m" \
+		&& rm "${BASE_DIR}"/.image_shas.tmp \
+		&& exit 0
 }
 
 delete_old_images() {
@@ -108,11 +102,6 @@ delete_old_images() {
 		echo -en "\n\e[31mCould not find digests of current images.\nExiting.\e[0m"
 		return
 	fi
-
-	[[ -z ${old_images_to_delete[0]} ]] \
-		&& echo -e "\n\e[1mImage(s) did not change.\e[0m" \
-		&& rm "${BASE_DIR}"/.image_shas.tmp \
-		&& return
 
 	prompt_confirm "Delete all old images?"
 	if [[ $? == 0 ]];then
@@ -146,7 +135,7 @@ initial_setup_routine() {
 
 	docker_pull
 	
-	if [[ ${volumes[@]} ]];then
+	if [[ ${volumes[@]} && ! ${DOCKER_COMPOSE} ]];then
 		echo -e "\n\e[1mCreating volumes\e[0m"
 		for volume in "${!volumes[@]}";do
 			[[ ! $(docker volume ls -q --filter name=^${volume}$) ]] \
@@ -236,7 +225,7 @@ connect_containers_to_network() {
 		&& ! [[ $(docker network inspect dockerbunker-network | grep $1) ]] \
 		&& docker network connect ${NETWORK} ${1} >/dev/null \
 		&& return
-	for container in ${add_to_network};do
+	for container in ${add_to_network[@]};do
 		[[ $(docker ps -q --filter name=^/"${container}"$) ]] \
 			&& ! [[ $(docker network inspect dockerbunker-network | grep ${container}) ]] \
 			&& docker network connect ${NETWORK} ${container} >/dev/null
@@ -254,10 +243,6 @@ wait_for_db() {
 
 post_setup_routine() {
 
-	if [[ $SSL_CHOICE == "le" ]] && [[ ! -d "${CONF_DIR}"/nginx/ssl/letsencrypt/${SERVICE_DOMAIN[0]} ]];then
-		letsencrypt issue
-	fi
-
 	remove_from_CONFIGURED_SERVICES
 
 	! elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}" && INSTALLED_SERVICES+=( "${PROPER_NAME}" )
@@ -270,6 +255,18 @@ post_setup_routine() {
 	declare -p INSTALLED_SERVICES >> "${ENV_DIR}/dockerbunker.env"
 	declare -p WEB_SERVICES >> "${ENV_DIR}/dockerbunker.env"
 	declare -p CONTAINERS_IN_DOCKERBUNKER_NETWORK >> "${ENV_DIR}/dockerbunker.env" 2>/dev/null
+
+	if elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}";then
+		remove_from_STOPPED_SERVICES
+	fi
+
+	connect_containers_to_network
+
+	activate_nginx_conf
+
+	if [[ $SSL_CHOICE == "le" ]] && [[ ! -d "${CONF_DIR}"/nginx/ssl/letsencrypt/${SERVICE_DOMAIN[0]} ]];then
+		letsencrypt issue
+	fi
 }
 
 # This function issues a Let's Encrypt certificate if the choice has been made earlier and finally updates the arrays in dockerbunker.env so dockerbunker knows that the service now is installed

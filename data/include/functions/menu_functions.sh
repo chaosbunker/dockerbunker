@@ -14,6 +14,7 @@ options_menu() {
 	if elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}";then
 		for container in "${containers[@]}";do
 			RUNNING=$(docker ps -a -q --filter name=^/${container}$)
+			echo "Status: $RUNNING"
 			if [[ -z ${RUNNING} ]];then
 				echo -e "\n\e[3m$container container missing\e[0m\n"
 				missingContainers=( "$container" )
@@ -592,7 +593,13 @@ upgrade() {
 
 	docker_run_all
 
+	remove_from_STOPPED_SERVICES
+	
 	delete_old_images
+	
+	activate_nginx_conf
+	
+	restart_nginx
 }
 
 reinstall() {
