@@ -124,6 +124,7 @@ setup_nginx() {
 }
 
 # Build image if necessary, set up nginx container if necessary, create or use existing volumes, create networks if necessary, pull images if necessary
+
 initial_setup_routine() {
 	[[ ${STATIC} ]] && return
 
@@ -134,7 +135,13 @@ initial_setup_routine() {
 	done
 
 	docker_pull
-	
+
+	create_volumes
+
+	create_networks
+}
+
+create_volumes() {
 	if [[ ${volumes[@]} && ! ${DOCKER_COMPOSE} ]];then
 		echo -e "\n\e[1mCreating volumes\e[0m"
 		for volume in "${!volumes[@]}";do
@@ -145,7 +152,6 @@ initial_setup_routine() {
 				|| echo "- $volume (already exists)"
 		done
 	fi
-	create_networks
 }
 
 create_networks() {
