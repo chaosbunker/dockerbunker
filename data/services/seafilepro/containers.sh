@@ -28,12 +28,39 @@ seafilepro_setup_dockerbunker() {
 	${IMAGES[service]} $1
 }
 
+seafilepro_memcached_dockerbunker() {
+	docker run --entrypoint memcached -d \
+		--name=${FUNCNAME[0]//_/-} \
+		--restart=always \
+		--net-alias=memcached \
+		--network dockerbunker-seafilepro \
+	${IMAGES[memcached]} -m 256 >/dev/null
+}
+
+seafilepro_elasticsearch_dockerbunker() {
+	docker run -d \
+		--name=${FUNCNAME[0]//_/-} \
+		--restart=always \
+		--net-alias=elasticsearch \
+		--network dockerbunker-seafilepro \
+		-e discovery.type=single-node \
+		-e bootstrap.memory_lock=true \
+		-e "ES_JAVA_OPTS=-Xms1g -Xmx1g" \
+		--ulimit memlock=-1:-1 \
+		-m 2g \
+		-v ${SERVICE_NAME}-elasticsearch-vol-1:${volumes[${SERVICE_NAME}-elasticsearch-vol-1]} \
+	${IMAGES[elasticsearch]} >/dev/null
+}
+
 seafilepro_service_dockerbunker() {
 	docker run -e TZ=Europe/Amsterdam -d \
 		--name=${FUNCNAME[0]//_/-} \
 		--restart=always \
 		--network ${NETWORK} \
 		--network dockerbunker-seafilepro \
-		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
+		--env-file "${SERVICE_ENV}" \
+		-e DB_ROOT_PASSWD=${DBROOT} \
+		-e SEAFILE_SERVER_HOSTNAME=${SERVICE_DOMAIN} \
+		-v ${SERVICE_NAME}-data-vol-2:${volumes[${SERVICE_NAME}-data-vol-2]} \
 	${IMAGES[service]} >/dev/null
 }
