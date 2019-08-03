@@ -89,7 +89,12 @@ pull_and_compare() {
 	[[ ${unchanged_images_to_keep[0]} ]] \
 		&& declare -p unchanged_images_to_keep >> "${BASE_DIR}"/.image_shas.tmp
 
-	[[ -z ${old_images_to_delete[0]} ]] \
+	for container in "${containers[@]}";do
+		! [[ $(docker ps -q --filter name="^/${container}$") ]] \
+			&& missing_containers+=( $container )
+	done
+
+	[[ -z ${old_images_to_delete[0]} ]] && [[ -z ${missing_containers[0]} ]] \
 		&& echo -e "\n\e[1mImage(s) did not change.\e[0m" \
 		&& rm "${BASE_DIR}"/.image_shas.tmp \
 		&& exit 0
@@ -102,6 +107,9 @@ delete_old_images() {
 		echo -en "\n\e[31mCould not find digests of current images.\nExiting.\e[0m"
 		return
 	fi
+
+	[[ -z ${old_images_to_delete[0]} ]] \
+		&& return
 
 	prompt_confirm "Delete all old images?"
 	if [[ $? == 0 ]];then
