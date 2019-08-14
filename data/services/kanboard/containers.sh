@@ -4,6 +4,6 @@ kanboard_service_dockerbunker() {
 		--restart=always \
 		--network ${NETWORK} \
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
-		-v ${SERVICE_NAME}-db-vol-1:${volumes[${SERVICE_NAME}-db-vol-1]} \
+		-v ${SERVICE_NAME}-data-vol-2:${volumes[${SERVICE_NAME}-data-vol-2]} \
 	${IMAGES[service]} >/dev/null
 }
