@@ -21,44 +21,10 @@ source "${BASE_DIR}"/data/include/init.sh
 
 unset AVAILABLE_SERVICES count
 # All available services
-declare -a ALL_SERVICES=( \
-	"Static HTML Site" \
-	"Bitbucket" \
-	"Cryptpad" \
-	"CS50 IDE" \
-	"Dillinger" \
-	"Drone CI" \
-	"Firefly III" \
-	"Firefox Sync" \
-	"Ghost" \
-	"GitBucket" \
-	"Gitea" \
-	"Gitlab CE" \
-	"Gogs" \
-	"Hastebin" \
-	"IPsec VPN Server" \
-	"json-server" \
-	"Kanboard" \
-	"Koken" \
-	"Mailcow (Dockerized)" \
-	"Mailpile" \
-	"Mastodon" \
-	"Matomo" \
-	"Nextcloud" \
-	"Open Project" \
-	"Padlock Cloud" \
-	"Piwik" \
-	"Rocket.Chat" \
-	"Seafile Pro" \
-	"Searx" \
-	"Send" \
-	"sFTP Server" \
-	"Wekan" \
-	"Wordpress" \
-	)
+IFS=$'\n' declare -a ALL_SERVICES=( "$(cat ${BASE_DIR}/included_services)" )
 
-[[ -f "${ENV_DIR}"/custom.env ]] \
-	&& . "${ENV_DIR}"/custom.env
+[[ -f "${BASE_DIR}"/included_services.custom ]] \
+	&& IFS=$'\n' declare -a ALL_SERVICES+=( "$(cat ${BASE_DIR}/included_services.custom | sed '/^#/d')" )
 
 IFS=$'\n' sorted=($(printf '%s\n' "${ALL_SERVICES[@]}"|sort))
 
