@@ -1,0 +1,2 @@
+# Each line added here will be shown as a service, when executing ./dockerbunker
+# Useful if you want to add a service that is not included in dockerbunker
