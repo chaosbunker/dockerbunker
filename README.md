@@ -6,20 +6,16 @@ Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWm
 
 #### Currently included:
 
-| A - G        | H - N           | O - Z  |
-| :-------------: |:-------------:| :-----:|
-|[Bitbucket](https://www.atlassian.com/software/bitbucket)|[**Hastebin**](https://hastebin.com/about.md)|[Open Project](https://www.openproject.org/)|
-|[cryptpad](https://cryptpad.fr/)|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server)|[**Padlock Cloud**](https://github.com/padlock/padlock-cloud)|
-|[CS50 IDE](https://manual.cs50.net/ide/offline)|[json-server](https://github.com/typicode/json-server)|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)|
-|[Dillinger](https://dillinger.io/)|[Kanboard](https://kanboard.net/)|[**Seafile Pro**](https://github.com/haiwen/seafile)|
-|[**Drone CI**](https://github.com/drone/drone)|[Koken](http://koken.me/)|[**Searx**](https://github.com/asciimoo/searx.git)|
-|[**Firefly III**](https://github.com/firefly-iii/firefly-iii)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[sFTP Server](https://github.com/atmoz/sftp)|
-|[**Firefox Sync Server**](https://github.com/mozilla-services/syncserver)|[Mailpile](https://www.mailpile.is/)|[**Wekan**](https://github.com/wekan/wekan)|
-|[**Ghost Blog**](https://ghost.org/)|[**Mastodon**](https://github.com/tootsuite/mastodon)|[**Wordpress**](https://wordpress.org/)|
-|[GitBucket](https://github.com/gitbucket/gitbucket)|[**Matomo Analytics**](https://github.com/matomo-org/docker)||
-|[**Gitea**](https://gitea.io/en-us/)|[**Mozilla send**](https://send.firefox.com/)||
-|[Gitlab CE](https://gitlab.com/)|[**Nextcloud**](https://github.com/nextcloud/docker)||
-|[**Gogs**](https://gogs.io/)|||
+| A - E     | F-G                 | H-L              | M-O                | P-Z           |
+|-----------|---------------------|------------------|--------------------|---------------|
+| Bitbucket | Fathom              | Hastebin         | Mailcow Dockerized | Padlock Cloud |
+| Commento  | Firefly III         | IPsec VPN Server | Mailpile           | Rocket.Chat   |
+| Cryptpad  | Firefox Sync Server | json-server      | Mastodon           | Seafile Pro   |
+| CS50 IDE  | Ghost Blog          | Kanboard         | Matomo Analytics   | Searx         |
+| Dillinger | GitBucket           | Koken            | Mozilla send       | sFTP Server   |
+| Drone CI  | Gitea               |                  | Nextcloud          | Wekan         |
+|           | Gitlab CE           |                  | Open Project       | Wordpress     |
+|           | Gogs                |                  |                    |               |
 
 **Fair warning:** While all services appeared fully functional at the time I implemented them, I cannot guarantee that they still all are functional. Sometimes I just added something I was playing around with and hadn't tested every part of it. If something turns out to be not working, it often times broke because of changes that were made to the software and it most cases it's trivial to make it work again. I **marked bold** all the apps I am personally using with `dockerbunker`, as well as those that I recently tested and expect to work without issues. That being said, use this at your own risk. And if you do use `dockerbunker` and notice that something doesn't work, please file an issue .. or even better, submit a pull request. Contributions are welcome:)
 
