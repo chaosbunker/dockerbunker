@@ -12,7 +12,7 @@ Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWm
 |[Bitbucket](https://www.atlassian.com/software/bitbucket)|[**Hastebin**](https://hastebin.com/about.md)|[Open Project](https://www.openproject.org/)|
 |[**Commento**](https://github.com/adtac/commento)|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server)|[**Padlock Cloud**](https://github.com/padlock/padlock-cloud)|
 |[cryptpad](https://cryptpad.fr/)|[json-server](https://github.com/typicode/json-server)|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)|
-|[CS50 IDE](https://manual.cs50.net/ide/offline)|[**Kanboard**](https://kanboard.net/)|[**Seafile Pro**](https://github.com/haiwen/seafile)|
+|[CS50 IDE](https://manual.cs50.net/ide/offline)|[**Kanboard**](https://kanboard.net/)|[Seafile Pro (broken)](https://github.com/haiwen/seafile)|
 |[Dillinger](https://dillinger.io/)|[Koken](http://koken.me/)|[**Searx**](https://github.com/asciimoo/searx.git)|
 |[**Drone CI**](https://github.com/drone/drone)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[sFTP Server](https://github.com/atmoz/sftp)|
 |[**Fathom Analytics**](https://github.com/usefathom/fathom)|[Mailpile](https://www.mailpile.is/)|[**Wekan**](https://github.com/wekan/wekan)|
