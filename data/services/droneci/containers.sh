@@ -4,7 +4,6 @@ droneci_service_dockerbunker() {
 		--restart=always \
 		--network ${NETWORK} \
 		--env-file "${SERVICE_ENV}" \
-		--publish=7777:80 \
 		--detach=true \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
