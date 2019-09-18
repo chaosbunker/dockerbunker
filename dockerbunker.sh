@@ -164,7 +164,7 @@ do
 		echo "- All dockerbunker volume(s)"
 		echo "- All environment file(s)"
 		echo "- All nginx configuration files"
-		echo "- All self-signed certificates (Let's Encrypt certificates will be retained)"
+		echo "- All SSL Certificates"
 		echo ""
 		prompt_confirm "Continue?" \
 			&& destroy_all=1 destroy_all
