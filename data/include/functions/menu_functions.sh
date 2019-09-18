@@ -235,9 +235,12 @@ options_menu() {
 					|| -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
 					&& echo "- nginx configuration of ${SERVICE_DOMAIN[0]}"
 
-				[[ ${SERVICE_DOMAIN[0]} \
-					&& -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] \
-					&& echo "- self-signed certificate for ${SERVICE_DOMAIN[0]}"
+				if [[ ${SERVICE_DOMAIN[0]} ]];then
+					[[ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] \
+						&& echo "- self-signed certificate for ${SERVICE_DOMAIN[0]}"
+					[[ -f "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf ]] \
+						&& echo "- Let's Encrypt certificate for ${SERVICE_DOMAIN[0]}"
+				fi
 
 				echo ""
 
@@ -518,11 +521,17 @@ remove_environment_files() {
 }
 
 remove_ssl_certificate() {
-	if [[ ${SERVICE_DOMAIN[0]} ]] \
-		&& [[ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]];then
-		echo -en "\n\e[1mRemoving SSL Certificate\e[0m"
-		rm -r "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}
-		exit_response
+	if [[ ${SERVICE_DOMAIN[0]} ]];then
+		[[ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] \
+			&& echo -en "\n\e[1mRemoving SSL Certificates\e[0m" \
+			&& rm -r "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} \
+			&& exit_response
+		[[ -f "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf ]] \
+			&& rm "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf
+		[[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/archive/${SERVICE_DOMAIN[0]} ]] \
+			&& rm -r "${CONF_DIR}"/nginx/ssl/letsencrypt/archive/${SERVICE_DOMAIN[0]}
+		[[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]] \
+			&& rm -r "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]}
 	fi
 }
 
