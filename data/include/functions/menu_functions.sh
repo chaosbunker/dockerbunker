@@ -650,7 +650,7 @@ remove_nginx_conf() {
 disconnect_from_dockerbunker_network() {
 	for container in ${add_to_network[@]};do
 		[[ $container && $(docker ps -q --filter name=^/${container}$) ]] \
-			&&  docker network disconnect ${NETWORK} $container >/dev/null
+			&&  docker network disconnect --force ${NETWORK} $container >/dev/null
 	done
 }
 
@@ -722,6 +722,8 @@ stop_all() {
 
 destroy_all() {
 	# destroy_service() is calling restart_nginx, we don't want this happening after each service is destroyed
+	[[ -z ${CONF_DIR} || -z ${ENV_DIR} || -z ${SERVICES_DIR} ]] \
+		&& echo "Something went wrong. Exiting."
 	export prevent_nginx_restart=1
 	export destroy_all=1
 	all_services=( "${INSTALLED_SERVICES[@]}" "${CONFIGURED_SERVICES[@]}" )
@@ -757,9 +759,7 @@ if [[ "$i" == ${all_services[-1]} ]];then \
 			&& rm -r "${CONF_DIR}"/nginx/ssl/$cert_dir
 	done
 	
-	[[ -d "${ENV_DIR}"/static ]] \
-		&& [[ $(ls -A "${ENV_DIR}"/static) ]] \
-		&& rm "${ENV_DIR}"/static/*
+	rm -rf "${ENV_DIR}"/*
 }
 
 add_ssl_menuentry() {

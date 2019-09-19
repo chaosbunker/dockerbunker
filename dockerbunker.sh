@@ -72,13 +72,13 @@ count=$((${#AVAILABLE_SERVICES[@]}+1))
 	&& count=$(($count+2))
 
 [[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live ]] \
+	&& [[ ${#INSTALLED_SERVICES[@]} > 0 ]] \
 	&& [[ $(ls -A "${CONF_DIR}"/nginx/ssl/letsencrypt/live) ]] \
 	&& AVAILABLE_SERVICES+=( "$renewcerts" ) && cound=$(($count+1))
 
 [[ ${#INSTALLED_SERVICES[@]} > 0 \
 	|| ${#STATIC_SITES[@]} > 0 \
-	|| ${#CONFIGURED_SERVICES[@]} > 0 \
-	|| -f "${BASE_DIR}"/data/env/dockerbunker.env ]] \
+	|| ${#CONFIGURED_SERVICES[@]} > 0 ]] \
 	&& AVAILABLE_SERVICES+=( "$destroyall" ) \
 	&&  count=$(($count+1))
 

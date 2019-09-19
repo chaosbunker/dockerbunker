@@ -139,7 +139,7 @@ initial_setup_routine() {
 	setup_nginx
 
 	for container in "${containers[@]}";do
-		[[ ( $(docker inspect $container 2> /dev/null) &&  $? == 0 ) ]] && docker rm $container
+		[[ ( $(docker inspect $container 2> /dev/null) &&  $? == 0 ) ]] && docker rm -f $container
 	done
 
 	docker_pull
@@ -280,6 +280,8 @@ post_setup_routine() {
 
 	if [[ $SSL_CHOICE == "le" ]] && [[ ! -d "${CONF_DIR}"/nginx/ssl/letsencrypt/${SERVICE_DOMAIN[0]} ]];then
 		letsencrypt issue
+	else
+		restart_nginx
 	fi
 }
 
