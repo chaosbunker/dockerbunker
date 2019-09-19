@@ -15,11 +15,8 @@ declare -A IMAGES=( [service]="nginx:mainline-alpine" )
 
 setup() {
 
-	set +x
-
 	source "${ENV_DIR}"/dockerbunker.env
 
-	echo -e "\n\e[1mNo nginx container found\e[0m"
 	echo -e "\n\e[3m\xe2\x86\x92 Setup nginx\e[0m"
 
 	docker_pull
