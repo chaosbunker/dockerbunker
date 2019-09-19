@@ -725,7 +725,7 @@ destroy_all() {
 	export prevent_nginx_restart=1
 	export destroy_all=1
 	all_services=( "${INSTALLED_SERVICES[@]}" "${CONFIGURED_SERVICES[@]}" )
-	[[ $(docker ps -q --filter name=^/nginx-dockerbunker$) ]] && all_services+=( "nginx" )
+	[[ $(docker ps -a -q --filter name=^/nginx-dockerbunker$) ]] && all_services+=( "nginx" )
 	if [[ ${all_services[0]} ]];then
 			printf "\nThe following Services will be removed: \
 $(for i in "${all_services[@]}";do \
