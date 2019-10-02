@@ -4,8 +4,7 @@ mastodon_service_dockerbunker() {
 		--restart=always \
 		--health-cmd="wget -q --spider --header 'x-forwarded-proto: https' --proxy=off localhost:3000/api/v1/instance || exit 1" \
 		--health-interval=30s \
-		--network ${NETWORK} \
-		--network dockerbunker-${SERVICE_NAME} \
+		--network dockerbunker-${SERVICE_NAME} --net-alias mastodon \
 		--env RUN_DB_MIGRATIONS=true --env UID=991 --env GID=991 --env WEB_CONCURRENCY=16 --env MAX_THREADS=20 --env SIDEKIQ_WORKERS=25 \
 		--env-file "${SERVICE_ENV}" \
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
@@ -20,11 +19,10 @@ mastodon_streaming_dockerbunker() {
 		--restart=always \
 		--health-cmd="wget -q --spider --header 'x-forwarded-proto: https' --proxy=off localhost:4000/api/v1/streaming/health || exit 1" \
 		--health-interval=30s \
-		--network ${NETWORK} \
-		--network dockerbunker-${SERVICE_NAME} \
+		--network dockerbunker-${SERVICE_NAME} --net-alias streaming \
 		--env RUN_DB_MIGRATIONS=true --env UID=991 --env GID=991 --env WEB_CONCURRENCY=16 --env MAX_THREADS=20 --env SIDEKIQ_WORKERS=25 \
 		--env-file "${SERVICE_ENV}" \
-	${IMAGES[service]}${GLITCH} yarn start >/dev/null
+	${IMAGES[service]} yarn start >/dev/null
 }
 
 mastodon_sidekiq_dockerbunker() {
@@ -36,7 +34,7 @@ mastodon_sidekiq_dockerbunker() {
 		--env-file "${SERVICE_ENV}" \
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-v ${SERVICE_NAME}-data-vol-2:${volumes[${SERVICE_NAME}-data-vol-2]} \
-	${IMAGES[service]}${GLITCH} bundle exec sidekiq >/dev/null
+	${IMAGES[service]} bundle exec sidekiq >/dev/null
 }
 
 mastodon_redis_dockerbunker() {
@@ -71,7 +69,7 @@ mastodon_generatevapidkeys_dockerbunker() {
 	docker run -it --rm \
 		--name=${SERVICE_NAME}-vapidgen-dockerbunker \
 		--env-file "${SERVICE_ENV}" \
-	${IMAGES[service]}${GLITCH} rake mastodon:webpush:generate_vapid_key | grep VAPID > "${ENV_DIR}"/${SERVICE_NAME}_tmp.env
+	${IMAGES[service]} rake mastodon:webpush:generate_vapid_key | grep VAPID > "${ENV_DIR}"/${SERVICE_NAME}_tmp.env
 	exit_response
 }
 
@@ -84,7 +82,7 @@ mastodon_dbmigrateandprecompileassets_dockerbunker() {
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-v ${SERVICE_NAME}-data-vol-2:${volumes[${SERVICE_NAME}-data-vol-2]} \
 		-v ${SERVICE_NAME}-data-vol-3:${volumes[${SERVICE_NAME}-data-vol-3]} \
-	${IMAGES[service]}${GLITCH} bash -c "rake db:migrate && rake assets:precompile" >/dev/null
+	${IMAGES[service]} bash -c "rake db:migrate && rake assets:precompile" >/dev/null
 	exit_response
 }
 
@@ -97,6 +95,6 @@ mastodon_makeadmin_dockerbunker() {
 		-v ${SERVICE_NAME}-data-vol-1:${volumes[${SERVICE_NAME}-data-vol-1]} \
 		-v ${SERVICE_NAME}-data-vol-2:${volumes[${SERVICE_NAME}-data-vol-2]} \
 		-v ${SERVICE_NAME}-data-vol-3:${volumes[${SERVICE_NAME}-data-vol-3]} \
-	${IMAGES[service]} bash -c "RAILS_ENV=production bin/tootctl accounts modify ${1} --role admin" >/dev/null
+	${IMAGES[service]} bash -c "RAILS_ENV=production bin/tootctl accounts modify ${1} --role admin"
 	exit_response
 }
