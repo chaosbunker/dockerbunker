@@ -875,6 +875,7 @@ static_menu() {
 backup() {
 	! [[ -d ${BASE_DIR}/data/backup/${SERVICE_NAME} ]] && mkdir -p ${BASE_DIR}/data/backup/${SERVICE_NAME}
 	NOW=$(date -d "today" +"%Y%m%d_%H%M")
+	mkdir -p "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}
 
 	# compressing volumes
 	echo -e "\n\e[1mCompressing volumes\e[0m"
