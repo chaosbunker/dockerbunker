@@ -47,6 +47,7 @@ configure() {
 	DRONE_USER_CREATE=username:${GOGS_USER},admin:true
 	DRONE_DATABASE_SECRET=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32)
 	SERVICE_DOMAIN=${SERVICE_DOMAIN}
+	DRONE_AGENTS_DISABLED=true
 	EOF
 
 	post_configure_routine
