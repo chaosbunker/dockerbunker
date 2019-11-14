@@ -83,7 +83,7 @@ pull_and_compare() {
 		docker-compose up -d
 		popd >/dev/null
 	fi
-	
+
 	[[ ${old_images_to_delete[0]} ]] \
 		&& declare -p old_images_to_delete >> "${BASE_DIR}"/.image_shas.tmp
 	[[ ${unchanged_images_to_keep[0]} ]] \
@@ -187,15 +187,15 @@ basic_nginx() {
 			&& cp "${SERVICES_DIR}/nginx/ssl/dhparam.pem" "${CONF_DIR}"/nginx/ssl
 		[[ ! -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] && \
 			mkdir -p "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}
-	
+
 		if [[ ! -f "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
 			generate_certificate
 		fi
-	
+
 		[[ ! -d "${CONF_DIR}"/nginx/conf.d ]] && \
 			mkdir -p "${CONF_DIR}"/nginx/conf.d
 		if [[ ! -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]];then
-			cp "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_NAME}.conf "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf
+			cp "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/service.conf "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf
 			for variable in "${SUBSTITUTE[@]}";do
 				subst="\\${variable}"
 				variable=`eval echo "$variable"`
@@ -203,7 +203,7 @@ basic_nginx() {
 				"${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf
 			done
 		fi
-	
+
 		echo -en "\n\e[1mMoving nginx configuration in place\e[0m"
 		if [[ -f "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf ]];then
 			mv "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf "${CONF_DIR}"/nginx/conf.d
@@ -263,7 +263,7 @@ post_setup_routine() {
 	for container in ${add_to_network[@]};do
 		! elementInArray "${container}" "${CONTAINERS_IN_DOCKERBUNKER_NETWORK[@]}" && CONTAINERS_IN_DOCKERBUNKER_NETWORK+=( "${container}" )
 	done
-	
+
 	[[ -f "${ENV_DIR}/dockerbunker.env" ]] && ( sed -i '/CONFIGURED_SERVICES/d' "${ENV_DIR}/dockerbunker.env"; sed -i '/WEB_SERVICES/d' "${ENV_DIR}/dockerbunker.env"; sed -i '/CONTAINERS_IN_DOCKERBUNKER_NETWORK/d' "${ENV_DIR}/dockerbunker.env"; sed -i '/INSTALLED_SERVICES/d' "${ENV_DIR}/dockerbunker.env" )
 	declare -p CONFIGURED_SERVICES >> "${ENV_DIR}/dockerbunker.env"
 	declare -p INSTALLED_SERVICES >> "${ENV_DIR}/dockerbunker.env"
@@ -371,7 +371,7 @@ letsencrypt() {
 		-v "${BASE_DIR}"/data/web:/var/www/html:rw \
 		certbot/certbot \
 		renew
-	
+
 		restart_nginx
 	}
 
@@ -387,4 +387,3 @@ letsencrypt() {
 	fi
 
 }
-
