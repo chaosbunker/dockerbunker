@@ -17,11 +17,11 @@ fi
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${BASE_DIR}"/data/include/init.sh
 
-[[ -f "data/env/dockerbunker.env" ]] && source "data/env/dockerbunker.env" || init_dockerbunker
-
 unset AVAILABLE_SERVICES count
-# All available services
-IFS=$'\n' declare -a ALL_SERVICES=( "$(cat ${BASE_DIR}/included_services)" )
+# Load services dynamically from their directories
+while IFS= read -r d; do
+  declare -a ALL_SERVICES+=( $(basename "$d" ) )
+done < <(find "${BASE_DIR}/data/services" -maxdepth 1 -type d)
 
 [[ -f "${BASE_DIR}"/included_services.custom ]] \
 	&& IFS=$'\n' declare -a ALL_SERVICES+=( "$(cat ${BASE_DIR}/included_services.custom | sed '/^#/d')" )
@@ -189,4 +189,3 @@ do
 		;;
 	esac
 done
-
