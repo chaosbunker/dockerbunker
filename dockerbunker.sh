@@ -183,7 +183,7 @@ do
 			echo ""
 			echo -e "\n\e[3m\xe2\x86\x92 Checking service status"
 			echo ""
-			source "${BASE_DIR}"/data/services/${SERVICES_ARR[$choice]}/${SERVICES_ARR[$choice]}.sh
+			source "${BASE_DIR}"/data/services/${SERVICES_ARR[$choice]}/init.sh
 			break
 		fi
 		;;

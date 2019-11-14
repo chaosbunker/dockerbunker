@@ -24,7 +24,7 @@ set_domain() {
 	done
 	INVALID=1
 	echo ""
-	
+
 	if [[ $PROMPT_SSL ]];then
 		configure_ssl
 	fi
@@ -41,7 +41,7 @@ configure_mx() {
 	fi
 	if [[ ( $SERVICE_SPECIFIC_MX && ! -f "${ENV_DIR}/${SERVICE_SPECIFIC_MX}mx.env" ) || (  -z $SERVICE_SPECIFIC_MX && ! -f "${ENV_DIR}/mx.env" ) ]];then
 		echo -e "# \n# \e[4mSMTP Settings\e[0m"
-		
+
 		if [ "$MX_EMAIL" ]; then
 		  read -p "SMTP User: " -ei "$MX_EMAIL" MX_EMAIL
 		else
@@ -61,7 +61,7 @@ configure_mx() {
 			VALIDATE=1
 		done
 		unset VALIDATE
-		
+
 		invalid_mx=1
 		while [[ $invalid_mx ]];do
 			if [ -z "$MX_HOSTNAME" ]; then
@@ -81,11 +81,11 @@ configure_mx() {
 		cat <<-EOF >> "${ENV_DIR}/${SERVICE_SPECIFIC_MX}mx.env"
 		#MX
 		## ------------------------------
-		
+
 		MX_HOSTNAME=${MX_HOSTNAME}
 		MX_EMAIL=${MX_EMAIL}
 		MX_PASSWORD="${MX_PASSWORD}"
-		
+
 		## ------------------------------
 		#/MX
 		EOF
@@ -137,7 +137,7 @@ post_configure_routine() {
 		for containers in ${add_to_network[@]};do
 			[[ ( $container && ! "${CONTAINERS_IN_DOCKERBUNKER_NETWORK[@]}" =~ "${container}" ) ]] && CONTAINERS_IN_DOCKERBUNKER_NETWORK+=( "${container}" )
 		done
-	
+
 		if [[ -f "${ENV_DIR}/dockerbunker.env" ]];then
 			sed -i '/CONFIGURED_SERVICES/d' "${ENV_DIR}/dockerbunker.env"
 			sed -i '/WEB_SERVICES/d' "${ENV_DIR}/dockerbunker.env"
@@ -149,9 +149,7 @@ post_configure_routine() {
 			declare -p CONTAINERS_IN_DOCKERBUNKER_NETWORK >> "${ENV_DIR}/dockerbunker.env" 2>/dev/null
 			echo ""
 			echo "Please run \"Setup service\" next."
-			bash "${BASE_DIR}/data/services/${SERVICE_NAME}/${SERVICE_NAME}.sh"
+			bash "${BASE_DIR}/data/services/${SERVICE_NAME}/init.sh"
 		fi
 	fi
 }
-
-

@@ -7,7 +7,7 @@ options_menu() {
 	COLUMNS=12
 	exitmenu=$(printf "\e[1;4;33mExit\e[0m")
 	returntopreviousmenu=$(printf "\e[1;4;33mReturn to previous menu\e[0m")
-	
+
 	container_check=1
 
 	# if service is marked as installed, make sure all containers exist and offer to run them if necessary
@@ -94,14 +94,14 @@ options_menu() {
 		case $choice in
 			"Configure Site")
 				echo -e "\n\e[3m\xe2\x86\x92 Configure ${PROPER_NAME}\e[0m\n"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh configure
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh configure
 				say_done
 				sleep 0.2
 				break
 				;;
 			"Configure Service")
 				echo -e "\n\e[3m\xe2\x86\x92 Configure ${PROPER_NAME}\e[0m\n"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh configure
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh configure
 				sleep 0.2
 				break
 				;;
@@ -113,20 +113,20 @@ options_menu() {
 				;;
 			"Reconfigure service")
 				echo -e "\n\e[3m\xe2\x86\x92 Reconfigure ${PROPER_NAME}\e[0m"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh reconfigure
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh reconfigure
 				break
 				;;
 			"Setup service")
 				# Set up nginx container if not yet present
 				setup_nginx
 				echo -e "\n\e[3m\xe2\x86\x92 Setup ${PROPER_NAME}\e[0m"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh setup
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh setup
 				sleep 0.2
 				break
 			;;
 			"Reinstall service")
 				echo -e "\n\e[3m\xe2\x86\x92 Reinstall ${PROPER_NAME}\e[0m"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh reinstall
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh reinstall
 				say_done
 				sleep 0.2
 				break
@@ -136,25 +136,25 @@ options_menu() {
 				for container in ${missingContainers[@]};do
 					restore_container
 				done
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 				;;
 			"Upgrade Image(s)")
 				echo -e "\n\e[3m\xe2\x86\x92 Upgrade ${PROPER_NAME} images\e[0m"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh upgrade
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh upgrade
 				say_done
 				sleep 0.2
 				break
 			;;
 			"Backup Service")
 				echo -e "\n\e[3m\xe2\x86\x92 Backup Service\e[0m"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh backup
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh backup
 				say_done
 				sleep 0.2
 				break
 			;;
 			"Restore Service")
 				echo -e "\n\e[3m\xe2\x86\x92 Restore Service\e[0m"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh restore
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh restore
 				say_done
 				sleep 0.2
 				break
@@ -180,26 +180,26 @@ options_menu() {
 			;;
 			"Restart container(s)")
 				echo -e "\n\e[3m\xe2\x86\x92 Restart ${PROPER_NAME} Containers\e[0m"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh restart_containers
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh restart_containers
 				say_done
 				sleep 0.2
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 				break
 			;;
 			"Start container(s)")
 				echo -e "\n\e[3m\xe2\x86\x92 Start ${PROPER_NAME} Containers\e[0m"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh start_containers
 				say_done
 				sleep 0.2
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 				break
 			;;
 			"Stop container(s)")
 				echo -e "\n\e[3m\xe2\x86\x92 Stop ${PROPER_NAME} Containers\e[0m"
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh stop_containers
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh stop_containers
 				say_done
 				sleep 0.2
-				${SERVICES_DIR}/${SERVICE_NAME}/${SERVICE_NAME}.sh
+				${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 				break
 			;;
 			"Destroy \"${PROPER_NAME}\"")
@@ -246,7 +246,7 @@ options_menu() {
 
 				prompt_confirm "Continue?" \
 					&& prompt_confirm "Are you sure?" \
-					&& . "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh destroy_service
+					&& . "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh destroy_service
 
 				say_done
 				sleep 0.2
@@ -277,7 +277,7 @@ get_le_cert() {
 			sed -i "s/LE_EMAIL=.*/LE_EMAIL="${LE_EMAIL}"/" "${SERVICE_ENV}"
 		fi
 		elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}" \
-			&& "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
+			&& "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh start_containers
 		if [[ ${SERVICE_DOMAIN[0]} && -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} \
 			&& ! -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
 			# Back up self-signed certificate
@@ -291,7 +291,7 @@ get_le_cert() {
 	else
 		echo -e "\n\e[3m\xe2\x86\x92 Renew Let's Encrypt certificate\e[0m"
 		export prevent_nginx_restart=1
-		bash "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh letsencrypt issue
+		bash "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh letsencrypt issue
 	fi
 }
 
@@ -330,7 +330,7 @@ stop_nginx() {
 	exit_response
 }
 
-# all functions starting/stopping/restarting containers of individual services. This is offered in every service specific menu. 
+# all functions starting/stopping/restarting containers of individual services. This is offered in every service specific menu.
 deactivate_nginx_conf() {
 	if [[ ${SERVICE_NAME} == "nginx" ]] \
 	|| [[ -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
@@ -346,7 +346,7 @@ deactivate_nginx_conf() {
 
 	! [[ -d "${CONF_DIR}"/nginx/conf.inactive.d ]] \
 		&& mkdir "${CONF_DIR}"/nginx/conf.inactive.d
-	
+
 	if [[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]];then
 	echo -en "\n\e[1mDeactivating nginx configuration\e[0m"
 		[[ -d "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]} ]] \
@@ -354,13 +354,13 @@ deactivate_nginx_conf() {
 		mv "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf "${CONF_DIR}"/nginx/conf.inactive.d/
 		exit_response
 	fi
-	
+
 	if ! elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}";then
 		STOPPED_SERVICES+=( "${PROPER_NAME}" )
 		sed -i '/STOPPED_SERVICES/d' "${ENV_DIR}"/dockerbunker.env
 		declare -p STOPPED_SERVICES >> "${ENV_DIR}"/dockerbunker.env
 	fi
-	
+
 	[[ -z $prevent_nginx_restart ]] && restart_nginx
 }
 
@@ -581,7 +581,7 @@ destroy_service() {
 }
 
 
-# minimal setup routine. if more is needed add custom setup() in data/services/${SERVICE_NAME}/${SERVICE_NAME}.sh
+# minimal setup routine. if more is needed add custom setup() in data/services/${SERVICE_NAME}/init.sh
 setup() {
 	initial_setup_routine
 
@@ -593,7 +593,7 @@ setup() {
 	post_setup_routine
 }
 
-# minimal upgrade routine. if more is needed add custom upgrade() in data/services/${SERVICE_NAME}/${SERVICE_NAME}.sh
+# minimal upgrade routine. if more is needed add custom upgrade() in data/services/${SERVICE_NAME}/init.sh
 upgrade() {
 	pull_and_compare
 
@@ -603,11 +603,11 @@ upgrade() {
 	docker_run_all
 
 	remove_from_STOPPED_SERVICES
-	
+
 	delete_old_images
-	
+
 	activate_nginx_conf
-	
+
 	restart_nginx
 }
 
@@ -695,7 +695,7 @@ start_all() {
 	for PROPER_NAME in "${STOPPED_SERVICES[@]}";do
 		SERVICE_NAME="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
 		source "${ENV_DIR}"/${SERVICE_NAME}.env
-		source "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh start_containers
+		source "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh start_containers
 	done
 	restart_nginx
 }
@@ -743,8 +743,8 @@ if [[ "$i" == ${all_services[-1]} ]];then \
 	for service in "${all_services[@]}";do
 		SERVICE_NAME="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
 		echo -e "\n\e[3m\xe2\x86\x92 Destroying $service\e[0m"
-		[[ -f "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh ]] \
-			&& "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh destroy_service
+		[[ -f "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh ]] \
+			&& "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh destroy_service
 	done
 
 	[[ -d "${CONF_DIR}"/nginx/conf.inactive.d ]] \
@@ -758,7 +758,7 @@ if [[ "$i" == ${all_services[-1]} ]];then \
 		[[ $cert_dir != "letsencrypt" ]] \
 			&& rm -r "${CONF_DIR}"/nginx/ssl/$cert_dir
 	done
-	
+
 	rm -rf "${ENV_DIR}"/*
 }
 
@@ -783,10 +783,10 @@ add_ssl_menuentry() {
 static_menu() {
 	! [[ ${STATIC_SITES[@]} ]] \
 		&& echo -e "\n\e[1mNo existing sites found\e[0m" \
-		&& exec "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh
+		&& exec "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh
 
 	# Display all static sites in a menu
-	
+
 	# Option menu from directory listing, based on terdon's answer in https://askubuntu.com/a/682146
 	## Collect all sites in the array $staticsites
 	staticsites=( "${BASE_DIR}"/data/env/static/* )
@@ -796,7 +796,7 @@ static_menu() {
 	## Enable extended globbing. This lets us use @(foo|bar) to
 	## match either 'foo' or 'bar'.
 	shopt -s extglob
-	
+
 	## Start building the string to match against.
 	string="@(${staticsites[0]}"
 	## Add the rest of the site names to the string
@@ -807,7 +807,7 @@ static_menu() {
 	## Close the parenthesis. $string is now @(site1|site2|...|siteN)
 	string+=")"
 	echo ""
-	
+
 	## Show the menu. This will list all Static Sites that have an active environment file
 	select static in "${staticsites[@]}" "$returntopreviousmenu"
 	do
@@ -862,7 +862,7 @@ static_menu() {
 
 			break;
 			;;
-	
+
 		"$returntopreviousmenu")
 			exec "${SERVICES_DIR}"/statichtmlsite/statichtmlsite.sh options_menu;;
 		*)
@@ -942,7 +942,7 @@ echo ${FUNCNAME[@]}
 	## Enable extended globbing. This lets us use @(foo|bar) to
 	## match either 'foo' or 'bar'.
 	shopt -s extglob
-	
+
 	## Start building the string to match against.
 	string="@(${backups[0]}"
 	## Add the rest of the backups to the string
@@ -957,7 +957,7 @@ echo ${FUNCNAME[@]}
 		&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]];then
 		echo ""
 		echo -e "\e[4mPlease choose a backup\e[0m"
-		
+
 		## Show the menu. This will list all backups and the string "back to previous menu"
 		select backup in "${backups[@]}" "Back to previous menu"
 		do
@@ -1036,9 +1036,9 @@ echo ${FUNCNAME[@]}
 				post_setup_routine
 				exit 0
 		        ;;
-		
+
 		    "Back to previous menu")
-				"${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh
+				"${SERVICES_DIR}"/${SERVICE_NAME}/init.sh
 				;;
 		    *)
 		        backup=""
@@ -1048,6 +1048,6 @@ echo ${FUNCNAME[@]}
 	else
 		echo -e "\n\e[1mNo ${PROPER_NAME} backup found\e[0m"
 		echo -e "\n\e[3m\xe2\x86\x92 Checking service status"
-		exec "${SERVICES_DIR}"/${SERVICE_NAME}/${SERVICE_NAME}.sh
+		exec "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh
 	fi
 }
