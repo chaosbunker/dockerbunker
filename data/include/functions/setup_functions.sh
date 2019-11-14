@@ -128,7 +128,7 @@ delete_old_images() {
 }
 
 setup_nginx() {
-	[[ ! $(docker ps -q --filter name=^/${NGINX_CONTAINER}$) ]] && bash "${SERVICES_DIR}"/nginx/nginx.sh setup
+	[[ ! $(docker ps -q --filter name=^/${NGINX_CONTAINER}$) ]] && bash "${SERVER_DIR}/nginx/init.sh" setup
 }
 
 # Build image if necessary, set up nginx container if necessary, create or use existing volumes, create networks if necessary, pull images if necessary
@@ -184,7 +184,7 @@ basic_nginx() {
 		[[ ! -d "${CONF_DIR}"/nginx/ssl ]] \
 			&& mkdir -p "${CONF_DIR}"/nginx/ssl
 		[[ ! -f "${CONF_DIR}"/nginx/ssl/dhparam.pem ]] \
-			&& cp "${SERVICES_DIR}/nginx/ssl/dhparam.pem" "${CONF_DIR}"/nginx/ssl
+			&& cp "${SERVER_DIR}/nginx/ssl/dhparam.pem" "${CONF_DIR}"/nginx/ssl
 		[[ ! -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] && \
 			mkdir -p "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}
 
@@ -215,7 +215,7 @@ basic_nginx() {
 				SHA1="$(printf "%s%s" "${HTPASSWD}" "$SALT" | openssl dgst -binary -sha1)"
 				printf "${HTUSER}:{SSHA}%s\n" "$(printf "%s%s" "$SHA1" "$SALT" | base64)" > "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN}/.htpasswd
 
-				cp "${SERVICES_DIR}"/nginx/basic_auth.conf \
+				cp "${SERVER_DIR}/nginx/basic_auth.conf" \
 					"${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN}/basic_auth.conf
 				for variable in "${SUBSTITUTE[@]}";do
 					subst="\\${variable}"

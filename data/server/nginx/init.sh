@@ -28,7 +28,7 @@ setup() {
 		&& mkdir -p "${CONF_DIR}"/nginx/ssl
 
 	[[ ! -f "${CONF_DIR}"/nginx/ssl/dhparam.pem ]] \
-		&& cp "${SERVICES_DIR}/nginx/ssl/dhparam.pem" "${CONF_DIR}"/nginx/ssl
+		&& cp "${SERVER_DIR}/nginx/ssl/dhparam.pem" "${CONF_DIR}"/nginx/ssl
 
 	[[ ! -d "${BASE_DIR}"/data/web ]] \
 		&& mkdir "${BASE_DIR}"/data/web
@@ -43,11 +43,9 @@ destroy_service() {
 
 	[[ -f "${ENV_DIR}"/mx.env ]] \
 		&& rm "${ENV_DIR}"/mx.env
-	
+
 	[[ -f "${ENV_DIR}"/dockerbunker.env ]] \
 		&& rm "${ENV_DIR}"/dockerbunker.env
 }
 
 $1
-
-

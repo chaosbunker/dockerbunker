@@ -17,7 +17,6 @@ fi
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${BASE_DIR}"/data/include/init.sh
 
-unset AVAILABLE_SERVICES count
 # Load services dynamically from their directories
 while IFS= read -r d; do
   declare -a ALL_SERVICES+=( $(basename "$d" ) )

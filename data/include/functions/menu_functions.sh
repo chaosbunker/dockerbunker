@@ -380,7 +380,7 @@ activate_nginx_conf() {
 
 start_containers() {
 	RUNNING=$(docker inspect --format="{{.State.Running}}" ${NGINX_CONTAINER} 2> /dev/null)
-	[[ $RUNNING == "false" ]] || [[ -z $RUNNING ]] && bash -c "${SERVICES_DIR}"/nginx/nginx.sh setup
+	[[ $RUNNING == "false" ]] || [[ -z $RUNNING ]] && bash -c "${SERVER_DIR}/nginx/init.sh" setup
 	echo -e "\n\e[1mStarting containers\e[0m"
 	for container in "${containers[@]}";do
 		[[ $(docker ps -q --filter "status=exited" --filter name=^/${container}$) ]] \
@@ -470,7 +470,7 @@ remove_networks() {
 restart_containers() {
 	echo -e "\n\e[1mRestarting containers\e[0m"
 	[[ $(docker ps -a -q --filter name=^/${NGINX_CONTAINER}$ 2> /dev/null) ]] \
-		|| bash -c "${SERVICES_DIR}"/nginx/nginx.sh setup
+		|| bash -c "${SERVER_DIR}/nginx/init.sh" setup
 	for container in "${containers[@]}";do
 		if [[ $(docker ps -q --filter name=^/${container}$) ]];then
 			echo -en "- $container";docker restart $container >/dev/null 2>&1
@@ -572,7 +572,7 @@ destroy_service() {
 		&& [[ -z $restoring ]] \
 		&& echo -e "\nNo remaining services running.\n" \
 		&& prompt_confirm  "Destroy nginx as well and completely reset dockerbunker?" \
-		&& bash "${SERVICES_DIR}"/nginx/nginx.sh destroy_service \
+		&& bash "${SERVER_DIR}/nginx/init.sh" destroy_service \
 		&& return
 
 	[[ -z $prevent_nginx_restart ]] \

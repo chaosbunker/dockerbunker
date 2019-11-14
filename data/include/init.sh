@@ -8,11 +8,13 @@ init_dockerbunker() {
 		cat <<-EOF >> "${BASE_DIR}/data/env/dockerbunker.env"
 			BASE_DIR="${BASE_DIR}"
 			SERVICES_DIR="${BASE_DIR}/data/services"
-			SERVICE_DIR="\${SERVICES_DIR}/\${SERVICE_NAME}"
+      SERVICE_DIR="\${SERVICES_DIR}/\${SERVICE_NAME}"
+			SERVER_DIR="${BASE_DIR}/data/server"
 			CONF_DIR="${BASE_DIR}/data/conf"
 			ENV_DIR="${BASE_DIR}/data/env"
 			SERVICE_ENV="\${ENV_DIR}/\${SERVICE_NAME}.env"
-			CONTAINERS=\${SERVICE_DIR}/containers.sh
+      CONTAINERS=\${SERVICE_DIR}/containers.sh
+			SERVER_CONTAINER=\${SERVER_DIR}/nginx/containers.sh
 
 			LE_EMAIL=
 
@@ -43,6 +45,8 @@ else
 			&& source ${SERVICE_ENV}
 		[[ -f ${CONTAINERS} ]] \
 			&& source ${CONTAINERS}
+    [[ -f ${SERVER_CONTAINER} ]] \
+			&& source ${SERVER_CONTAINER}
 		[[ -f "${ENV_DIR}"/mx.env ]] \
 			&& source "${ENV_DIR}"/mx.env
 		[[ -f "${ENV_DIR}"/${SERVICE_NAME}_mx.env ]] \
