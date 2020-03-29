@@ -4,25 +4,20 @@
 
 Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWmh) to see `dockerbunker`in action.
 
-#### Currently included:
+#### Services which work:
 
+| Service | Status |
+|-|-|
+|[Drone CI](https://github.com/drone/drone)| |
+|[Firefox Sync Server](https://github.com/mozilla-services/syncserver)| |
+|[Gitea](https://gitea.io/en-us/)| [&#10004;] i use it live |
+|[Gitlab CE](https://gitlab.com/)| |
+|[Gogs](https://gogs.io/)| |
+|[Mozilla send](https://send.firefox.com/)| [&#10004;] i use it live |
+|[Nextcloud](https://github.com/nextcloud/docker)| [&#10004;] i use it live |
+|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)| |
+|[Wekan](https://github.com/wekan/wekan)| |
 
-| A - G        | H - N           | O - Z  |
-| :-------------: |:-------------:| :-----:|
-|[Bitbucket](https://www.atlassian.com/software/bitbucket)|[**Hastebin**](https://hastebin.com/about.md)|[Open Project](https://www.openproject.org/)|
-|[**Commento**](https://github.com/adtac/commento)|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server)|[**Padlock Cloud**](https://github.com/padlock/padlock-cloud)|
-|[cryptpad](https://cryptpad.fr/)|[json-server](https://github.com/typicode/json-server)|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)|
-|[CS50 IDE](https://manual.cs50.net/ide/offline)|[**Kanboard**](https://kanboard.net/)|[Seafile Pro (broken)](https://github.com/haiwen/seafile)|
-|[Dillinger](https://dillinger.io/)|[Koken](http://koken.me/)|[**Searx**](https://github.com/asciimoo/searx.git)|
-|[**Drone CI**](https://github.com/drone/drone)|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized)|[sFTP Server](https://github.com/atmoz/sftp)|
-|[**Fathom Analytics**](https://github.com/usefathom/fathom)|[Mailpile](https://www.mailpile.is/)|[**Wekan**](https://github.com/wekan/wekan)|
-|[**Firefly III**](https://github.com/firefly-iii/firefly-iii)|[**Mastodon**](https://github.com/tootsuite/mastodon)|[**Wordpress**](https://wordpress.org/)|
-|[**Firefox Sync Server**](https://github.com/mozilla-services/syncserver)|[**Matomo Analytics**](https://github.com/matomo-org/docker)||
-|[**Ghost Blog**](https://ghost.org/)|[**Mozilla send**](https://send.firefox.com/)||
-|[GitBucket](https://github.com/gitbucket/gitbucket)|[**Nextcloud**](https://github.com/nextcloud/docker)||
-|[**Gitea**](https://gitea.io/en-us/)|||
-|[Gitlab CE](https://gitlab.com/)|||
-|[**Gogs**](https://gogs.io/)|||
 
 **Fair warning:** While all services appeared fully functional at the time I implemented them, I cannot guarantee that they still all are functional. Sometimes I just added something I was playing around with and hadn't tested every part of it. If something turns out to be not working, it often times broke because of changes that were made to the software and it most cases it's trivial to make it work again. I **marked bold** all the apps I am personally using with `dockerbunker`, as well as those that I recently tested and expect to work without issues. That being said, use this at your own risk. And if you do use `dockerbunker` and notice that something doesn't work, please file an issue .. or even better, submit a pull request. Contributions are welcome:)
 
@@ -36,14 +31,14 @@ Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWm
 	- Bash 4+ -> `brew install bash`
 	- GNU grep -> `brew install grep`
 	- GNU sed -> `brew install gnu-sed`
-	
+
 		```
 		ln -sv /usr/local/bin/ggrep /usr/local/bin/grep
 		ln -sv /usr/local/bin/gsed /usr/local/bin/sed
 		```
 
 		Make sure `/usr/local/bin`is added to your PATH! If it's not:
-        
+
 		`echo 'PATH="/usr/local/bin:$PATH"' >> ~/.bash_profile`
 
 ## How to get started:
@@ -94,7 +89,7 @@ It is possible to add additional domains to the certificate before obtaining the
 
 #### Backup & Restore
 
-When backing up a service, a timestamped directory will be created in `data/backup/${SERVICE_NAME}`. The following things will get backed up into (or restored from) that directory: 
+When backing up a service, a timestamped directory will be created in `data/backup/${SERVICE_NAME}`. The following things will get backed up into (or restored from) that directory:
 
 - All volumes (will be compressed)
 - nginx configuration if service is accessible via web (from data/conf/nginx/conf.d/${SERVICE_DOMAIN})
