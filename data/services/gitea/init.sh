@@ -2,7 +2,9 @@
 
 while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
 
-PROPER_NAME="Gitea"
+# load PROPER_NAME and SERVICE_NAME dynamically
+# from service folder-name
+PROPER_NAME="$(basename $(dirname "$BASH_SOURCE"))"
 SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
 PROMPT_SSL=1
 
@@ -33,7 +35,7 @@ configure() {
 	else
 	  read -p "Gitea Application Name: " -ei "Gitea Go Git Service" GITEA_APP_NAME
 	fi
-	
+
 	echo "# User Settings"
 	echo ""
 
@@ -46,13 +48,13 @@ configure() {
 			[[ ${GITEA_ADMIN} == "admin" ]] && echo -e "\n\e[31mAdmin account setting is invalid: name is reserved [name: admin]\e[0m\n"
 		done
 	fi
-	
+
 	if [ "${GITEA_ADMIN_EMAIL}" ]; then
 	  read -p "Gitea Admin E-Mail: " -ei "${GITEA_ADMIN_EMAIL}" GITEA_ADMIN_EMAIL
 	else
 	  read -p "Gitea Admin E-Mail: " GITEA_ADMIN_EMAIL
 	fi
-	
+
 	unset GITEA_ADMIN_PASSWORD
 	while [[ "${#GITEA_ADMIN_PASSWORD}" -le 6 || "${GITEA_ADMIN_PASSWORD}" != *[A-Z]* || "${GITEA_ADMIN_PASSWORD}" != *[a-z]* || "${GITEA_ADMIN_PASSWORD}" != *[0-9]* ]];do
 		if [ ${VALIDATE} ];then
@@ -69,13 +71,13 @@ configure() {
 	echo ""
 
 	prompt_confirm "Enable Registration Confirmation?" && GITEA_REGISTER_CONFIRM="on" || GITEA_REGISTER_CONFIRM="off"
-	
+
 	prompt_confirm "Enable Mail Notification?" && GITEA_MAIL_NOTIFY="on" || GITEA_MAIL_NOTIFY="off"
 
-	echo ""	
+	echo ""
 	echo "# Server & Other  Service Settings"
 	echo ""
-	
+
 	if [ "${SSH_PORT}" ]; then
 	  read -p "SSH Port: " -ei "${SSH_PORT}" SSH_PORT
 	else
@@ -83,17 +85,17 @@ configure() {
 	fi
 
 	prompt_confirm "Enable Offline Mode?" && GITEA_OFFLINE_MODE="on" || GITEA_OFFLINE_MODE="off"
-	
+
 	prompt_confirm "Disable Gravatar Service?" && GITEA_DISABLE_GRAVATAR="on" || GITEA_DISABLE_GRAVATAR="off"
-	
+
 	prompt_confirm "Enable Federated Avatars Lookup?" && GITEA_ENABLE_FEDERATED_AVATAR="on" || GITEA_ENABLE_FEDERATED_AVATAR="on"
 
 	prompt_confirm "Disable Self Registration?" && GITEA_DISABLE_REGISTRATION="off" || GITEA_DISABLE_REGISTRATION="on"
-	
+
 	prompt_confirm "Enable Captcha?" && GITEA_ENABLE_CAPTCHA="on" || GITEA_ENABLE_CAPTCHA="off"
-	
+
 	prompt_confirm "Enable Require Sign In To View Pages?" && GITEA_REQUIRE_SIGN_IN_VIEW="on" || GITEA_REQUIRE_SIGN_IN_VIEW="off"
-	
+
 	configure_mx
 
 	# avoid tr illegal byte sequence in macOS when generating random strings
@@ -117,41 +119,41 @@ configure() {
 
 	GITEA_DBNAME=gitea
 	GITEA_DBUSER=gitea
-	
+
 	# Please use long, random alphanumeric strings (A-Za-z0-9)
 	GITEA_DBPASS=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 28)
 	GITEA_DBROOT=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 28)
-	
+
 	# ------------------------------
 	# General Settings
 	# ------------------------------
-	
+
 	SERVICE_DOMAIN=${SERVICE_DOMAIN}
 	GITEA_APP_NAME="${GITEA_APP_NAME}"
 	SSH_PORT=${SSH_PORT}
-	
+
 	GITEA_REGISTER_CONFIRM=${GITEA_REGISTER_CONFIRM}
 	GITEA_MAIL_NOTIFY=${GITEA_MAIL_NOTIFY}
-	
+
 	# ------------------------------
 	# User configuration
 	# ------------------------------
-	
+
 	GITEA_ADMIN=${GITEA_ADMIN}
 	GITEA_ADMIN_EMAIL=${GITEA_ADMIN_EMAIL}
 	GITEA_ADMIN_PASSWORD="${GITEA_ADMIN_PASSWORD}"
-	
+
 	# ------------------------------
 	# Server & Other  Service Settings
 	# ------------------------------
-	
+
 	GITEA_OFFLINE_MODE=${GITEA_OFFLINE_MODE}
 	GITEA_DISABLE_GRAVATAR=${GITEA_DISABLE_GRAVATAR}
 	GITEA_ENABLE_FEDERATED_AVATAR=${GITEA_ENABLE_FEDERATED_AVATAR}
 	GITEA_DISABLE_REGISTRATION=${GITEA_DISABLE_REGISTRATION}
 	GITEA_ENABLE_CAPTCHA=${GITEA_ENABLE_CAPTCHA}
 	GITEA_REQUIRE_SIGN_IN_VIEW=${GITEA_REQUIRE_SIGN_IN_VIEW}
-	
+
 	## ------------------------------
 	SERVICE_SPECIFIC_MX=${SERVICE_SPECIFIC_MX}
 	EOF

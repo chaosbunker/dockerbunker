@@ -2,7 +2,9 @@
 
 while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
 
-PROPER_NAME="Nextcloud"
+# load PROPER_NAME and SERVICE_NAME dynamically
+# from service folder-name
+PROPER_NAME="$(basename $(dirname "$BASH_SOURCE"))"
 SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
 PROMPT_SSL=1
 
@@ -23,11 +25,11 @@ declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
 
 configure() {
 	pre_configure_routine
-	
+
 	echo -e "# \e[4mNextcloud Settings\e[0m"
 
 	set_domain
-	
+
 	unset NEXTCLOUD_ADMIN_USER
 	if [ "$NEXTCLOUD_ADMIN_USER" ]; then
 	  read -p "Nextcloud Admin User: " -ei "$NEXTCLOUD_ADMIN_USER" NEXTCLOUD_ADMIN_USER
@@ -37,7 +39,7 @@ configure() {
 			[[ ${NEXTCLOUD_ADMIN_USER} == "admin" ]] && echo -e "\n\e[31mAdmin account setting is invalid: name is reserved [name: admin]\e[0m\n"
 		done
 	fi
-	
+
 	unset NEXTCLOUD_ADMIN_PASSWORD
 	while [[ "${#NEXTCLOUD_ADMIN_PASSWORD}" -le 6 || "$NEXTCLOUD_ADMIN_PASSWORD" != *[A-Z]* || "$NEXTCLOUD_ADMIN_PASSWORD" != *[a-z]* || "$NEXTCLOUD_ADMIN_PASSWORD" != *[0-9]* ]];do
 		if [ $VALIDATE ];then
@@ -72,7 +74,7 @@ configure() {
 	NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
 	NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
 	NEXTCLOUD_TRUSTED_DOMAINS=${SERVICE_DOMAIN}
-	
+
 	# ------------------------------
 	# SQL database configuration
 	# ------------------------------
@@ -80,7 +82,7 @@ configure() {
 	MYSQL_DATABASE=nextcloud
 	MYSQL_USER=nextcloud
 	MYSQL_HOST=db
-	
+
 	# Please use long, random alphanumeric strings (A-Za-z0-9)
 	MYSQL_PASSWORD=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 28)
 	MYSQL_ROOT_PASSWORD=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 28)

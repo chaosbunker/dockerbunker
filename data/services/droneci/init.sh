@@ -2,7 +2,9 @@
 
 while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
 
-PROPER_NAME="Drone CI"
+# load PROPER_NAME and SERVICE_NAME dynamically
+# from service folder-name
+PROPER_NAME="$(basename $(dirname "$BASH_SOURCE"))"
 SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -cd '[:alnum:]')"
 PROMPT_SSL=1
 
@@ -23,15 +25,15 @@ declare -a networks=( )
 
 configure() {
 	pre_configure_routine
-	
+
 	echo -e "# \e[4mDrone CI Settings\e[0m"
 
 	set_domain
-	
+
 	read -p "Gogs server address: " -ei "https://" DRONE_GOGS_SERVER
-	
+
 	read -p "Gogs username: " -ei "" GOGS_USER
-	
+
 	cat <<-EOF >> "${SERVICE_ENV}"
 	PROPER_NAME="${PROPER_NAME}"
 	SERVICE_NAME=${SERVICE_NAME}

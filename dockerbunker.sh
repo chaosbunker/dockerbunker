@@ -15,18 +15,19 @@ fi
 
 # Find base dir
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# initialize dockerbunker
 source "${BASE_DIR}"/data/include/init.sh
 
-# Load services dynamically from their directories
-while IFS= read -r d; do
-  declare -a ALL_SERVICES+=( $(basename "$d" ) )
-done < <(find "${BASE_DIR}/data/services" -maxdepth 1 -type d)
-
-[[ -f "${BASE_DIR}"/included_services.custom ]] \
-	&& IFS=$'\n' declare -a ALL_SERVICES+=( "$(cat ${BASE_DIR}/included_services.custom | sed '/^#/d')" )
+# load service-names dynamically
+# via loop through folder-names at depth 1 within ./data/services, e.g. data/services/service-name
+while IFS= read -r servicename; do
+  declare -a ALL_SERVICES+=( $(basename "$servicename") )
+done < <(find "${BASE_DIR}/data/services/" -mindepth 1 -maxdepth 1 -type d)
 
 IFS=$'\n' sorted=($(printf '%s\n' "${ALL_SERVICES[@]}"|sort))
 
+# create array with service menu
 # style menu according to what status service has
 declare -A SERVICES_ARR
 for service in "${sorted[@]}";do
@@ -105,7 +106,6 @@ echo ""
 [[ ${CONFIGURED_SERVICES[@]} ]] && echo -e " \e[33mOrange\e[0m: Configured"
 echo ""
 
-COLUMNS=12
 select choice in "${AVAILABLE_SERVICES[@]}"  "$exitmenu"
 do
 	case $choice in
@@ -182,7 +182,7 @@ do
 			echo ""
 			echo -e "\n\e[3m\xe2\x86\x92 Checking service status"
 			echo ""
-			source "${BASE_DIR}"/data/services/${SERVICES_ARR[$choice]}/init.sh
+      source "${BASE_DIR}/data/services/${SERVICES_ARR[$choice]}/init.sh"
 			break
 		fi
 		;;

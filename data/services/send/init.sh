@@ -2,7 +2,9 @@
 
 while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
 
-PROPER_NAME="Send"
+# load PROPER_NAME and SERVICE_NAME dynamically
+# from service folder-name
+PROPER_NAME="$(basename $(dirname "$BASH_SOURCE"))"
 SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
 PROMPT_SSL=1
 
@@ -27,7 +29,7 @@ configure() {
 	echo -e "# \e[4mSend Settings\e[0m"
 
 	set_domain
-	
+
 	cat <<-EOF >> "${SERVICE_ENV}"
 	PROPER_NAME=${PROPER_NAME}
 	SERVICE_NAME=${SERVICE_NAME}
