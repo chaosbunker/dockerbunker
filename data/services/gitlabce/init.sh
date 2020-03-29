@@ -1,61 +1,38 @@
 #!/usr/bin/env bash
+######
+# this file is identical to other service files and should not be edited
+# pleas edit your service within service.sh
+######
 
+# setup base-directory variable
 while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
 
-PROPER_NAME="Gitlab CE"
+# load PROPER_NAME and SERVICE_NAME dynamically
+# from service folder-name
+PROPER_NAME="$(basename $(dirname "$BASH_SOURCE"))"
 SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
 PROMPT_SSL=1
 
+# load prior saved dockerbunker and service specific environment variables
 declare -a environment=( "data/env/dockerbunker.env" "data/include/init.sh" )
 
 for env in "${environment[@]}";do
 	[[ -f "${BASE_DIR}"/$env ]] && source "${BASE_DIR}"/$env
 done
 
-declare -A WEB_SERVICES
-declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/etc/opt/gitlab" [${SERVICE_NAME}-conf-vol-1]="/etc/gitlab" [${SERVICE_NAME}-log-vol-1]="/var/log/gitlab" )
-declare -a networks=( )
-declare -A IMAGES=( [service]="gitlab/gitlab-ce:latest" )
+# load service specific configuration
+source "$(dirname "$BASH_SOURCE")/service.sh"
 
-[[ -z $1 ]] && options_menu
-
-configure() {
-	pre_configure_routine
-
-	echo -e "# \e[4m'${PROPER_NAME}' Settings\e[0m"
-
-	set_domain
-	
-	cat <<-EOF >> "${SERVICE_ENV}"
-	PROPER_NAME="${PROPER_NAME}"
-	SERVICE_NAME=${SERVICE_NAME}
-	SSL_CHOICE=${SSL_CHOICE}
-	LE_EMAIL=${LE_EMAIL}
-
-	SERVICE_DOMAIN=${SERVICE_DOMAIN}
-	EOF
-
-	post_configure_routine
-}
-setup() {
-	initial_setup_routine
-
-	SUBSTITUTE=( "\${SERVICE_DOMAIN}" )
-	basic_nginx
-
-	#/proc/sys/fs/file-max #this is shared with the host:
-	GITLAB_FILEMAX=1000000
-	[[ $(cat /proc/sys/fs/file-max) -lt ${GITLAB_FILEMAX} ]] && echo $GITLAB_FILEMAX > /proc/sys/fs/file-max
-
-	docker_run_all
-
-	post_setup_routine
-}
-
-if [[ $1 == "letsencrypt" ]];then
+# check shell-script call parameter
+if [[ -z $1 ]]; then
+  # if there isno parameter run menu function
+  options_menu
+elif [[ $1 == "letsencrypt" ]];then
+  # run letsencrypt function with given parameter
+  # e.g. init.sh letsencrypt issue
 	$1 $*
 else
+  # run other given functions as parameter
+  # e.g. init.sh reconfigure
 	$1
 fi
