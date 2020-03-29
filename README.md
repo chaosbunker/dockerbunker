@@ -7,7 +7,7 @@ Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWm
 #### Services which work:
 
 | Service | Status |
-|-|-|
+|---|---|
 |[Drone CI](https://github.com/drone/drone)| |
 |[Firefox Sync Server](https://github.com/mozilla-services/syncserver)| |
 |[Gitea](https://gitea.io/en-us/)| [&#10004;] i use it live |
