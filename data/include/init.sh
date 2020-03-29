@@ -30,8 +30,10 @@ init_dockerbunker() {
 	fi
 }
 
-[[ -f "${BASE_DIR}"/data/env/dockerbunker.env ]] && source "${BASE_DIR}"/data/env/dockerbunker.env
+# load dockerbunker environment variables or initialize it via init_dockerbunker functionality
+[[ -f "${BASE_DIR}"/data/env/dockerbunker.env ]] && source "${BASE_DIR}"/data/env/dockerbunker.env  || init_dockerbunker
 
+# load dockerbunker functions
 for file in "${BASE_DIR}"/data/include/functions/*; do
   source $file
 done
@@ -53,4 +55,3 @@ else
 			&& source "${ENV_DIR}"/${SERVICE_NAME}_mx.env
 	fi
 fi
-
