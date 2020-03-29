@@ -4,7 +4,6 @@
 # Services marked green are installed and running
 # If containers of a service are currently stopped the services will say (stopped) behind the service name. This only works if the service has been stopped via the dockerbunker menu, because only then the service is marked as stopped in dockerbunker.env
 options_menu() {
-	COLUMNS=12
 	exitmenu=$(printf "\e[1;4;33mExit\e[0m")
 	returntopreviousmenu=$(printf "\e[1;4;33mReturn to previous menu\e[0m")
 
