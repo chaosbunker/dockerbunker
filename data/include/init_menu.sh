@@ -132,6 +132,13 @@ do
     sleep 1
     break
     ;;
+		"$restartall")
+		prevent_nginx_restart=1
+		restart_all
+		say_done
+		sleep 1
+		break
+		;;
     "$stopall")
     prevent_nginx_restart=1
     stop_all

@@ -700,10 +700,10 @@ start_all() {
 }
 
 restart_all() {
-	for service in "${INSTALLED_SERVICES[@]}";do
-		service="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
-		source "${ENV_DIR}/${service}.env"
-		source "${SERVICES_DIR}"/${service}/${service}.sh restart_containers
+	for SERVICE_NAME in "${INSTALLED_SERVICES[@]}";do
+		PROPER_NAME=$SERVICE_NAME
+		source "${ENV_DIR}/${SERVICE_NAME}.env"
+		source "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh restart_containers
 	done
 	restart_nginx
 }
