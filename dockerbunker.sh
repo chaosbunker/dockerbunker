@@ -17,7 +17,7 @@ fi
 # Find base dir
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# initialize dockerbunker with variables and functions
+# initialize variables and functions
 source "${BASE_DIR}"/data/include/init.sh
 
 #######
@@ -29,4 +29,5 @@ done < <(find "${BASE_DIR}/data/services/" -mindepth 1 -maxdepth 1 -type d)
 
 IFS=$'\n' sorted=($(printf '%s\n' "${ALL_SERVICES[@]}"|sort))
 
+# initialize menu
 source "${BASE_DIR}"/data/include/init_menu.sh

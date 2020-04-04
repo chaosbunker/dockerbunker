@@ -1,4 +1,21 @@
+#######
 # Helper functions that are used in multiple other functions
+#
+# function: prompt_confirm
+# function: exit_response
+# function: insert
+# function: elementInArray
+# function: validate_fqdn
+# function: remove_from_WEB_SERVICES
+# function: remove_from_CONFIGURED_SERVICES
+# function: remove_from_STATIC_SITES
+# function: remove_from_INSTALLED_SERVICES
+# function: remove_from_STOPPED_SERVICES
+# function: remove_from_CONTAINERS_IN_DOCKERBUNKER_NETWORK
+# function: collectAllImageNamesFromDockerComposeFile
+# function: collectImageNamesAndCorrespondingSha256
+# function: say_done
+#######
 
 # get user input
 prompt_confirm() {
@@ -172,4 +189,3 @@ collectImageNamesAndCorrespondingSha256() {
 say_done() {
 	echo -e "\n\e[1mDone.\e[0m"
 }
-

@@ -1,8 +1,19 @@
-# The options menu and all its associated functions
-# Options are only shown if relevant in that moment (e.g. "setup" only if service is already configured, "configure" only if service has not yet been configured, "reconfigure" if service is already configured, "destroy" only if it has been configured or installed etc...)
-# Services marked orange are configured but not installed.
-# Services marked green are installed and running
-# If containers of a service are currently stopped the services will say (stopped) behind the service name. This only works if the service has been stopped via the dockerbunker menu, because only then the service is marked as stopped in dockerbunker.env
+#######
+#
+# function: options_menu
+# function: start_all
+# function: restart_all
+# function: stop_all
+# function: destroy_all
+# function: setup
+# function: upgrade
+# function: reinstall
+# function: reconfigure
+# function: static_menu
+# function: backup
+# function: restore
+#######
+
 options_menu() {
 	exitmenu=$(printf "\e[1;4;33mExit\e[0m")
 	returntopreviousmenu=$(printf "\e[1;4;33mReturn to previous menu\e[0m")
@@ -264,430 +275,6 @@ options_menu() {
 	done
 }
 
-get_le_cert() {
-	if ! [[ $1 == "renew" ]];then
-		echo -e "\n\e[3m\xe2\x86\x92 Obtain Let's Encrypt certificate\e[0m"
-		[[ -z ${LE_EMAIL} ]] && get_le_email
-		if [[ ${STATIC} ]];then
-			sed -i "s/SSL_CHOICE=.*/SSL_CHOICE=le/" "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env
-			sed -i "s/LE_EMAIL=.*/LE_EMAIL="${LE_EMAIL}"/" "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env
-		else
-			sed -i "s/SSL_CHOICE=.*/SSL_CHOICE=le/" "${SERVICE_ENV}"
-			sed -i "s/LE_EMAIL=.*/LE_EMAIL="${LE_EMAIL}"/" "${SERVICE_ENV}"
-		fi
-		elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}" \
-			&& "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh start_containers
-		if [[ ${SERVICE_DOMAIN[0]} && -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} \
-			&& ! -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
-			# Back up self-signed certificate
-			mv "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.{pem,pem.backup}
-			mv "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.{pem,pem.backup}
-			# Symlink letsencrypt certificate
-			ln -sf "/etc/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]}/fullchain.pem" "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem
-			ln -sf "/etc/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]}/privkey.pem" "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem
-		fi
-		letsencrypt issue
-	else
-		echo -e "\n\e[3m\xe2\x86\x92 Renew Let's Encrypt certificate\e[0m"
-		export prevent_nginx_restart=1
-		bash "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh letsencrypt issue
-	fi
-}
-
-# start/stop/restart nginx container
-restart_nginx() {
-	echo -en "\n\e[1mRestarting nginx container\e[0m"
-	docker exec -it nginx-dockerbunker nginx -t >/dev/null \
-		&& docker restart ${NGINX_CONTAINER} >/dev/null
-	exit_response
-	if [[ $? == 1 ]];then
-		echo ""
-		docker exec -it nginx-dockerbunker nginx -t
-		echo -e "\n\e[3m\xe2\x86\x92 \e[3m\`nginx -t\` failed. Trying to add missing containers to dockerbunker-network.\e[0m"
-		for container in ${CONTAINERS_IN_DOCKERBUNKER_NETWORK[@]};do
-			connect_containers_to_network ${container}
-		done
-		echo -en "\n\e[1mRestarting nginx container\e[0m"
-		docker exec -it nginx-dockerbunker nginx -t >/dev/null \
-			&& docker restart ${NGINX_CONTAINER} >/dev/null
-		exit_response
-		if [[ $? == 1 ]];then
-			echo ""
-			docker exec -it nginx-dockerbunker nginx -t
-			echo -e "\n\`nginx -t\` failed again. Please resolve issue and try again."
-		fi
-	fi
-}
-start_nginx() {
-	echo -en "\n\e[1mStarting nginx container\e[0m"
-	docker start ${NGINX_CONTAINER} >/dev/null
-	exit_response
-}
-stop_nginx() {
-	echo -en "\n\e[1mStopping nginx container\e[0m"
-	docker stop ${NGINX_CONTAINER} >/dev/null
-	exit_response
-}
-
-# all functions starting/stopping/restarting containers of individual services. This is offered in every service specific menu.
-deactivate_nginx_conf() {
-	if [[ ${SERVICE_NAME} == "nginx" ]] \
-	|| [[ -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
-	|| elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}" \
-	|| [[ ${FUNCNAME[2]} == "destroy_service" ]];then \
-		return
-	fi
-
-	! [[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]] \
-		&& [[ -z $reconfigure ]] \
-		&& echo -e "\n\e[31mNginx configuration for ${SERVICE_NAME} is not active or missing.\nPlease make sure ${SERVICE_NAME} is properly configured.\e[0m\n" \
-		&& return
-
-	! [[ -d "${CONF_DIR}"/nginx/conf.inactive.d ]] \
-		&& mkdir "${CONF_DIR}"/nginx/conf.inactive.d
-
-	if [[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]];then
-	echo -en "\n\e[1mDeactivating nginx configuration\e[0m"
-		[[ -d "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]} ]] \
-			&& mv "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]} "${CONF_DIR}"/nginx/conf.inactive.d/
-		mv "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf "${CONF_DIR}"/nginx/conf.inactive.d/
-		exit_response
-	fi
-
-	if ! elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}";then
-		STOPPED_SERVICES+=( "${SERVICE_NAME}" )
-		sed -i '/STOPPED_SERVICES/d' "${ENV_DIR}"/dockerbunker.env
-		declare -p STOPPED_SERVICES >> "${ENV_DIR}"/dockerbunker.env
-	fi
-
-	[[ -z $prevent_nginx_restart ]] && restart_nginx
-}
-
-activate_nginx_conf() {
-	[[ ${SERVICE_NAME} == "nginx" ]] && return
-	[[ ${FUNCNAME[1]} != "setup" ]] \
-		&& elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}" \
-		&& ! [[ -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
-		&& echo -e "\n\e[31mNginx configuration for ${SERVICE_NAME} is not inactive or missing. Please make sure ${SERVICE_NAME} is properly configured.\e[0m\n" \
-		&& return
-	# activate nginx config
-	[[ -d "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]} ]] \
-		&& mv "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]} "${CONF_DIR}"/nginx/conf.d/
-	[[ -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
-		&& mv "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf "${CONF_DIR}"/nginx/conf.d/
-}
-
-start_containers() {
-	RUNNING=$(docker inspect --format="{{.State.Running}}" ${NGINX_CONTAINER} 2> /dev/null)
-	[[ $RUNNING == "false" ]] || [[ -z $RUNNING ]] && bash -c "${SERVER_DIR}/nginx/init.sh" setup
-	echo -e "\n\e[1mStarting containers\e[0m"
-	for container in "${containers[@]}";do
-		[[ $(docker ps -q --filter "status=exited" --filter name=^/${container}$) ]] \
-			&& echo -en "- $container" \
-			&& docker start $container >/dev/null 2>&1 \
-			&& exit_response
-	done
-	remove_from_STOPPED_SERVICES
-	activate_nginx_conf
-	[[ -z $prevent_nginx_restart ]] && restart_nginx
-}
-
-stop_containers() {
-	deactivate_nginx_conf
-	echo -e "\n\e[1mStopping containers\e[0m"
-	for container in "${containers[@]}";do
-		[[ $(docker ps -q --filter name=^/${container}$) ]] \
-			&& echo -en "- $container" \
-			&& docker stop $container >/dev/null 2>&1 \
-			&& exit_response \
-			|| echo "- $container (not running)"
-	done
-}
-
-restore_container() {
-	docker_run ${container//-/_}
-	echo -en "\n- $container"
-	exit_response
-	connect_containers_to_network $container
-	restart_nginx
-}
-
-
-
-remove_containers() {
-	for container in ${containers[@]};do
-		[[ $(docker ps -a -q --filter name=^/${container}$) ]]  \
-		&& containers_found+=( $container )
-	done
-	if [[ -z ${containers_found[0]} ]];then
-		echo -e "\n\e[1mRemoving containers\e[0m"
-		for container in "${containers[@]}";do
-			[[ $(docker ps -q --filter "status=exited" --filter name=^/${container}$) || $(docker ps -q --filter "status=restarting" --filter name=^/${container}$) ]] \
-				&& echo -en "- $container" \
-				&& docker rm -f $container >/dev/null 2>&1 \
-				&& exit_response \
-				|| echo "- $container (not found)"
-		done
-	elif [[ ${#containers_found[@]} > 0 ]];then
-		echo -e "\n\e[1mRemoving containers\e[0m"
-		for container in "${containers[@]}";do
-			echo -en "- $container"
-			docker rm -f $container >/dev/null 2>&1
-			exit_response
-		done
-	else
-		return
-	fi
-}
-
-remove_volumes() {
-	if [[ ${volumes[@]} && -z $keep_volumes ]] || [[ $destroy_all ]];then
-		echo -e "\n\e[1mRemoving volumes\e[0m"
-		for volume in "${!volumes[@]}";do
-			[[ $(docker volume ls -q --filter name=^${volume}$) ]] \
-				&& echo -en "- ${volume}" \
-				&& docker volume rm ${volume} >/dev/null \
-				&& exit_response \
-				|| echo "- ${volume} (not found)"
-		done
-	fi
-}
-
-remove_networks() {
-	if [[ ${networks[0]} ]];then
-		echo -e "\n\e[1mRemoving networks\e[0m"
-		for network in "${networks[@]}";do
-			[[ $(docker network ls -q --filter name=^${network}$) ]] \
-				&& echo -en "- $network" \
-				&& docker network rm $network >/dev/null \
-				&& exit_response \
-				|| echo "- $network (not found)"
-		done
-	fi
-}
-
-restart_containers() {
-	echo -e "\n\e[1mRestarting containers\e[0m"
-	[[ $(docker ps -a -q --filter name=^/${NGINX_CONTAINER}$ 2> /dev/null) ]] \
-		|| bash -c "${SERVER_DIR}/nginx/init.sh" setup
-	for container in "${containers[@]}";do
-		if [[ $(docker ps -q --filter name=^/${container}$) ]];then
-			echo -en "- $container";docker restart $container >/dev/null 2>&1
-			exit_response
-		fi
-	done
-	[[ -z $prevent_nginx_restart ]] && restart_nginx
-}
-
-remove_images() {
-	if [[ ${IMAGES[0]} ]];then
-		prompt_confirm "Remove all images?"
-		if [[ $? == 0 ]];then
-			echo -e "\n\e[1mRemoving images\e[0m"
-			for image in "${IMAGES[@]}";do
-				if ! [[ $(docker container ls | awk '{print $2}' | grep "\<${image}\>") ]];then
-					echo -en "- $image"
-					docker rmi $image >/dev/null
-					exit_response
-				fi
-			done
-		fi
-	fi
-}
-
-remove_service_conf() {
-	[[ -d "${CONF_DIR}/${SERVICE_NAME}" ]] \
-		&& echo -en "\n\e[1mRemoving ${CONF_DIR}/${SERVICE_NAME}\e[0m" \
-		&& rm -r "${CONF_DIR}/${SERVICE_NAME}" \
-
-}
-
-remove_environment_files() {
-	[[ -f "${ENV_DIR}"/${SERVICE_NAME}.env ]] \
-		&& echo -en "\n\e[1mRemoving ${SERVICE_NAME}.env\e[0m" \
-		&& rm "${ENV_DIR}"/${SERVICE_NAME}.env \
-		&& exit_response
-
-	[[ ${SERVICE_SPECIFIC_MX} ]] \
-		&& [[ -f "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env ]] \
-		&& rm "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env
-
-	[[ ${STATIC} \
-		&& -f "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env ]] \
-		&& echo -en "\n\e[1mRemoving ${SERVICE_DOMAIN[0]}.env\e[0m" \
-		&& rm "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env \
-		&& exit_response
-}
-
-remove_ssl_certificate() {
-	if [[ ${SERVICE_DOMAIN[0]} ]];then
-		[[ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] \
-			&& echo -en "\n\e[1mRemoving SSL Certificates\e[0m" \
-			&& rm -r "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} \
-			&& exit_response
-		[[ -f "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf ]] \
-			&& rm "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf
-		[[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/archive/${SERVICE_DOMAIN[0]} ]] \
-			&& rm -r "${CONF_DIR}"/nginx/ssl/letsencrypt/archive/${SERVICE_DOMAIN[0]}
-		[[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]] \
-			&& rm -r "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]}
-	fi
-}
-
-destroy_service() {
-	if [[ -z ${STATIC} ]];then
-		disconnect_from_dockerbunker_network
-		stop_containers
-		remove_containers
-		remove_volumes
-		remove_networks
-		remove_images
-
-		echo -en "\n\e[1mRemoving ${SERVICE_NAME} from dockerbunker.env\e[0m"
-		remove_from_WEB_SERVICES
-		remove_from_CONFIGURED_SERVICES
-		remove_from_INSTALLED_SERVICES
-		remove_from_STOPPED_SERVICES
-		remove_from_CONTAINERS_IN_DOCKERBUNKER_NETWORK
-	else
-		[[ -d ${STATIC_HOME} ]] \
-			&& prompt_confirm "Remove HTML directory [${STATIC_HOME}]" \
-			&& echo -en "\n\e[1mRemoving ${STATIC_HOME}\e[0m" \
-			&& rm -r ${STATIC_HOME} >/dev/null \
-			&& exit_response
-		echo -en "\n\e[1mRemoving "${SERVICE_DOMAIN[0]}" from dockerbunker.env\e[0m"
-		remove_from_STATIC_SITES
-	fi
-	exit_response
-
-	remove_nginx_conf
-	remove_environment_files
-	remove_service_conf
-	remove_ssl_certificate
-
-	[[ -z $destroy_all ]] \
-		&& [[ -z ${INSTALLED_SERVICES[@]} ]] \
-		&& [[ $(docker ps -q --filter name=^/${NGINX_CONTAINER}) ]] \
-		&& [[ -z $restoring ]] \
-		&& echo -e "\nNo remaining services running.\n" \
-		&& prompt_confirm  "Destroy nginx as well and completely reset dockerbunker?" \
-		&& bash "${SERVER_DIR}/nginx/init.sh" destroy_service \
-		&& return
-
-	[[ -z $prevent_nginx_restart ]] \
-		&& [[ ${SERVICE_NAME} != "nginx" ]] \
-		&& restart_nginx
-}
-
-
-# minimal setup routine. if more is needed add custom setup() in data/services/${SERVICE_NAME}/init.sh
-setup() {
-	initial_setup_routine
-
-	SUBSTITUTE=( "\${SERVICE_DOMAIN}" )
-	basic_nginx
-
-	docker_run_all
-
-	post_setup_routine
-}
-
-# minimal upgrade routine. if more is needed add custom upgrade() in data/services/${SERVICE_NAME}/init.sh
-upgrade() {
-	pull_and_compare
-
-	stop_containers
-	remove_containers
-
-	docker_run_all
-
-	remove_from_STOPPED_SERVICES
-
-	delete_old_images
-
-	activate_nginx_conf
-
-	restart_nginx
-}
-
-reinstall() {
-	echo ""
-	prompt_confirm "Keep volumes?" && export keep_volumes=1
-
-	disconnect_from_dockerbunker_network
-
-	stop_containers
-	remove_containers
-	remove_volumes
-	remove_networks
-
-	export reinstall=1
-	setup
-}
-
-remove_nginx_conf() {
-	if [[ ${SERVICE_DOMAIN[0]} ]];then
-		if [[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf || -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]];then
-			echo -en "\n\e[1mRemoving nginx configuration\e[0m"
-			[[ -d "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]} ]] \
-				&& rm -r "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]} \
-				|| true
-			[[ -d "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]} ]] \
-				&& rm -r "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]} \
-				|| true
-			[[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]] \
-				&& rm "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf \
-				|| true
-			[[ -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
-				&& rm "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf \
-				|| true
-			exit_response
-		fi
-	fi
-}
-
-disconnect_from_dockerbunker_network() {
-	for container in ${add_to_network[@]};do
-		[[ $container && $(docker ps -q --filter name=^/${container}$) ]] \
-			&&  docker network disconnect --force ${NETWORK} $container >/dev/null
-	done
-}
-
-reconfigure() {
-	reconfigure=1
-	if [[ $safe_to_keep_volumes_when_reconfiguring ]];then
-		echo ""
-		prompt_confirm "Keep volumes?" && keep_volumes=1
-	else
-		echo ""
-		prompt_confirm "All volumes will be removed. Continue?" || exit 0
-	fi
-
-	disconnect_from_dockerbunker_network
-
-	stop_containers
-	remove_containers
-	remove_volumes
-	remove_networks
-
-	remove_nginx_conf
-	remove_ssl_certificate
-
-	remove_environment_files
-	remove_service_conf
-
-	[[ $(grep "${SERVICE_NAME}" "${ENV_DIR}"/dockerbunker.env) ]] && echo -en "\n\e[1mRemoving ${SERVICE_NAME} from dockerbunker.env\e[0m"
-	remove_from_WEB_SERVICES
-	remove_from_CONFIGURED_SERVICES
-	remove_from_INSTALLED_SERVICES
-	remove_from_STOPPED_SERVICES
-	remove_from_CONTAINERS_IN_DOCKERBUNKER_NETWORK
-
-	exit_response
-	echo ""
-	configure
-}
-
 # all functions that manipulate all containers
 start_all() {
 	start_nginx
@@ -759,22 +346,84 @@ if [[ "$i" == ${all_services[-1]} ]];then \
 	rm -rf "${ENV_DIR}"/*
 }
 
-add_ssl_menuentry() {
-	if [[ $SSL_CHOICE == "le" ]] && [[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]];then
-		# in this case le cert has been obtained previously and everything is as expected
-		insert $1 "Renew Let's Encrypt certificate" $2
-	elif ! [[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]] && [[ -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
-		# in this case neither a self-signed nor a le cert could be found. nginx container will refuse to restart until it can find a certificate in /etc/nginx/ssl/${SERVICE_DOMAIN} - so offer to put one there either via LE or generate new self-signed
-		insert $1 "Generate self-signed certificate" $2
-		insert $1 "Obtain Let's Encrypt certificate" $2
-	elif [[ -f "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
-		# in this case only a self-signed cert is found and a previous cert for the domain might be present in the le directories (if so it will be used and linked to)
-		insert $1 "Obtain Let's Encrypt certificate" $2
+# minimal setup routine. if more is needed add custom setup() in data/services/${SERVICE_NAME}/init.sh
+setup() {
+	initial_setup_routine
+
+	SUBSTITUTE=( "\${SERVICE_DOMAIN}" )
+	basic_nginx
+
+	docker_run_all
+
+	post_setup_routine
+}
+
+# minimal upgrade routine. if more is needed add custom upgrade() in data/services/${SERVICE_NAME}/init.sh
+upgrade() {
+	pull_and_compare
+
+	stop_containers
+	remove_containers
+
+	docker_run_all
+
+	remove_from_STOPPED_SERVICES
+
+	delete_old_images
+
+	activate_nginx_conf
+
+	restart_nginx
+}
+
+reinstall() {
+	echo ""
+	prompt_confirm "Keep volumes?" && export keep_volumes=1
+
+	disconnect_from_dockerbunker_network
+
+	stop_containers
+	remove_containers
+	remove_volumes
+	remove_networks
+
+	export reinstall=1
+	setup
+}
+
+reconfigure() {
+	reconfigure=1
+	if [[ $safe_to_keep_volumes_when_reconfiguring ]];then
+		echo ""
+		prompt_confirm "Keep volumes?" && keep_volumes=1
 	else
-		# not sure when this should be the case, but if it does happen, bot options are available
-		insert $1 "Generate self-signed certificate" $2
-		insert $1 "Obtain Let's Encrypt certificate" $2
+		echo ""
+		prompt_confirm "All volumes will be removed. Continue?" || exit 0
 	fi
+
+	disconnect_from_dockerbunker_network
+
+	stop_containers
+	remove_containers
+	remove_volumes
+	remove_networks
+
+	remove_nginx_conf
+	remove_ssl_certificate
+
+	remove_environment_files
+	remove_service_conf
+
+	[[ $(grep "${SERVICE_NAME}" "${ENV_DIR}"/dockerbunker.env) ]] && echo -en "\n\e[1mRemoving ${SERVICE_NAME} from dockerbunker.env\e[0m"
+	remove_from_WEB_SERVICES
+	remove_from_CONFIGURED_SERVICES
+	remove_from_INSTALLED_SERVICES
+	remove_from_STOPPED_SERVICES
+	remove_from_CONTAINERS_IN_DOCKERBUNKER_NETWORK
+
+	exit_response
+	echo ""
+	configure
 }
 
 static_menu() {
