@@ -46,8 +46,8 @@ options_menu() {
 			insert menu "Restart container(s)" 3
 			insert menu "Stop container(s)" 4
 		fi
-		[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
-			&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
+		[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
+			&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
 			&& insert menu "Restore Service" 6
 	elif [[ ${missingContainers[@]} ]];then
 			echo -e "\n\n\e[3m\xe2\x86\x92 \e[3mThe following containers are missing\e[0m"
@@ -56,8 +56,8 @@ options_menu() {
 	elif [[ $RUNNING = false ]];then
 		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Start container(s)" "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
 		add_ssl_menuentry menu 2
-		[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
-			&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
+		[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
+			&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
 			&& insert menu "Restore Service" 3
 	else
 		if ! elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
@@ -67,29 +67,29 @@ options_menu() {
 				&& $(ls -A "${ENV_DIR}"/static) ]] \
 				&& menu=( "Configure Site" "Manage Sites" "$exitmenu" ) \
 				|| menu=( "Configure Service" "$exitmenu" )
-			[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
-				&& [[ "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
-				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
+			[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
+				&& [[ ${BACKUP_DIR}/${SERVICE_NAME} ]] \
+				&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
 				&& insert menu "Restore Service" 1
 		elif ! elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& ! elementInArray "${SERVICE_NAME}" "${INSTALLED_SERVICES[@]}";then
 			menu=( "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
-			[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
-				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
+			[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
+				&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
 				&& insert menu "Restore Service" 1
 			error="Environment file found but ${SERVICE_NAME} is not marked as configured or installed. Please destroy first!"
 		elif elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& [[ ! -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
 				error="Service marked as configured, but configuration file is missing. Please destroy first."
 				menu=( "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
-				[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
-					&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
+				[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
+					&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
 					&& insert menu "Restore Service" 1
 		elif elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& [[ -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
 			menu=( "Reconfigure service" "Setup service" "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
-			[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
-				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
+			[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
+				&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
 				&& insert menu "Restore Service" 2
 		fi
 	fi
@@ -519,50 +519,50 @@ static_menu() {
 }
 
 backup() {
-	! [[ -d ${BASE_DIR}/data/backup/${SERVICE_NAME} ]] && mkdir -p ${BASE_DIR}/data/backup/${SERVICE_NAME}
+	! [[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] && mkdir -p ${BACKUP_DIR}/${SERVICE_NAME}
 	NOW=$(date -d "today" +"%Y%m%d_%H%M")
-	mkdir -p "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}
+	mkdir -p ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}
 
 	# compressing volumes
 	echo -e "\n\e[1mCompressing volumes\e[0m"
 	for volume in ${!volumes[@]};do
-		docker run --rm -i -v ${volume}:/${volumes[$volume]##*/} -v ${BASE_DIR}/data/backup/${SERVICE_NAME}/${NOW}:/backup debian:jessie tar cvfz /backup/${volume}.tar.gz /${volumes[$volume]##*/} 2>/dev/null | cut -b1-$(tput cols) | sed -u 'i\\o033[2K' | stdbuf -o0 tr '\n' '\r';echo -e "\033[2K\c"
+		docker run --rm -i -v ${volume}:/${volumes[$volume]##*/} -v ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}:/backup debian:jessie tar cvfz /backup/${volume}.tar.gz /${volumes[$volume]##*/} 2>/dev/null | cut -b1-$(tput cols) | sed -u 'i\\o033[2K' | stdbuf -o0 tr '\n' '\r';echo -e "\033[2K\c"
 		echo -en "- $volume"
 		exit_response
 	done
 
 	if [ -d "${CONF_DIR}"/${SERVICE_NAME} ];then
-		! [ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/conf ] \
-			&& mkdir "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/conf
+		! [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/conf ] \
+			&& mkdir ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/conf
 		echo -en "\n\e[1mBacking up configuration files\e[0m"
 		sleep 0.2
-		cp -r "${CONF_DIR}"/${SERVICE_NAME}/* "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/conf
+		cp -r "${CONF_DIR}"/${SERVICE_NAME}/* ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/conf
 		exit_response
 	fi
 
 	if [[ ${SERVICE_DOMAIN[0]} ]] && [ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ];then
-		! [ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/ssl ] \
-			&& mkdir "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/ssl
+		! [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl ] \
+			&& mkdir ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl
 		echo -en "\n\e[1mBacking up SSL certificate\e[0m"
 		sleep 0.2
 		[[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]] \
 			&& mkdir -p \
-				"${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/live \
-				"${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/archive \
-				"${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/renewal \
-			&& cp -r "${CONF_DIR}"/nginx/ssl/letsencrypt/archive/${SERVICE_DOMAIN[0]} "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/archive \
-			&& cp -r "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/live \
-			&& cp -r "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/renewal
-		cp -r "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/ssl
+				${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/live \
+				${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/archive \
+				${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/renewal \
+			&& cp -r "${CONF_DIR}"/nginx/ssl/letsencrypt/archive/${SERVICE_DOMAIN[0]} ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/archive \
+			&& cp -r "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/live \
+			&& cp -r "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl/letsencrypt/renewal
+		cp -r "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl
 		exit_response
 	fi
 
 	if [ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ];then
-		! [ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/nginx ] \
-			&& mkdir -p "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/nginx
+		! [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/nginx ] \
+			&& mkdir -p ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/nginx
 		echo -en "\n\e[1mBacking up nginx configuration\e[0m"
 		sleep 0.2
-		cp -r "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}* "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}/nginx
+		cp -r "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}* ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/nginx
 		exit_response
 	fi
 
@@ -570,8 +570,8 @@ backup() {
 		echo -en "\n\e[1mBacking up environemt file(s)\e[0m"
 		sleep 0.2
 		[[ -f "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env ]] \
-			&& cp "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}
-		cp "${ENV_DIR}"/${SERVICE_NAME}.env "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}
+			&& cp "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}
+		cp "${ENV_DIR}"/${SERVICE_NAME}.env ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}
 		exit_response
 	else
 		echo -e "\n\e[3mCould not find environment file(s) for ${SERVICE_NAME}.\e[0m"
@@ -582,7 +582,7 @@ restore() {
 echo ${FUNCNAME[@]}
 	restoring=1
 	## Collect the backups in the array $backups
-	backups=( "${BASE_DIR}"/data/backup/${SERVICE_NAME}/* )
+	backups=( ${BACKUP_DIR}/${SERVICE_NAME}/* )
 	# strip path from directory names
 	backups=( "${backups[@]##*/}" )
 	## Enable extended globbing. This lets us use @(foo|bar) to
@@ -599,8 +599,8 @@ echo ${FUNCNAME[@]}
 	## Close the parenthesis. $string is now @(backup1|backup2|...|backupN)
 	string+=")"
 	# only continue if backup directory is not empty
-	if [[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
-		&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]];then
+	if [[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
+		&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]];then
 		echo ""
 		echo -e "\e[4mPlease choose a backup\e[0m"
 
@@ -610,7 +610,7 @@ echo ${FUNCNAME[@]}
 		    case $backup in
 		    ## If the choice is one of the backups (if it matches $string)
 		    $string)
-				! [[ -f "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env ]] \
+				! [[ -f ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env ]] \
 					&& echo -e "\n\e[3mCould not find ${SERVICE_NAME}.env in ${backup}\e[0m" \
 					&& return
 				# destroy current service if found
@@ -619,61 +619,61 @@ echo ${FUNCNAME[@]}
 					destroy_service
 				fi
 
-				source "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env
+				source ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env
 
 				! [[ $(docker ps -q --filter name=^/nginx-dockerbunker$) ]] && setup_nginx
 				echo -e "\n\e[3m\xe2\x86\x92 Restoring ${SERVICE_NAME}\e[0m"
 				for volume in ${!volumes[@]};do
 					[[ $(docker volume ls --filter name=^${volume}$) ]] \
 						&& docker volume create $volume >/dev/null
-					docker run --rm -i -v ${volume}:/${volumes[$volume]##*/} -v ${BASE_DIR}/data/backup/${SERVICE_NAME}/${backup}:/backup debian:jessie tar xvfz /backup/${volume}.tar.gz 2>/dev/null | cut -b1-$(tput cols) | sed -u 'i\\o033[2K' | stdbuf -o0 tr '\n' '\r';echo -e "\033[2K\c"
+					docker run --rm -i -v ${volume}:/${volumes[$volume]##*/} -v ${BACKUP_DIR}/${SERVICE_NAME}/${backup}:/backup debian:jessie tar xvfz /backup/${volume}.tar.gz 2>/dev/null | cut -b1-$(tput cols) | sed -u 'i\\o033[2K' | stdbuf -o0 tr '\n' '\r';echo -e "\033[2K\c"
 					echo -en "\n\e[1mDecompressing $volume\e[0m"
 					exit_response
 				done
 				sleep 0.2
 
-				if [ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/conf ];then
+				if [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/conf ];then
 					! [ -d "${CONF_DIR}"/${SERVICE_NAME} ] \
 						&& mkdir "${CONF_DIR}"/${SERVICE_NAME}
 					echo -en "\n\e[1mRestoring configuration files\e[0m"
 					sleep 0.2
-					cp -r "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/conf/* "${CONF_DIR}"/${SERVICE_NAME}
+					cp -r ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/conf/* "${CONF_DIR}"/${SERVICE_NAME}
 					exit_response
 				fi
 
-				if [ -f "${BASE_DIR}"/data/backup/${SERVICE_NAME}/$backup/nginx/${SERVICE_DOMAIN}.conf ];then
+				if [ -f ${BACKUP_DIR}/${SERVICE_NAME}/$backup/nginx/${SERVICE_DOMAIN}.conf ];then
 					! [[ -d "${CONF_DIR}"/nginx/conf.inactive.d ]] \
 						&& mkdir "${CONF_DIR}"/nginx/conf.inactive.d
 					echo -en "\n\e[1mRestoring nginx configuration\e[0m"
-					cp -r "${BASE_DIR}"/data/backup/${SERVICE_NAME}/$backup/nginx/${SERVICE_DOMAIN}* "${CONF_DIR}"/nginx/conf.inactive.d
+					cp -r ${BACKUP_DIR}/${SERVICE_NAME}/$backup/nginx/${SERVICE_DOMAIN}* "${CONF_DIR}"/nginx/conf.inactive.d
 					exit_response
 				fi
 				sleep 0.2
 
 
-				if [[ ${SERVICE_DOMAIN[0]} ]] && [ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/ssl ];then
+				if [[ ${SERVICE_DOMAIN[0]} ]] && [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/ssl ];then
 					! [ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ] \
 						&& mkdir -p "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}
 					echo -en "\n\e[1mRestoring SSL certificate\e[0m"
 					sleep 0.2
-					[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]] \
+					[[ -d ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]] \
 						&& mkdir -p \
 							"${CONF_DIR}"/nginx/ssl/letsencrypt/live \
 							"${CONF_DIR}"/nginx/ssl/letsencrypt/archive \
 							"${CONF_DIR}"/nginx/ssl/letsencrypt/renewal \
-						&& cp -r "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/ssl/letsencrypt/archive/${SERVICE_DOMAIN[0]} "${CONF_DIR}"/nginx/ssl/letsencrypt/archive \
-						&& cp -r "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} "${CONF_DIR}"/nginx/ssl/letsencrypt/live \
-						&& cp -r "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal
-					cp -r "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/ssl/${SERVICE_DOMAIN[0]} "${CONF_DIR}"/nginx/ssl
+						&& cp -r ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/ssl/letsencrypt/archive/${SERVICE_DOMAIN[0]} "${CONF_DIR}"/nginx/ssl/letsencrypt/archive \
+						&& cp -r ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} "${CONF_DIR}"/nginx/ssl/letsencrypt/live \
+						&& cp -r ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal
+					cp -r ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/ssl/${SERVICE_DOMAIN[0]} "${CONF_DIR}"/nginx/ssl
 					exit_response
 				fi
 
-				if [ -f "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env ];then
+				if [ -f ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env ];then
 					echo -en "\n\e[1mRestoring environemt file(s)\e[0m"
 					sleep 0.2
-					[[ -f "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_SPECIFIC_MX}mx.env ]] \
-						&& cp "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_SPECIFIC_MX}mx.env "${ENV_DIR}"
-					cp "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env "${ENV_DIR}"
+					[[ -f ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_SPECIFIC_MX}mx.env ]] \
+						&& cp ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_SPECIFIC_MX}mx.env "${ENV_DIR}"
+					cp ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env "${ENV_DIR}"
 					exit_response
 				fi
 				create_networks
