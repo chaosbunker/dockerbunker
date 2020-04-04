@@ -2,7 +2,7 @@ while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;b
 
 SERVICE_NAME="$(basename $(dirname "$BASH_SOURCE"))"
 
-declare -a environment=( "data/env/dockerbunker.env" "data/include/init.sh" )
+declare -a environment=( "build/env/dockerbunker.env" "data/include/init.sh" )
 
 for env in "${environment[@]}";do
 	[[ -f "${BASE_DIR}"/$env ]] && source "${BASE_DIR}"/$env
@@ -29,8 +29,8 @@ setup() {
 	[[ ! -f "${CONF_DIR}"/nginx/ssl/dhparam.pem ]] \
 		&& cp "${SERVER_DIR}/nginx/ssl/dhparam.pem" "${CONF_DIR}"/nginx/ssl
 
-	[[ ! -d "${BASE_DIR}"/data/web ]] \
-		&& mkdir "${BASE_DIR}"/data/web
+	[[ ! -d "${BASE_DIR}"/build/web ]] \
+		&& mkdir "${BASE_DIR}"/build/web
 
 	docker_run nginx_dockerbunker
 }

@@ -15,7 +15,7 @@ while true;do /bin/ls | /bin/grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_
 	--rm --name=certbot \
 	--network dockerbunker-network \
 	-v "${CONF_DIR}"/nginx/ssl/letsencrypt:/etc/letsencrypt \
-	-v "${BASE_DIR}"/data/web:/var/www/html:rw \
+	-v "${BASE_DIR}"/build/web:/var/www/html:rw \
 	certbot/certbot renew | /usr/bin/tee -a /var/log/certbot.log
 
 if /usr/bin/docker exec -t nginx-dockerbunker nginx -t | grep -q 'test is successful';then

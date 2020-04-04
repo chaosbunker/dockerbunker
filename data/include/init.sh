@@ -1,18 +1,18 @@
 # On first run, generate the basic environment file. This file will collect and hold all information regarding dockerbunker.
 # It keeps track of which web-apps are configured, installed, which services' containers are stopped etc.
 init_dockerbunker() {
-	if [[ ! -f "${BASE_DIR}/data/env/dockerbunker.env" ]];then
-		! [[ -d "${BASE_DIR}/data/env/" ]] && mkdir -p "${BASE_DIR}/data/env/"
-		! [[ -d "${BASE_DIR}"/data/env/static ]] && mkdir -p "${BASE_DIR}"/data/env/static
-		! [[ -d "${BASE_DIR}"/data/conf/nginx/conf.d ]] && mkdir -p "${BASE_DIR}"/data/conf/nginx/conf.d
-		cat <<-EOF >> "${BASE_DIR}/data/env/dockerbunker.env"
+	if [[ ! -f "${BASE_DIR}/build/env/dockerbunker.env" ]];then
+		! [[ -d "${BASE_DIR}/build/env/" ]] && mkdir -p "${BASE_DIR}/build/env/"
+		! [[ -d "${BASE_DIR}"/build/env/static ]] && mkdir -p "${BASE_DIR}"/build/env/static
+		! [[ -d "${BASE_DIR}"/build/conf/nginx/conf.d ]] && mkdir -p "${BASE_DIR}"/build/conf/nginx/conf.d
+		cat <<-EOF >> "${BASE_DIR}/build/env/dockerbunker.env"
 			BASE_DIR="${BASE_DIR}"
 			SERVICES_DIR="${BASE_DIR}/data/services"
       SERVICE_DIR="${SERVICES_DIR}/${SERVICE_NAME}"
 			SERVER_DIR="${BASE_DIR}/data/server"
-			CONF_DIR="${BASE_DIR}/data/conf"
-			ENV_DIR="${BASE_DIR}/data/env"
-			BACKUP_DIR="${BASE_DIR}/data/backup"
+			CONF_DIR="${BASE_DIR}/build/conf"
+			ENV_DIR="${BASE_DIR}/build/env"
+			BACKUP_DIR="${BASE_DIR}/build/backup"
 			SERVICE_ENV="${ENV_DIR}/${SERVICE_NAME}.env"
       CONTAINERS="${SERVICE_DIR}/containers.sh"
 			SERVER_CONTAINER="${SERVER_DIR}/nginx/containers.sh"
@@ -32,8 +32,8 @@ init_dockerbunker() {
 }
 
 # load dockerbunker environment variables or initialize it via init_dockerbunker functionality
-[[ -f "${BASE_DIR}"/data/env/dockerbunker.env ]] \
-&& source "${BASE_DIR}"/data/env/dockerbunker.env  || init_dockerbunker
+[[ -f "${BASE_DIR}"/build/env/dockerbunker.env ]] \
+&& source "${BASE_DIR}"/build/env/dockerbunker.env  || init_dockerbunker
 
 # load dockerbunker functions
 for file in "${BASE_DIR}"/data/include/functions/*; do

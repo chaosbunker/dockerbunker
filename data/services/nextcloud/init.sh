@@ -13,7 +13,7 @@ SERVICE_NAME="$(basename $(dirname "$BASH_SOURCE"))"
 PROMPT_SSL=1
 
 # load prior saved dockerbunker and service specific environment variables
-declare -a environment=( "data/env/dockerbunker.env" "data/include/init.sh" )
+declare -a environment=( "build/env/dockerbunker.env" "data/include/init.sh" )
 
 for env in "${environment[@]}";do
 	[[ -f "${BASE_DIR}"/$env ]] && source "${BASE_DIR}"/$env

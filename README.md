@@ -81,24 +81,24 @@ When destroying a service everything related to the service will be removed. Onl
 
 ### SSL
 
-When configuring a service, a self-signed certificate is generated and stored in `data/conf/nginx/ssl/${SERVICE_HOSTNAME}`. Please move your own trusted certificate and key in that directory as `cert.pem` and `key.pem` after configuration of the service is complete.
+When configuring a service, a self-signed certificate is generated and stored in `build/conf/nginx/ssl/${SERVICE_HOSTNAME}`. Please move your own trusted certificate and key in that directory as `cert.pem` and `key.pem` after configuration of the service is complete.
 
-If you choose to use [Let's Encrypt](https://letsencrypt.org/) during setup, certificates will be automatically obtained via a Certbot container. Let's Encrypt data is stored in `data/conf/nginx/ssl/letsencrypt`.
+If you choose to use [Let's Encrypt](https://letsencrypt.org/) during setup, certificates will be automatically obtained via a Certbot container. Let's Encrypt data is stored in `build/conf/nginx/ssl/letsencrypt`.
 
 It is possible to add additional domains to the certificate before obtaining the certificate and these domains will also automatically be added to the corresponding nginx configuration.
 
 #### Backup & Restore
 
-When backing up a service, a timestamped directory will be created in `data/backup/${SERVICE_NAME}`. The following things will get backed up into (or restored from) that directory:
+When backing up a service, a timestamped directory will be created in `build/backup/${SERVICE_NAME}`. The following things will get backed up into (or restored from) that directory:
 
 - All volumes (will be compressed)
-- nginx configuration if service is accessible via web (from data/conf/nginx/conf.d/${SERVICE_DOMAIN})
-- other user-specific configuration files (from data/conf/${SERVICE_NAME})
-- environment file(s) (from data/env/${SERVICE_NAME}*)
-- ssl certificate" (from data/conf/nginx/ssl/${SERVICE_DOMAIN} and, if applicable data/conf/nginx/ssl/letsencrypt)
+- nginx configuration if service is accessible via web (from build/conf/nginx/conf.d/${SERVICE_DOMAIN})
+- other user-specific configuration files (from build/conf/${SERVICE_NAME})
+- environment file(s) (from build/env/${SERVICE_NAME}*)
+- ssl certificate" (from build/conf/nginx/ssl/${SERVICE_DOMAIN} and, if applicable build/conf/nginx/ssl/letsencrypt)
 
 #### Good to know:
-All credentials that are set by the user or that are automatically generated are stored in data/env/${SERVICE_NAME}.env.
+All credentials that are set by the user or that are automatically generated are stored in build/env/${SERVICE_NAME}.env.
 
 Please refer to the documentation of each web-app (regarding default credentials, configuration etc.)
 

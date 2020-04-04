@@ -435,7 +435,7 @@ static_menu() {
 
 	# Option menu from directory listing, based on terdon's answer in https://askubuntu.com/a/682146
 	## Collect all sites in the array $staticsites
-	staticsites=( "${BASE_DIR}"/data/env/static/* )
+	staticsites=( "${BASE_DIR}"/build/env/static/* )
 	# strip path from directory names
 	staticsites=( "${staticsites[@]##*/}" )
 	staticsites=( "${staticsites[@]%.*}" )
@@ -459,8 +459,8 @@ static_menu() {
 	do
 	    case $static in
 	    $string)
-			if [[ -f "${BASE_DIR}"/data/env/static/${static}.env ]];then
-				source "${BASE_DIR}"/data/env/static/${static}.env
+			if [[ -f "${BASE_DIR}"/build/env/static/${static}.env ]];then
+				source "${BASE_DIR}"/build/env/static/${static}.env
 			else
 				echo "No environment file found for $static. Exiting."
 				exit 1

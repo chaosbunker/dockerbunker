@@ -67,9 +67,9 @@ letsencrypt() {
 			done
 
 			if [[ ${STATIC} ]];then
-				[[ ${domains[1]} ]] && sed -i "s/server_name.*/server_name ${domains[*]}\;/" "data/conf/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf" && sed -i "s/^SERVICE\_DOMAIN.*/SERVICE\_DOMAIN\=\(\ ${domains[*]}\ \)/" "data/env/static/${SERVICE_DOMAIN[0]}.env"
+				[[ ${domains[1]} ]] && sed -i "s/server_name.*/server_name ${domains[*]}\;/" "build/conf/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf" && sed -i "s/^SERVICE\_DOMAIN.*/SERVICE\_DOMAIN\=\(\ ${domains[*]}\ \)/" "build/env/static/${SERVICE_DOMAIN[0]}.env"
 			else
-				[[ ${domains[1]} ]] && sed -i "s/server_name.*/server_name ${domains[*]}\;/" "data/conf/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf" && sed -i "s/^SERVICE\_DOMAIN.*/SERVICE\_DOMAIN\=\(\ ${domains[*]}\ \)/" "data/env/${SERVICE_NAME}.env"
+				[[ ${domains[1]} ]] && sed -i "s/server_name.*/server_name ${domains[*]}\;/" "build/conf/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf" && sed -i "s/^SERVICE\_DOMAIN.*/SERVICE\_DOMAIN\=\(\ ${domains[*]}\ \)/" "build/env/${SERVICE_NAME}.env"
 			fi
 			expand="--expand "
 		else
@@ -97,7 +97,7 @@ letsencrypt() {
 			&& docker run --rm -it --name=certbot \
 				--network ${NETWORK} \
 				-v "${CONF_DIR}"/nginx/ssl/letsencrypt:/etc/letsencrypt \
-				-v "${BASE_DIR}"/data/web:/var/www/html:rw \
+				-v "${BASE_DIR}"/build/web:/var/www/html:rw \
 				certbot/certbot \
 				certonly --noninteractive \
 				--webroot -w /var/www/html \
@@ -105,7 +105,7 @@ letsencrypt() {
 				--email ${LE_EMAIL} ${expand}\
 				--agree-tos
 		if [[ $? == 0 ]];then
-			if ! [[ -L "data/conf/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem" ]];then
+			if ! [[ -L "build/conf/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem" ]];then
 				echo -en "\n\e[1mBacking up self-signed certificate\e[0m"
 				mv "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.{pem,pem.backup} && \
 					mv "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.{pem,pem.backup} && exit_response || exit_response
@@ -121,7 +121,7 @@ letsencrypt() {
 		docker run --rm -it --name=certbot \
 		--network ${NETWORK} \
 		-v "${CONF_DIR}"/nginx/ssl/letsencrypt:/etc/letsencrypt \
-		-v "${BASE_DIR}"/data/web:/var/www/html:rw \
+		-v "${BASE_DIR}"/build/web:/var/www/html:rw \
 		certbot/certbot \
 		renew
 

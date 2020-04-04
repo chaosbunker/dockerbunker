@@ -5,7 +5,7 @@ nginx_dockerbunker() {
 		--restart=always \
 		--net=${NETWORK} --net-alias=nginx \
 		-p 80:80 -p 443:443 \
-		-v "${BASE_DIR}/data/web":/var/www/html:ro \
+		-v "${BASE_DIR}/build/web":/var/www/html:ro \
 		-v "${SERVER_DIR}/nginx/nginx.conf":/etc/nginx/nginx.conf:ro \
 		-v "${SERVER_DIR}/nginx/includes":/etc/nginx/includes \
 		-v "${CONF_DIR}/nginx/ssl":/etc/nginx/ssl \
