@@ -68,16 +68,16 @@ count=$((${#AVAILABLE_SERVICES[@]}+1))
 && AVAILABLE_SERVICES+=( "$startnginx" )
 
 [[ $(docker ps -q --filter "status=running" --filter name=dockerbunker) \
-&& ${#INSTALLED_SERVICES[@]} > 1 ]] \
+&& ${#INSTALLED_SERVICES[@]} > 0 ]] \
 && AVAILABLE_SERVICES+=( "$stopall" ) \
 &&  count=$(($count+1))
 
 [[ $(docker ps -q --filter "status=exited" --filter name=dockerbunker) \
-&& ${#STOPPED_SERVICES[@]} > 1 ]] \
+&& ${#STOPPED_SERVICES[@]} > 0 ]] \
 && AVAILABLE_SERVICES+=( "$startall" ) \
 && count=$(($count+1))
 
-[[ ${#INSTALLED_SERVICES[@]} > 1 ]] \
+[[ ${#INSTALLED_SERVICES[@]} > 0 ]] \
 && AVAILABLE_SERVICES+=( "$restartall" ) \
 && count=$(($count+1))
 
