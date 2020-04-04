@@ -10,7 +10,7 @@ options_menu() {
 	container_check=1
 
 	# if service is marked as installed, make sure all containers exist and offer to run them if necessary
-	if elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}";then
+	if elementInArray "${SERVICE_NAME}" "${INSTALLED_SERVICES[@]}";then
 		for container in "${containers[@]}";do
 			RUNNING=$(docker ps -a -q --filter name=^/${container}$)
 			echo "Status: $RUNNING"
@@ -27,9 +27,9 @@ options_menu() {
 		done
 	fi
 	if [[ $RUNNING ]];then
-		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Upgrade Image(s)" "Destroy \"${PROPER_NAME}\"" "${returntopreviousmenu}" "$exitmenu" )
+		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Upgrade Image(s)" "Destroy \"${SERVICE_NAME}\"" "${returntopreviousmenu}" "$exitmenu" )
 		add_ssl_menuentry menu 2
-		if elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}";then
+		if elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}";then
 			insert menu "Start container(s)" 3
 		else
 			insert menu "Restart container(s)" 3
@@ -41,16 +41,16 @@ options_menu() {
 	elif [[ ${missingContainers[@]} ]];then
 			echo -e "\n\n\e[3m\xe2\x86\x92 \e[3mThe following containers are missing\e[0m"
 			for container in "${missingContainers[@]}";do echo -e "\n    - $container";done
-			menu=( "Restore missing containers" "Reconfigure service" "Start container(s)" "Stop container(s)" "Reinstall service" "Backup Service" "Restore Service" "Upgrade Image(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
+			menu=( "Restore missing containers" "Reconfigure service" "Start container(s)" "Stop container(s)" "Reinstall service" "Backup Service" "Restore Service" "Upgrade Image(s)" "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
 	elif [[ $RUNNING = false ]];then
-		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Start container(s)" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
+		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Start container(s)" "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
 		add_ssl_menuentry menu 2
 		[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 			&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 			&& insert menu "Restore Service" 3
 	else
-		if ! elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
-		&& ! elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}" \
+		if ! elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
+		&& ! elementInArray "${SERVICE_NAME}" "${INSTALLED_SERVICES[@]}" \
 		&& [[ ! -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
 			[[ ${STATIC} \
 				&& $(ls -A "${ENV_DIR}"/static) ]] \
@@ -60,23 +60,23 @@ options_menu() {
 				&& [[ "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 				&& insert menu "Restore Service" 1
-		elif ! elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
-		&& ! elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}";then
-			menu=( "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
+		elif ! elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
+		&& ! elementInArray "${SERVICE_NAME}" "${INSTALLED_SERVICES[@]}";then
+			menu=( "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
 			[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 				&& insert menu "Restore Service" 1
-			error="Environment file found but ${PROPER_NAME} is not marked as configured or installed. Please destroy first!"
-		elif elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
+			error="Environment file found but ${SERVICE_NAME} is not marked as configured or installed. Please destroy first!"
+		elif elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& [[ ! -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
 				error="Service marked as configured, but configuration file is missing. Please destroy first."
-				menu=( "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
+				menu=( "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
 				[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 					&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 					&& insert menu "Restore Service" 1
-		elif elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" \
+		elif elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& [[ -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
-			menu=( "Reconfigure service" "Setup service" "Destroy \"${PROPER_NAME}\"" "$exitmenu" )
+			menu=( "Reconfigure service" "Setup service" "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
 			[[ -d "${BASE_DIR}"/data/backup/${SERVICE_NAME} ]] \
 				&& [[ $(ls -A "${BASE_DIR}"/data/backup/${SERVICE_NAME}) ]] \
 				&& insert menu "Restore Service" 2
@@ -84,7 +84,7 @@ options_menu() {
 	fi
 
 	echo ""
-	echo -e "\e[4m${PROPER_NAME}\e[0m"
+	echo -e "\e[4m${SERVICE_NAME}\e[0m"
 	if [[ $error ]];then
 		echo -e "\n\e[3m$error\e[0m\n"
 	fi
@@ -92,14 +92,14 @@ options_menu() {
 	do
 		case $choice in
 			"Configure Site")
-				echo -e "\n\e[3m\xe2\x86\x92 Configure ${PROPER_NAME}\e[0m\n"
+				echo -e "\n\e[3m\xe2\x86\x92 Configure ${SERVICE_NAME}\e[0m\n"
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh configure
 				say_done
 				sleep 0.2
 				break
 				;;
 			"Configure Service")
-				echo -e "\n\e[3m\xe2\x86\x92 Configure ${PROPER_NAME}\e[0m\n"
+				echo -e "\n\e[3m\xe2\x86\x92 Configure ${SERVICE_NAME}\e[0m\n"
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh configure
 				sleep 0.2
 				break
@@ -111,20 +111,20 @@ options_menu() {
 				break
 				;;
 			"Reconfigure service")
-				echo -e "\n\e[3m\xe2\x86\x92 Reconfigure ${PROPER_NAME}\e[0m"
+				echo -e "\n\e[3m\xe2\x86\x92 Reconfigure ${SERVICE_NAME}\e[0m"
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh reconfigure
 				break
 				;;
 			"Setup service")
 				# Set up nginx container if not yet present
 				setup_nginx
-				echo -e "\n\e[3m\xe2\x86\x92 Setup ${PROPER_NAME}\e[0m"
+				echo -e "\n\e[3m\xe2\x86\x92 Setup ${SERVICE_NAME}\e[0m"
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh setup
 				sleep 0.2
 				break
 			;;
 			"Reinstall service")
-				echo -e "\n\e[3m\xe2\x86\x92 Reinstall ${PROPER_NAME}\e[0m"
+				echo -e "\n\e[3m\xe2\x86\x92 Reinstall ${SERVICE_NAME}\e[0m"
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh reinstall
 				say_done
 				sleep 0.2
@@ -138,7 +138,7 @@ options_menu() {
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 				;;
 			"Upgrade Image(s)")
-				echo -e "\n\e[3m\xe2\x86\x92 Upgrade ${PROPER_NAME} images\e[0m"
+				echo -e "\n\e[3m\xe2\x86\x92 Upgrade ${SERVICE_NAME} images\e[0m"
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh upgrade
 				say_done
 				sleep 0.2
@@ -178,7 +178,7 @@ options_menu() {
 				exit
 			;;
 			"Restart container(s)")
-				echo -e "\n\e[3m\xe2\x86\x92 Restart ${PROPER_NAME} Containers\e[0m"
+				echo -e "\n\e[3m\xe2\x86\x92 Restart ${SERVICE_NAME} Containers\e[0m"
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh restart_containers
 				say_done
 				sleep 0.2
@@ -186,7 +186,7 @@ options_menu() {
 				break
 			;;
 			"Start container(s)")
-				echo -e "\n\e[3m\xe2\x86\x92 Start ${PROPER_NAME} Containers\e[0m"
+				echo -e "\n\e[3m\xe2\x86\x92 Start ${SERVICE_NAME} Containers\e[0m"
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh start_containers
 				say_done
 				sleep 0.2
@@ -194,15 +194,15 @@ options_menu() {
 				break
 			;;
 			"Stop container(s)")
-				echo -e "\n\e[3m\xe2\x86\x92 Stop ${PROPER_NAME} Containers\e[0m"
+				echo -e "\n\e[3m\xe2\x86\x92 Stop ${SERVICE_NAME} Containers\e[0m"
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh stop_containers
 				say_done
 				sleep 0.2
 				${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 				break
 			;;
-			"Destroy \"${PROPER_NAME}\"")
-				echo -e "\n\e[3m\xe2\x86\x92 Destroy ${PROPER_NAME}\e[0m"
+			"Destroy \"${SERVICE_NAME}\"")
+				echo -e "\n\e[3m\xe2\x86\x92 Destroy ${SERVICE_NAME}\e[0m"
 				echo ""
 				echo "The following will be removed:"
 				echo ""
@@ -213,7 +213,7 @@ options_menu() {
 				done
 
 				[[ ${containers_found[0]} ]] \
-					&& echo "- ${PROPER_NAME} container(s)"
+					&& echo "- ${SERVICE_NAME} container(s)"
 
 				for volume in ${volumes[@]};do
 					[[ $(docker volume ls -q --filter name=^${volume}$) ]] \
@@ -221,14 +221,14 @@ options_menu() {
 				done
 
 				[[ ${volumes_found[0]} ]] \
-					&& echo "- ${PROPER_NAME} volume(s)"
+					&& echo "- ${SERVICE_NAME} volume(s)"
 
 				[[ -f "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env \
 					|| -f "${ENV_DIR}"/${SERVICE_NAME}.env ]] \
-					&& echo "- ${PROPER_NAME} environment file(s)"
+					&& echo "- ${SERVICE_NAME} environment file(s)"
 
 				[[ -d "${CONF_DIR}"/${SERVICE_NAME} ]] \
-					&& echo "- ${PROPER_NAME} config file(s)"
+					&& echo "- ${SERVICE_NAME} config file(s)"
 
 				[[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf \
 					|| -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
@@ -275,7 +275,7 @@ get_le_cert() {
 			sed -i "s/SSL_CHOICE=.*/SSL_CHOICE=le/" "${SERVICE_ENV}"
 			sed -i "s/LE_EMAIL=.*/LE_EMAIL="${LE_EMAIL}"/" "${SERVICE_ENV}"
 		fi
-		elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}" \
+		elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}" \
 			&& "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh start_containers
 		if [[ ${SERVICE_DOMAIN[0]} && -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} \
 			&& ! -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
@@ -333,14 +333,14 @@ stop_nginx() {
 deactivate_nginx_conf() {
 	if [[ ${SERVICE_NAME} == "nginx" ]] \
 	|| [[ -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
-	|| elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}" \
+	|| elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}" \
 	|| [[ ${FUNCNAME[2]} == "destroy_service" ]];then \
 		return
 	fi
 
 	! [[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]] \
 		&& [[ -z $reconfigure ]] \
-		&& echo -e "\n\e[31mNginx configuration for ${PROPER_NAME} is not active or missing.\nPlease make sure ${PROPER_NAME} is properly configured.\e[0m\n" \
+		&& echo -e "\n\e[31mNginx configuration for ${SERVICE_NAME} is not active or missing.\nPlease make sure ${SERVICE_NAME} is properly configured.\e[0m\n" \
 		&& return
 
 	! [[ -d "${CONF_DIR}"/nginx/conf.inactive.d ]] \
@@ -354,8 +354,8 @@ deactivate_nginx_conf() {
 		exit_response
 	fi
 
-	if ! elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}";then
-		STOPPED_SERVICES+=( "${PROPER_NAME}" )
+	if ! elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}";then
+		STOPPED_SERVICES+=( "${SERVICE_NAME}" )
 		sed -i '/STOPPED_SERVICES/d' "${ENV_DIR}"/dockerbunker.env
 		declare -p STOPPED_SERVICES >> "${ENV_DIR}"/dockerbunker.env
 	fi
@@ -366,9 +366,9 @@ deactivate_nginx_conf() {
 activate_nginx_conf() {
 	[[ ${SERVICE_NAME} == "nginx" ]] && return
 	[[ ${FUNCNAME[1]} != "setup" ]] \
-		&& elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}" \
+		&& elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}" \
 		&& ! [[ -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]] \
-		&& echo -e "\n\e[31mNginx configuration for ${PROPER_NAME} is not inactive or missing. Please make sure ${PROPER_NAME} is properly configured.\e[0m\n" \
+		&& echo -e "\n\e[31mNginx configuration for ${SERVICE_NAME} is not inactive or missing. Please make sure ${SERVICE_NAME} is properly configured.\e[0m\n" \
 		&& return
 	# activate nginx config
 	[[ -d "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]} ]] \
@@ -543,7 +543,7 @@ destroy_service() {
 		remove_networks
 		remove_images
 
-		echo -en "\n\e[1mRemoving ${PROPER_NAME} from dockerbunker.env\e[0m"
+		echo -en "\n\e[1mRemoving ${SERVICE_NAME} from dockerbunker.env\e[0m"
 		remove_from_WEB_SERVICES
 		remove_from_CONFIGURED_SERVICES
 		remove_from_INSTALLED_SERVICES
@@ -676,7 +676,7 @@ reconfigure() {
 	remove_environment_files
 	remove_service_conf
 
-	[[ $(grep "${PROPER_NAME}" "${ENV_DIR}"/dockerbunker.env) ]] && echo -en "\n\e[1mRemoving ${PROPER_NAME} from dockerbunker.env\e[0m"
+	[[ $(grep "${SERVICE_NAME}" "${ENV_DIR}"/dockerbunker.env) ]] && echo -en "\n\e[1mRemoving ${SERVICE_NAME} from dockerbunker.env\e[0m"
 	remove_from_WEB_SERVICES
 	remove_from_CONFIGURED_SERVICES
 	remove_from_INSTALLED_SERVICES
@@ -691,8 +691,7 @@ reconfigure() {
 # all functions that manipulate all containers
 start_all() {
 	start_nginx
-	for PROPER_NAME in "${STOPPED_SERVICES[@]}";do
-		SERVICE_NAME="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
+	for SERVICE_NAME in "${STOPPED_SERVICES[@]}";do
 		source "${ENV_DIR}"/${SERVICE_NAME}.env
 		source "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh start_containers
 	done
@@ -701,7 +700,6 @@ start_all() {
 
 restart_all() {
 	for SERVICE_NAME in "${INSTALLED_SERVICES[@]}";do
-		PROPER_NAME=$SERVICE_NAME
 		source "${ENV_DIR}/${SERVICE_NAME}.env"
 		source "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh restart_containers
 	done
@@ -711,7 +709,7 @@ restart_all() {
 stop_all() {
 	for SERVICE_NAME in "${INSTALLED_SERVICES[@]}";do
 		if ! elementInArray "$SERVICE_NAME" "${STOPPED_SERVICES[@]}";then
-			source "${SERVICE_ENV}"
+			source "${ENV_DIR}/${SERVICE_NAME}.env"
 			source "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh stop_containers
 		fi
 	done
@@ -927,7 +925,7 @@ backup() {
 		cp "${ENV_DIR}"/${SERVICE_NAME}.env "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${NOW}
 		exit_response
 	else
-		echo -e "\n\e[3mCould not find environment file(s) for ${PROPER_NAME}.\e[0m"
+		echo -e "\n\e[3mCould not find environment file(s) for ${SERVICE_NAME}.\e[0m"
 	fi
 }
 
@@ -968,14 +966,14 @@ echo ${FUNCNAME[@]}
 					&& return
 				# destroy current service if found
 				if [[ $(docker ps -q -a --filter name=^/"${SERVICE_NAME}-service-dockerbunker"$) ]];then
-					echo -e "\n\e[3m\xe2\x86\x92 Destroying ${PROPER_NAME}\e[0m"
+					echo -e "\n\e[3m\xe2\x86\x92 Destroying ${SERVICE_NAME}\e[0m"
 					destroy_service
 				fi
 
 				source "${BASE_DIR}"/data/backup/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env
 
 				! [[ $(docker ps -q --filter name=^/nginx-dockerbunker$) ]] && setup_nginx
-				echo -e "\n\e[3m\xe2\x86\x92 Restoring ${PROPER_NAME}\e[0m"
+				echo -e "\n\e[3m\xe2\x86\x92 Restoring ${SERVICE_NAME}\e[0m"
 				for volume in ${!volumes[@]};do
 					[[ $(docker volume ls --filter name=^${volume}$) ]] \
 						&& docker volume create $volume >/dev/null
@@ -1045,7 +1043,7 @@ echo ${FUNCNAME[@]}
 		    esac
 		done
 	else
-		echo -e "\n\e[1mNo ${PROPER_NAME} backup found\e[0m"
+		echo -e "\n\e[1mNo ${SERVICE_NAME} backup found\e[0m"
 		echo -e "\n\e[3m\xe2\x86\x92 Checking service status"
 		exec "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh
 	fi

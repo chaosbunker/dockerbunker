@@ -77,9 +77,9 @@ pull_and_compare() {
 	if [[ ${DOCKER_COMPOSE} ]] \
 	&& [[ ${old_images_to_delete[0]} ]];then
 		pushd "${SERVICE_HOME}" >/dev/null
-		echo -e "\n\e[1mTaking down ${PROPER_NAME}\e[0m"
+		echo -e "\n\e[1mTaking down ${SERVICE_NAME}\e[0m"
 		docker-compose down
-		echo -e "\n\e[1mBringing ${PROPER_NAME} back up\e[0m"
+		echo -e "\n\e[1mBringing ${SERVICE_NAME} back up\e[0m"
 		docker-compose up -d
 		popd >/dev/null
 	fi
@@ -175,7 +175,7 @@ generate_certificate() {
 	[[ -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]] && rm "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem
 	[[ -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem ]] && rm "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem
 	echo -en "\n\e[1mGenerating self-signed certificate for ${SERVICE_DOMAIN[0]}\e[0m"
-	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem -out "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem -subj "/C=XY/ST=hidden/L=nowhere/O=${PROPER_NAME}/OU=IT Department/CN=${SERVICE_DOMAIN[0]}" >/dev/null 2>&1
+	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem -out "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem -subj "/C=XY/ST=hidden/L=nowhere/O=${SERVICE_NAME}/OU=IT Department/CN=${SERVICE_DOMAIN[0]}" >/dev/null 2>&1
 	exit_response
 }
 # this generates the nginx configuration for the service that is being set up and puts it into data/services/ngix/conf.d
@@ -259,7 +259,7 @@ post_setup_routine() {
 
 	remove_from_CONFIGURED_SERVICES
 
-	! elementInArray "${PROPER_NAME}" "${INSTALLED_SERVICES[@]}" && INSTALLED_SERVICES+=( "${PROPER_NAME}" )
+	! elementInArray "${SERVICE_NAME}" "${INSTALLED_SERVICES[@]}" && INSTALLED_SERVICES+=( "${SERVICE_NAME}" )
 	for container in ${add_to_network[@]};do
 		! elementInArray "${container}" "${CONTAINERS_IN_DOCKERBUNKER_NETWORK[@]}" && CONTAINERS_IN_DOCKERBUNKER_NETWORK+=( "${container}" )
 	done
@@ -270,7 +270,7 @@ post_setup_routine() {
 	declare -p WEB_SERVICES >> "${ENV_DIR}/dockerbunker.env"
 	declare -p CONTAINERS_IN_DOCKERBUNKER_NETWORK >> "${ENV_DIR}/dockerbunker.env" 2>/dev/null
 
-	if elementInArray "${PROPER_NAME}" "${STOPPED_SERVICES[@]}";then
+	if elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}";then
 		remove_from_STOPPED_SERVICES
 	fi
 
@@ -324,7 +324,7 @@ letsencrypt() {
 		fi
 	}
 	issue() {
-		[[ -z $1 ]] && ! [[ $(docker ps -q --filter name=^/${SERVICE_NAME}-service-dockerbunker$) ]] && echo "${PROPER_NAME} container not running. Exiting." && exit 1
+		[[ -z $1 ]] && ! [[ $(docker ps -q --filter name=^/${SERVICE_NAME}-service-dockerbunker$) ]] && echo "${SERVICE_NAME} container not running. Exiting." && exit 1
 			for value in $*;do
 				[[ ( $value == "letsencrypt" || $value == "issue" || $value == "static" ) ]] || domains+=( "$value" )
 			done
@@ -337,7 +337,7 @@ letsencrypt() {
 				fi
 			done
 		[[ ( "${domains[@]}" =~ ${SERVICE_DOMAIN[0]} && ! "${domains[0]}" =~ "${SERVICE_DOMAIN[0]}" ) ]] && ( echo "Please list ${SERVICE_DOMAIN[0]} first.";exit 1 )
-			[[ "${domains[@]}" =~ ${SERVICE_DOMAIN[0]} ]] || ( echo -e "Please include your chosen ${PROPER_NAME} domain ${SERVICE_DOMAIN[0]}";exit 1 )
+			[[ "${domains[@]}" =~ ${SERVICE_DOMAIN[0]} ]] || ( echo -e "Please include your chosen ${SERVICE_NAME} domain ${SERVICE_DOMAIN[0]}";exit 1 )
 			[[ ! -d "${CONF_DIR}"/nginx/ssl/letsencrypt ]] && mkdir "${CONF_DIR}"/nginx/ssl/letsencrypt
 		[[ ( "${domains[@]}" =~ "${SERVICE_DOMAIN[0]}" && "${domains[0]}" =~ "${SERVICE_DOMAIN[0]}" ) ]] \
 			&& echo "" \

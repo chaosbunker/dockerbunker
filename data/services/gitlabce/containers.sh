@@ -1,5 +1,5 @@
 gitlabce_service_dockerbunker() {
-	echo -en "Starting up '${PROPER_NAME}' container"
+	echo -en "Starting up '${SERVICE_NAME}' container"
 	docker run -d \
 		--hostname ${SERVICE_DOMAIN} \
 		--sysctl net.core.somaxconn=1024 \

@@ -17,12 +17,12 @@ declare -A IMAGES=( [service]="gitlab/gitlab-ce:latest" )
 configure() {
 	pre_configure_routine
 
-	echo -e "# \e[4m'${PROPER_NAME}' Settings\e[0m"
+	echo -e "# \e[4m'${SERVICE_NAME}' Settings\e[0m"
 
 	set_domain
 
 	cat <<-EOF >> "${SERVICE_ENV}"
-	PROPER_NAME="${PROPER_NAME}"
+	SERVICE_NAME="${SERVICE_NAME}"
 	SERVICE_NAME=${SERVICE_NAME}
 	SSL_CHOICE=${SSL_CHOICE}
 	LE_EMAIL=${LE_EMAIL}

@@ -58,7 +58,7 @@ configure() {
 
 		# save Drone-Ci Config
 		cat <<-EOF >> "${SERVICE_ENV}"
-		PROPER_NAME=${PROPER_NAME}
+		SERVICE_NAME=${SERVICE_NAME}
 		SERVICE_NAME=${SERVICE_NAME}
 		SSL_CHOICE=${SSL_CHOICE}
 		LE_EMAIL=${LE_EMAIL}

@@ -66,7 +66,7 @@ validate_fqdn() {
 # remove services from relevant arrays in dockerbunker.env after they have been installed/destroyed/configured/started etc..
 remove_from_WEB_SERVICES() {
 	for key in "${!WEB_SERVICES[@]}";do
-		if [[ "$key" =~ "${PROPER_NAME}" ]];then
+		if [[ "$key" =~ "${SERVICE_NAME}" ]];then
 			unset WEB_SERVICES["$key"]
 		fi
 	done
@@ -75,7 +75,7 @@ remove_from_WEB_SERVICES() {
 }
 
 remove_from_CONFIGURED_SERVICES() {
-	CONFIGURED_SERVICES=("${CONFIGURED_SERVICES[@]/"${PROPER_NAME}"}");
+	CONFIGURED_SERVICES=("${CONFIGURED_SERVICES[@]/"${SERVICE_NAME}"}");
 	for key in "${!CONFIGURED_SERVICES[@]}";do
 		if [[ "${CONFIGURED_SERVICES[$key]}" == "" ]];then
 			unset CONFIGURED_SERVICES[$key]
@@ -103,7 +103,7 @@ remove_from_STATIC_SITES() {
 }
 
 remove_from_INSTALLED_SERVICES() {
-	INSTALLED_SERVICES=("${INSTALLED_SERVICES[@]/"${PROPER_NAME}"}");
+	INSTALLED_SERVICES=("${INSTALLED_SERVICES[@]/"${SERVICE_NAME}"}");
 	for key in "${!INSTALLED_SERVICES[@]}";do
 		if [[ "${INSTALLED_SERVICES[$key]}" == "" ]];then
 			unset INSTALLED_SERVICES[$key]
@@ -117,7 +117,7 @@ remove_from_INSTALLED_SERVICES() {
 }
 
 remove_from_STOPPED_SERVICES() {
-	STOPPED_SERVICES=("${STOPPED_SERVICES[@]/"${PROPER_NAME}"}");
+	STOPPED_SERVICES=("${STOPPED_SERVICES[@]/"${SERVICE_NAME}"}");
 	for key in "${!STOPPED_SERVICES[@]}";do
 		if [[ "${STOPPED_SERVICES[$key]}" == "" ]];then
 			unset STOPPED_SERVICES[$key]

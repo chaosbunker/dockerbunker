@@ -1,7 +1,6 @@
 while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
 
-PROPER_NAME="Nginx"
-SERVICE_NAME="$(echo -e "${PROPER_NAME,,}" | tr -d '[:space:]')"
+SERVICE_NAME="$(basename $(dirname "$BASH_SOURCE"))"
 
 declare -a environment=( "data/env/dockerbunker.env" "data/include/init.sh" )
 

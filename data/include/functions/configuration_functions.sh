@@ -2,7 +2,7 @@
 
 # only relevant if the menu shows "Configure service", although the service has already been configured or installed. This should only happen if things are messed up.
 pre_configure_routine() {
-	if [[ "${CONFIGURED_SERVICES[@]}" =~ ${PROPER_NAME} ]] || [[ -f "${ENV_DIR}/${SERVICE_NAME}" ]]|| [[ "${INSTALLED_SERVICES[@]}" =~ ${PROPER_NAME} ]];then
+	if [[ "${CONFIGURED_SERVICES[@]}" =~ ${SERVICE_NAME} ]] || [[ -f "${ENV_DIR}/${SERVICE_NAME}" ]]|| [[ "${INSTALLED_SERVICES[@]}" =~ ${SERVICE_NAME} ]];then
 		prompt_confirm  "Existing configuration found. Destroy containers and reconfigure?" && destroy || echo "Exiting..";exit
 	fi
 }
@@ -14,11 +14,11 @@ set_domain() {
 	INVALID=
 	while [[ -z $fqdn_is_valid ]];do
 		if [[ -z "${SERVICE_DOMAIN[0]}" ]]; then
-		  read -p "${PROPER_NAME} Service Domain (FQDN): " SERVICE_DOMAIN
+		  read -p "${SERVICE_NAME} Service Domain (FQDN): " SERVICE_DOMAIN
 		else
 		  previous_domain=${SERVICE_DOMAIN[0]}
 		  unset SERVICE_DOMAIN
-		  read -p "${PROPER_NAME} Service Domain (FQDN): " -ei "${previous_domain}" SERVICE_DOMAIN
+		  read -p "${SERVICE_NAME} Service Domain (FQDN): " -ei "${previous_domain}" SERVICE_DOMAIN
 		fi
 		validate_fqdn ${SERVICE_DOMAIN[0]}
 	done
@@ -132,8 +132,8 @@ post_configure_routine() {
 			declare -p STATIC_SITES >> "${ENV_DIR}/dockerbunker.env"
 		fi
 	else
-		[[ ${SERVICE_DOMAIN[0]} ]] && ! elementInArray "${PROPER_NAME}" "${!WEB_SERVICES[@]}" && WEB_SERVICES+=( [${PROPER_NAME}]="${SERVICE_DOMAIN[0]}" )
-		! elementInArray "${PROPER_NAME}" "${CONFIGURED_SERVICES[@]}" && CONFIGURED_SERVICES+=( "${PROPER_NAME}" )
+		[[ ${SERVICE_DOMAIN[0]} ]] && ! elementInArray "${SERVICE_NAME}" "${!WEB_SERVICES[@]}" && WEB_SERVICES+=( [${SERVICE_NAME}]="${SERVICE_DOMAIN[0]}" )
+		! elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" && CONFIGURED_SERVICES+=( "${SERVICE_NAME}" )
 		for containers in ${add_to_network[@]};do
 			[[ ( $container && ! "${CONTAINERS_IN_DOCKERBUNKER_NETWORK[@]}" =~ "${container}" ) ]] && CONTAINERS_IN_DOCKERBUNKER_NETWORK+=( "${container}" )
 		done
