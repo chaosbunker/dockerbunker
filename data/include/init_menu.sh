@@ -42,41 +42,37 @@ restartall=$(printf "\e[1;4;33mRestart all containers\e[0m")
 destroyall=$(printf "\e[1;4;33mDestroy everything\e[0m")
 exitmenu=$(printf "\e[1;4;33mExit\e[0m")
 
-count=$((${#AVAILABLE_SERVICES[@]}+1))
-
-# check service states
+# add generell menu-entrys
 [[ $(docker ps -q --filter "status=running" --filter name=^/nginx-dockerbunker$) ]] \
 && AVAILABLE_SERVICES+=( "$stopnginx" ) \
-&& AVAILABLE_SERVICES+=( "$restartnginx") \
-&& count=$(($count+2))
+&& AVAILABLE_SERVICES+=( "$restartnginx")
 
 [[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live ]] \
 && [[ ${#INSTALLED_SERVICES[@]} > 0 ]] \
 && [[ $(ls -A "${CONF_DIR}"/nginx/ssl/letsencrypt/live) ]] \
-&& AVAILABLE_SERVICES+=( "$renewcerts" ) && cound=$(($count+1))
+&& AVAILABLE_SERVICES+=( "$renewcerts" )
 
 [[ ${#INSTALLED_SERVICES[@]} > 0 \
 || ${#STATIC_SITES[@]} > 0 \
 || ${#CONFIGURED_SERVICES[@]} > 0 ]] \
-&& AVAILABLE_SERVICES+=( "$destroyall" ) \
-&&  count=$(($count+1))
+&& AVAILABLE_SERVICES+=( "$destroyall" )
 
 [[ $(docker ps -q --filter "status=exited" --filter name=^/nginx-dockerbunker$) ]] \
 && AVAILABLE_SERVICES+=( "$startnginx" )
 
 [[ $(docker ps -q --filter "status=running" --filter name=dockerbunker) \
 && ${#INSTALLED_SERVICES[@]} > 0 ]] \
-&& AVAILABLE_SERVICES+=( "$stopall" ) \
-&&  count=$(($count+1))
+&& AVAILABLE_SERVICES+=( "$stopall" )
 
 [[ $(docker ps -q --filter "status=exited" --filter name=dockerbunker) \
 && ${#STOPPED_SERVICES[@]} > 0 ]] \
-&& AVAILABLE_SERVICES+=( "$startall" ) \
-&& count=$(($count+1))
+&& AVAILABLE_SERVICES+=( "$startall" )
 
 [[ ${#INSTALLED_SERVICES[@]} > 0 ]] \
-&& AVAILABLE_SERVICES+=( "$restartall" ) \
-&& count=$(($count+1))
+&& AVAILABLE_SERVICES+=( "$restartall" )
+
+# count all Menu-Entrys to work with its numbers
+count="${#AVAILABLE_SERVICES[@]}"
 
 # print menu
 echo ""
