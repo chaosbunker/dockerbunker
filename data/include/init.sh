@@ -32,7 +32,8 @@ init_dockerbunker() {
 }
 
 # load dockerbunker environment variables or initialize it via init_dockerbunker functionality
-[[ -f "${BASE_DIR}"/data/env/dockerbunker.env ]] && source "${BASE_DIR}"/data/env/dockerbunker.env  || init_dockerbunker
+[[ -f "${BASE_DIR}"/data/env/dockerbunker.env ]] \
+&& source "${BASE_DIR}"/data/env/dockerbunker.env  || init_dockerbunker
 
 # load dockerbunker functions
 for file in "${BASE_DIR}"/data/include/functions/*; do
@@ -56,3 +57,15 @@ else
 			&& source "${ENV_DIR}"/${SERVICE_NAME}_mx.env
 	fi
 fi
+
+# load service-names dynamically
+# via loop through folder-names at depth 1 within ./data/services, e.g. data/services/service-name
+while IFS= read -r servicename; do
+	declare -a ALL_SERVICES+=( $(basename "$servicename") )
+done < <(find "${BASE_DIR}/data/services/" -mindepth 1 -maxdepth 1 -type d)
+
+# sort services
+IFS=$'\n' sorted=($(printf '%s\n' "${ALL_SERVICES[@]}"|sort));
+
+# unset variables to work with it clean later
+unset AVAILABLE_SERVICES count
