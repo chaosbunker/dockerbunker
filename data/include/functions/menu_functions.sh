@@ -707,12 +707,12 @@ restart_all() {
 	done
 	restart_nginx
 }
+
 stop_all() {
-	for service in "${INSTALLED_SERVICES[@]}";do
-		service="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
-		if ! elementInArray "$service" "${STOPPED_SERVICES[@]}";then
+	for SERVICE_NAME in "${INSTALLED_SERVICES[@]}";do
+		if ! elementInArray "$SERVICE_NAME" "${STOPPED_SERVICES[@]}";then
 			source "${SERVICE_ENV}"
-			source "${SERVICES_DIR}"/${service}/${service}.sh stop_containers
+			source "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh stop_containers
 		fi
 	done
 	stop_nginx

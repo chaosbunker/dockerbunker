@@ -45,9 +45,6 @@ exitmenu=$(printf "\e[1;4;33mExit\e[0m")
 count=$((${#AVAILABLE_SERVICES[@]}+1))
 
 # check service states
-[[ ${STOPPED_SERVICES[0]} ]] \
-&& AVAILABLE_SERVICES+=( "$startall" )
-
 [[ $(docker ps -q --filter "status=running" --filter name=^/nginx-dockerbunker$) ]] \
 && AVAILABLE_SERVICES+=( "$stopnginx" ) \
 && AVAILABLE_SERVICES+=( "$restartnginx") \
