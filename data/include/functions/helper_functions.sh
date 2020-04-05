@@ -20,7 +20,8 @@
 # get user input
 prompt_confirm() {
 	while true; do
-		read -rs -n 1 -p "${1:-Continue?} [y/n]: " REPLY
+		read -rs -n 1 -p "${1:-Continue?} [Y/n]: " REPLY
+		[[ $REPLY ]] || REPLY="Y"
 		case $REPLY in
 			[yY]) echo -e "\e[32m[Yes]\e[0m"; return 0 ;;
 			[nN]) echo -e "\e[32m[No]\e[0m"; return 1 ;;
