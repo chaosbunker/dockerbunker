@@ -507,13 +507,19 @@ static_menu() {
 				done
 
 			break;
-			;;
 
-		"$returntopreviousmenu")
-			exec "${SERVICES_DIR}"/statichtmlsite/statichtmlsite.sh options_menu;;
-		*)
+			;;
+			"$returntopreviousmenu")
+
+			exec "${SERVICES_DIR}"/staticsites/init.sh options_menu
+
+			;;
+			*)
+
 			static=""
-			echo "Please choose a number from 1 to $((${#staticsites[@]}+1))";;
+			echo "Please choose a number from 1 to $((${#staticsites[@]}+1))"
+
+			;;
 		esac
 	done
 }
