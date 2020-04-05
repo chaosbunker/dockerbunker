@@ -157,17 +157,21 @@ get_le_email() {
 	[[ -f ${SERVICE_ENV} ]] && sed -i "s/LE_EMAIL=.*/LE_EMAIL=${LE_EMAIL}/" ${SERVICE_ENV}
 }
 
-# Update dockerbunker.env to let dockerbunker know that the service is now configured, then offer a menu to choose further steps (setup/reconfigure/destroy)
+# Update dockerbunker.env to let dockerbunker know that the service is now configured,
+# then offer a menu to choose further steps (setup/reconfigure/destroy)
 post_configure_routine() {
 	if [[ ${STATIC} ]];then
+		# configuration for static HTML sites
 		if ! [[ "${STATIC_SITES[@]}" =~ "${SERVICE_DOMAIN[0]}" ]];then
 			STATIC_SITES+=( "${SERVICE_DOMAIN[0]}" )
 			sed -i '/STATIC_SITES/d' "${ENV_DIR}/dockerbunker.env"
 			declare -p STATIC_SITES >> "${ENV_DIR}/dockerbunker.env"
 		fi
 	else
+		# configuration for docker services
 		[[ ${SERVICE_DOMAIN[0]} ]] && ! elementInArray "${SERVICE_NAME}" "${!WEB_SERVICES[@]}" && WEB_SERVICES+=( [${SERVICE_NAME}]="${SERVICE_DOMAIN[0]}" )
 		! elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" && CONFIGURED_SERVICES+=( "${SERVICE_NAME}" )
+
 		for containers in ${add_to_network[@]};do
 			[[ ( $container && ! "${CONTAINERS_IN_DOCKERBUNKER_NETWORK[@]}" =~ "${container}" ) ]] && CONTAINERS_IN_DOCKERBUNKER_NETWORK+=( "${container}" )
 		done
