@@ -8,7 +8,7 @@ while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;b
 
 # load SERVICE_NAME and SERVICE_NAME dynamically
 # from service folder-name
-SERVICE_NAME="$(basename $(dirname "$BASH_SOURCE"))"
+SERVICE_NAME="$(basename $(dirname "$BASH_SOURCE") | tr -cd '[a-z|0-9|\-|\_]')" # tr delets all the other characters)"
 PROMPT_SSL=1
 
 # load prior saved dockerbunker and service specific environment variables
