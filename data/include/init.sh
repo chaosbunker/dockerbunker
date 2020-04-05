@@ -8,14 +8,15 @@ init_dockerbunker() {
 		cat <<-EOF >> "${BASE_DIR}/build/env/dockerbunker.env"
 			BASE_DIR="${BASE_DIR}"
 			SERVICES_DIR="${BASE_DIR}/data/services"
-      SERVICE_DIR="${SERVICES_DIR}/${SERVICE_NAME}"
 			SERVER_DIR="${BASE_DIR}/data/server"
 			CONF_DIR="${BASE_DIR}/build/conf"
 			ENV_DIR="${BASE_DIR}/build/env"
 			BACKUP_DIR="${BASE_DIR}/build/backup"
-			SERVICE_ENV="${ENV_DIR}/${SERVICE_NAME}.env"
-      CONTAINERS="${SERVICE_DIR}/containers.sh"
-			SERVER_CONTAINER="${SERVER_DIR}/nginx/containers.sh"
+
+			SERVICE_DIR="\${SERVICES_DIR}/\${SERVICE_NAME}"
+			SERVICE_ENV="\${ENV_DIR}/\${SERVICE_NAME}.env"
+      CONTAINERS=\${SERVICE_DIR}/containers.sh
+			SERVER_CONTAINER=\${SERVER_DIR}/nginx/containers.sh
 
 			LE_EMAIL=
 
