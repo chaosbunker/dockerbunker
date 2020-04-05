@@ -13,6 +13,7 @@ Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWm
 |[Gitea](https://gitea.io/en-us/)| [&#10004;] i use it live |
 |[Gitlab CE](https://gitlab.com/)| |
 |[Gogs](https://gogs.io/)| |
+|[KeeWeb](https://github.com/keeweb/keeweb)| [&#10004;] i use it live |
 |[Mozilla send](https://send.firefox.com/)| [&#10004;] i use it live |
 |[Nextcloud](https://github.com/nextcloud/docker)| [&#10004;] i use it live |
 |[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)| |
