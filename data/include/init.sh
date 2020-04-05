@@ -14,6 +14,7 @@ init_dockerbunker() {
 			BACKUP_DIR="${BASE_DIR}/build/backup"
 			WEB_DIR="${BASE_DIR}/build/web"
 
+			SERVICE_SERVER_CONFIG="\${SERVICES_DIR}/\${SERVICE_NAME}/nginx/service.conf"
 			SERVICE_DIR="\${SERVICES_DIR}/\${SERVICE_NAME}"
 			SERVICE_ENV="\${ENV_DIR}/\${SERVICE_NAME}.env"
       CONTAINERS=\${SERVICE_DIR}/containers.sh

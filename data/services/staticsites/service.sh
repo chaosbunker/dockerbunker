@@ -28,6 +28,7 @@ configure() {
 	LE_EMAIL=${LE_EMAIL}
 	STATIC_HOME="${STATIC_HOME}"
 	SERVICE_DOMAIN[0]=${SERVICE_DOMAIN[0]}
+	SERVICE_SERVER_CONFIG=${SERVICE_SERVER_CONFIG}
 	## ------------------------------
 	#/STATIC
 	EOF
@@ -46,6 +47,7 @@ configure() {
 	post_configure_routine
 
 	SUBSTITUTE=( "\${SERVICE_DOMAIN}" )
+	set_nginx_config
 	basic_nginx
 
 	[[ ! $(docker ps -q --filter name=^/${NGINX_CONTAINER}$) ]] \

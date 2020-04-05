@@ -2,6 +2,7 @@
 #
 # function: setup_nginx
 # function: create_networks
+# function: set_nginx_config
 # function: basic_nginx
 # function: connect_containers_to_network
 #######
@@ -17,6 +18,29 @@ create_networks() {
 		[[ ! $(docker network ls -q --filter name=^${network}$) ]] \
 			&& docker network create $network >/dev/null
 	done
+}
+
+# set nginx service.config
+set_nginx_config() {
+	prompt_confirm "Use default Service Nginx.Config File?: ${SERVICE_SERVER_CONFIG}" && custom_server_config=1;
+
+	if [[ -z $custom_server_config ]];then
+		SERVICE_SERVER_CONFIG+="notexists"
+
+		# loop if file not exists
+		while [[ true ]];do
+			if [[ -f "${SERVICE_SERVER_CONFIG}" ]]; then
+				echo -e "\e[32m[Path is valid]\e[0m";
+				break;
+			else
+				echo -e "\e[31m[Invalid Path]\e[0m";
+
+				read -p "Set new Service Config Path: " -ei "/nginx/service.conf" CUSTOM_SERVICE_SERVER_CONFIG
+				SERVICE_SERVER_CONFIG="${SERVICES_DIR}/${SERVICE_NAME}${CUSTOM_SERVICE_SERVER_CONFIG}"
+			fi
+		done
+
+	fi
 }
 
 # this generates the nginx configuration for the service that is being set up
@@ -37,7 +61,12 @@ basic_nginx() {
 		[[ ! -d "${CONF_DIR}"/nginx/conf.d ]] && \
 			mkdir -p "${CONF_DIR}"/nginx/conf.d
 		if [[ ! -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]];then
-			cp "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/service.conf "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf
+			# set path fallback and use default service.config path
+			if [[ -z "$SERVICE_SERVER_CONFIG" ]]; then
+				SERVICE_SERVER_CONFIG="${SERVICES_DIR}/${SERVICE_NAME}/nginx/service.conf"
+			fi
+
+			cp $SERVICE_SERVER_CONFIG "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf
 			for variable in "${SUBSTITUTE[@]}";do
 				subst="\\${variable}"
 				variable=`eval echo "$variable"`
