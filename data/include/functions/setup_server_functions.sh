@@ -67,6 +67,7 @@ basic_nginx() {
 			fi
 
 			cp $SERVICE_SERVER_CONFIG "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf
+			# replace existing Variables set in
 			for variable in "${SUBSTITUTE[@]}";do
 				subst="\\${variable}"
 				variable=`eval echo "$variable"`

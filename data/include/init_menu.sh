@@ -7,8 +7,6 @@
 # style menu according to what status service has
 declare -A SERVICES_ARR
 for service in "${sorted[@]}";do
-  service_name="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
-
 	if elementInArray "$service" "${INSTALLED_SERVICES[@]}" \
 	|| [[ "${STATIC_SITES[@]}" > 0 && "${service}" == "staticsites" ]] ;then
     if elementInArray "$service" "${STOPPED_SERVICES[@]}";then
@@ -18,19 +16,19 @@ for service in "${sorted[@]}";do
       # style service as INSTALLED
       service_status="$(printf "\e[32m${service}\e[0m")"
     fi
-    SERVICES_ARR+=( ["$service_status"]="${service_name}" )
+    SERVICES_ARR+=( ["$service_status"]="${service}" )
     AVAILABLE_SERVICES+=( "$service_status" )
 
   elif elementInArray "${service}" "${CONFIGURED_SERVICES[@]}";then
     # style service as CONFIGURED
     service_status="$(printf "\e[33m${service}\e[0m")"
-    SERVICES_ARR+=( ["$service_status"]="${service_name}" )
+    SERVICES_ARR+=( ["$service_status"]="${service}" )
     AVAILABLE_SERVICES+=( "$service_status" )
 
 	else
     # list service only
     service_status="$(printf "${service}")"
-    SERVICES_ARR+=( ["$service_status"]="${service_name}" )
+    SERVICES_ARR+=( ["$service_status"]="${service}" )
     AVAILABLE_SERVICES+=( "$service_status" )
   fi
 done

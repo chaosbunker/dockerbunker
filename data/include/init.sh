@@ -64,7 +64,8 @@ fi
 # load service-names dynamically
 # via loop through folder-names at depth 1 within ./data/services, e.g. data/services/service-name
 while IFS= read -r servicename; do
-	declare -a ALL_SERVICES+=( $(basename "$servicename") )
+	 # tr delets all the other characters
+	declare -a ALL_SERVICES+=( $(basename "$servicename" | tr -cd '[a-z|0-9|\-|\_]') )
 done < <(find "${BASE_DIR}/data/services/" -mindepth 1 -maxdepth 1 -type d)
 
 # sort services

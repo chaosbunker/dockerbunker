@@ -1,6 +1,6 @@
 while true;do ls | grep -q dockerbunker.sh;if [[ $? == 0 ]];then BASE_DIR=$PWD;break;else cd ../;fi;done
 
-SERVICE_NAME="$(basename $(dirname "$BASH_SOURCE"))"
+SERVICE_NAME="$(basename $(dirname "$BASH_SOURCE") | tr -cd '[a-z|0-9|\-|\_]')" # tr delets all the other characters)"
 
 declare -a environment=( "build/env/dockerbunker.env" "data/include/init.sh" )
 

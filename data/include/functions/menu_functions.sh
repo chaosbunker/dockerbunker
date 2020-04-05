@@ -325,7 +325,6 @@ if [[ "$i" == ${all_services[-1]} ]];then \
 	prompt_confirm "Continue?"
 	[[ $? == 1 ]] && echo "Exiting..." && exit 0
 	for service in "${all_services[@]}";do
-		SERVICE_NAME="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
 		echo -e "\n\e[3m\xe2\x86\x92 Destroying $service\e[0m"
 		[[ -f "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh ]] \
 			&& "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh destroy_service
@@ -350,7 +349,7 @@ if [[ "$i" == ${all_services[-1]} ]];then \
 setup() {
 	initial_setup_routine
 
-	SUBSTITUTE=( "\${SERVICE_DOMAIN}" )
+	SUBSTITUTE=( "\${SERVICE_DOMAIN}" "\${SERVICE_NAME}" )
 	basic_nginx
 
 	docker_run_all
