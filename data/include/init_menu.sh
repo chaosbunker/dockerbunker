@@ -8,7 +8,9 @@
 declare -A SERVICES_ARR
 for service in "${sorted[@]}";do
   service_name="$(echo -e "${service,,}" | tr -cd '[:alnum:]')"
-  if elementInArray "$service" "${INSTALLED_SERVICES[@]}";then
+
+	if elementInArray "$service" "${INSTALLED_SERVICES[@]}" \
+	|| [[ "${STATIC_SITES[@]}" > 0 && "${service}" == "staticsites" ]] ;then
     if elementInArray "$service" "${STOPPED_SERVICES[@]}";then
       # style service as STOPPED
       service_status="$(printf "\e[32m${service}\e[0m \e[31m(Stopped)\e[0m")"
@@ -18,12 +20,14 @@ for service in "${sorted[@]}";do
     fi
     SERVICES_ARR+=( ["$service_status"]="${service_name}" )
     AVAILABLE_SERVICES+=( "$service_status" )
+
   elif elementInArray "${service}" "${CONFIGURED_SERVICES[@]}";then
     # style service as CONFIGURED
     service_status="$(printf "\e[33m${service}\e[0m")"
     SERVICES_ARR+=( ["$service_status"]="${service_name}" )
     AVAILABLE_SERVICES+=( "$service_status" )
-  else
+
+	else
     # list service only
     service_status="$(printf "${service}")"
     SERVICES_ARR+=( ["$service_status"]="${service_name}" )
@@ -78,7 +82,7 @@ count="${#AVAILABLE_SERVICES[@]}"
 echo ""
 echo "Please select the service you want to manage"
 echo ""
-[[ ${INSTALLED_SERVICES[@]} ]] && echo -e " \e[32mGreen\e[0m: Installed"
+[[ ${INSTALLED_SERVICES[@]} ]] || [[ ${STATIC_SITES[@]} ]] && echo -e " \e[32mGreen\e[0m: Installed"
 [[ ${CONFIGURED_SERVICES[@]} ]] && echo -e " \e[33mOrange\e[0m: Configured"
 echo ""
 
