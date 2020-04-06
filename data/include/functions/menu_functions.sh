@@ -518,7 +518,7 @@ static_menu() {
 			;;
 			"$returntopreviousmenu")
 
-			exec "${SERVICES_DIR}"/staticsites/init.sh options_menu
+			exec "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh options_menu
 
 			;;
 			*)
