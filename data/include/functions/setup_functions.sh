@@ -5,6 +5,7 @@
 # function: post_setup_routine
 # function: pre_configure_routine
 # function: set_domain
+# function: set_IP_PORT
 # function: configure_mx
 # function: get_le_email
 # function: post_configure_routine
@@ -86,6 +87,27 @@ set_domain() {
 	if [[ $PROMPT_SSL ]];then
 		configure_ssl
 	fi
+}
+
+#  Ask which IP and PORT should be used for the service
+set_IP_PORT() {
+	while [[ -z $ip_is_valid ]];do
+		if [[ -z "${SERVICE_IP}" ]]; then
+		  read -p "${SERVICE_NAME} IPv4-Adress: " SERVICE_IP
+		else
+		  previous_ip=${SERVICE_IP}
+		  unset SERVICE_IP
+		  read -p "${SERVICE_NAME} IPv4-Adress: " -ei "${previous_ip}" SERVICE_IP
+		fi
+
+		if is_ip_valid ${SERVICE_IP}; then
+			ip_is_valid=1
+		else
+			echo -e "\n\e[31m Invlaid IP: ${SERVICE_IP}\e[0m"
+		fi
+	done
+
+	read -p "${SERVICE_NAME} Port: " -ei "${SERVICE_PORT}" SERVICE_PORT
 }
 
 # Ask user for mx info. User has the option to set for the service that is being configured global mx environment variables or service specific. This creates mx.env (if it does not exist yet) or ${SERVICE_NAME}_mx.env respectively

@@ -6,6 +6,7 @@
 # function: insert
 # function: elementInArray
 # function: validate_fqdn
+# function: is_ip_valid
 # function: remove_from_WEB_SERVICES
 # function: remove_from_CONFIGURED_SERVICES
 # function: remove_from_STATIC_SITES
@@ -79,6 +80,29 @@ validate_fqdn() {
 	else
 		echo -e "\n\e[3m$domain is not a valid domain\e[0m\n"
 	fi
+}
+
+# Test an IP address for validity:
+# Usage:
+#      valid_ip IP_ADDRESS
+#      if [[ $? -eq 0 ]]; then echo good; else echo bad; fi
+#   OR
+#      if valid_ip IP_ADDRESS; then echo good; else echo bad; fi
+# script found at https://www.linuxjournal.com/content/validating-ip-address-bash-script
+function is_ip_valid() {
+	local  ip=$1
+	local  stat=1
+
+	if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+		OIFS=$IFS
+		IFS='.'
+		ip=($ip)
+		IFS=$OIFS
+		[[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
+		&& ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
+		stat=$?
+	fi
+	return $stat
 }
 
 # remove services from relevant arrays in dockerbunker.env after they have been installed/destroyed/configured/started etc..
