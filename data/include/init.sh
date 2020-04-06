@@ -29,6 +29,7 @@ init_dockerbunker() {
 			declare -a CONFIGURED_SERVICES=()
 			declare -a INSTALLED_SERVICES=()
 			declare -a STATIC_SITES=()
+			declare -a STATIC_SERVICES=()
 		EOF
 
 	fi

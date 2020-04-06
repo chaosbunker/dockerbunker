@@ -8,7 +8,7 @@
 declare -A SERVICES_ARR
 for service in "${sorted[@]}";do
 	if elementInArray "$service" "${INSTALLED_SERVICES[@]}" \
-	|| [[ "${STATIC_SITES[@]}" > 0 && "${service}" == "staticsites" ]] ;then
+	|| [[ "${STATIC_SERVICES[@]}" =~ "${service}" ]] ;then
     if elementInArray "$service" "${STOPPED_SERVICES[@]}";then
       # style service as STOPPED
       service_status="$(printf "\e[32m${service}\e[0m \e[31m(Stopped)\e[0m")"

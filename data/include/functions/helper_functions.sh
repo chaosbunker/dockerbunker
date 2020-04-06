@@ -132,6 +132,8 @@ remove_from_CONFIGURED_SERVICES() {
 
 remove_from_STATIC_SITES() {
 	STATIC_SITES=("${STATIC_SITES[@]/"${SERVICE_DOMAIN[0]}"}");
+
+	# remove Static-Site from environemen Variable
 	for key in "${!STATIC_SITES[@]}";do
 		if [[ "${STATIC_SITES[$key]}" == "" ]];then
 			unset STATIC_SITES[$key]
@@ -139,8 +141,22 @@ remove_from_STATIC_SITES() {
 				unset ${STATIC_SITES[@]}
 			fi
 		fi
-	sed -i '/STATIC_SITES/d' "${ENV_DIR}/dockerbunker.env"
-	declare -p STATIC_SITES >> "${ENV_DIR}/dockerbunker.env"
+		sed -i '/STATIC_SITES/d' "${ENV_DIR}/dockerbunker.env"
+		declare -p STATIC_SITES >> "${ENV_DIR}/dockerbunker.env"
+	done
+
+	# Remove Static-Site from STATIC_SERVICES environment Variable, to hide service-state in menu
+	STATIC_SERVICES=("${STATIC_SERVICES[@]/"${SERVICE_NAME}-${SERVICE_DOMAIN[0]}"}");
+
+	for key in "${!STATIC_SERVICES[@]}";do
+		if [[ "${STATIC_SERVICES[$key]}" == "" ]];then
+			unset STATIC_SERVICES[$key]
+			if [[ -z "${STATIC_SERVICES[@]}" ]];then
+				unset ${STATIC_SERVICES[@]}
+			fi
+		fi
+		sed -i '/STATIC_SERVICES/d' "${ENV_DIR}/dockerbunker.env"
+		declare -p STATIC_SERVICES >> "${ENV_DIR}/dockerbunker.env"
 	done
 }
 

@@ -188,6 +188,11 @@ post_configure_routine() {
 			STATIC_SITES+=( "${SERVICE_DOMAIN[0]}" )
 			sed -i '/STATIC_SITES/d' "${ENV_DIR}/dockerbunker.env"
 			declare -p STATIC_SITES >> "${ENV_DIR}/dockerbunker.env"
+
+			# save static-service name to show his state (INSTALLED) within menu
+			STATIC_SERVICES+=( "${SERVICE_NAME}-${SERVICE_DOMAIN[0]}" )
+			sed -i '/STATIC_SERVICES/d' "${ENV_DIR}/dockerbunker.env"
+			declare -p STATIC_SERVICES >> "${ENV_DIR}/dockerbunker.env"
 		fi
 	else
 		# configuration for docker services

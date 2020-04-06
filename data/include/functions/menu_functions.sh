@@ -65,6 +65,7 @@ options_menu() {
 		&& [[ ! -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
 			[[ ${STATIC} \
 				&& $(ls -A "${ENV_DIR}"/static) ]] \
+				&& [[ "${STATIC_SERVICES[@]}" =~ "${SERVICE_NAME}" ]] \
 				&& menu=( "Configure Site" "Manage Sites" "$exitmenu" ) \
 				|| menu=( "Configure Service" "$exitmenu" )
 			[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
@@ -443,18 +444,25 @@ static_menu() {
 	shopt -s extglob
 
 	## Start building the string to match against.
-	string="@(${staticsites[0]}"
+	string="@("
+	declare -a current_static_services
 	## Add the rest of the site names to the string
-	for((i=1;i<${#staticsites[@]};i++))
+	for((i=0;i<${#staticsites[@]};i++))
 	do
-	    string+="|${staticsites[$i]}"
+		# show only services which match STATIC_SERVICES pattern
+		# to show only correct static-service in case we habe more than once static-services (agains initial dockerbunker functionality)
+		if elementInArray "${SERVICE_NAME}-${staticsites[$i]}" "${STATIC_SERVICES[@]}"; then
+			[[ $i > 0 ]] && string+="|";
+			string+="${staticsites[$i]}"
+			current_static_services+="${staticsites[$i]}"
+		fi
 	done
 	## Close the parenthesis. $string is now @(site1|site2|...|siteN)
 	string+=")"
 	echo ""
 
 	## Show the menu. This will list all Static Sites that have an active environment file
-	select static in "${staticsites[@]}" "$returntopreviousmenu"
+	select static in "${current_static_services[@]}" "$returntopreviousmenu"
 	do
 	    case $static in
 	    $string)
@@ -516,7 +524,7 @@ static_menu() {
 			*)
 
 			static=""
-			echo "Please choose a number from 1 to $((${#staticsites[@]}+1))"
+			echo "Please choose a number from 1 to $((${#current_static_services[@]}+1))"
 
 			;;
 		esac
