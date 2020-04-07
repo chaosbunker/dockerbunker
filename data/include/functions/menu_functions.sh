@@ -454,7 +454,7 @@ static_menu() {
 		if elementInArray "${SERVICE_NAME}-${staticsites[$i]}" "${STATIC_SERVICES[@]}"; then
 			[[ $i > 0 ]] && string+="|";
 			string+="${staticsites[$i]}"
-			current_static_services+="${staticsites[$i]}"
+			current_static_services+=( "${staticsites[$i]}" )
 		fi
 	done
 	## Close the parenthesis. $string is now @(site1|site2|...|siteN)
