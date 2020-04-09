@@ -16,21 +16,16 @@ for service in "${sorted[@]}";do
       # style service as INSTALLED
       service_status="$(printf "\e[32m${service}\e[0m")"
     fi
-    SERVICES_ARR+=( ["$service_status"]="${service}" )
-    AVAILABLE_SERVICES+=( "$service_status" )
-
   elif elementInArray "${service}" "${CONFIGURED_SERVICES[@]}";then
     # style service as CONFIGURED
     service_status="$(printf "\e[33m${service}\e[0m")"
-    SERVICES_ARR+=( ["$service_status"]="${service}" )
-    AVAILABLE_SERVICES+=( "$service_status" )
-
 	else
     # list service only
     service_status="$(printf "${service}")"
-    SERVICES_ARR+=( ["$service_status"]="${service}" )
-    AVAILABLE_SERVICES+=( "$service_status" )
   fi
+
+	SERVICES_ARR+=( ["$service_status"]="${service}" )
+	AVAILABLE_SERVICES+=( "$service_status" )
 done
 
 # setup service meta-navigation
@@ -159,13 +154,13 @@ do
     say_done
     exit 0
     ;;
-    $choice)
+    *)
     if [[ -z $choice ]];then
       echo "$PRINT_PLEASE_CHOOSE_A_NUMBER $count"
     else
       service="$(echo -e "${choice,,}" | tr -d '[:space:]')"
       echo ""
-      echo -e "\n\e[3m\xe2\x86\x92 $PRINT_CHECKING_SERVICE_STATUS"
+      echo -e "\n\e[3m\xe2\x86\x92 $PRINT_CHECKING_SERVICE_STATUS ${service}"
       echo ""
       source "${BASE_DIR}/data/services/${SERVICES_ARR[$choice]}/init.sh"
       break
