@@ -178,7 +178,7 @@ setup() {
 		response=$(curl -kso /dev/null -w '%{http_code}' https://${SERVICE_DOMAIN}/install)
 		sleep 1
 		count+=1
-		[[ $count > 30 ]] && echo "\e[31mfailed\n\nCannot reach https://${SERVICE_DOMAIN}/install. Exiting\e[0m\n" && exit 1
+		(( $count > 30 )) && echo "\e[31mfailed\n\nCannot reach https://${SERVICE_DOMAIN}/install. Exiting\e[0m\n" && exit 1
 	done
 	[[ $response == 200 ]] && true
 

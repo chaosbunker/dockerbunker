@@ -161,6 +161,8 @@ setup() {
 
 	docker_run_all
 
+	restart_nginx
+
 	# wait for gogs db to be available
 	if ! docker exec gogs-db-dockerbunker mysqladmin ping -h"127.0.0.1" --silent;then
 		echo -e "\n\e[3mWaiting for gogs-db-dockerbunker to be ready...\e[0m"
@@ -175,7 +177,7 @@ setup() {
 		response=$(curl -kso /dev/null -w '%{http_code}' https://${SERVICE_DOMAIN}/install)
 		sleep 1
 		count+=1
-		[[ $count > 30 ]] && echo "\e[31mfailed\n\nCannot reach https://${SERVICE_DOMAIN}/install. Exiting\e[0m\n" && exit 1
+		(( $count > 30 )) && echo "\e[31mfailed\n\nCannot reach https://${SERVICE_DOMAIN}/install. Exiting\e[0m\n" && exit 1
 	done
 	[[ $response == 200 ]] && true
 
