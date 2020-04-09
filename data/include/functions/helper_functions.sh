@@ -27,7 +27,7 @@ prompt_confirm() {
 		[[ $REPLY ]] || REPLY="Y"
 		case $REPLY in
 			[yY]) echo -e "\e[32m$PRINT_PROMPT_CONFIRM_YES\e[0m"; return 0 ;;
-			[nN]) echo -e "\e[32m$PRINT_PROMPT_CONFIRM_YES\e[0m"; return 1 ;;
+			[nN]) echo -e "\e[32m$PRINT_PROMPT_CONFIRM_NO\e[0m"; return 1 ;;
 			*) echo -e "\e[31m$PRINT_PROMPT_CONFIRM_ERROR\e[0m"
 		esac
 	done
