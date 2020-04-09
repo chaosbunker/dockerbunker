@@ -21,10 +21,17 @@ Index:
 
 #### <span id="services">Services:</span>
 
+* [&#10004;] install works
+  > means that the installation worked but the service was not further tested
+* [&#9760;] some issue
+  > got some isse by installation or by service execution via browser
+* [&#10004;] works
+  > is tested in live-environment
+
 | A - G |
 |---|---|
 |[Bitbucket](https://www.atlassian.com/software/bitbucket) | [&#9760;] some issue |
-|[Commento](https://github.com/adtac/commento) | [&#9760;] some issue |
+|[Commento](https://github.com/adtac/commento) | **[&#10004;]** install works |
 |[cryptpad](https://cryptpad.fr/) | **[&#10004;]** install works |
 |[CS50 IDE](https://manual.cs50.net/ide/offline) | [&#9760;] some issue |
 |[Dillinger](https://dillinger.io/) | **[&#10004;]** install works |
