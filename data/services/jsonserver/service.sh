@@ -23,9 +23,8 @@ configure() {
 
 	[[ ! -d "${CONF_DIR}"/jsonserver ]] && \
 		mkdir -p "${CONF_DIR}"/jsonserver
-	[[ ! -f "${CONF_DIR}"/jsonserver/db.json ]] \
-		&& echo -e "\nCannot find db.json in \e[3mdata/conf/jsonserver/db.json\e[0m\n" \
-		&& exit 1
+	[[ ! -f "${CONF_DIR}"/jsonserver/db.json ]] && \
+		cp ${SERVICES_DIR}/${SERVICE_NAME}/db.json "${CONF_DIR}"/jsonserver/db.json
 
 	set_domain
 

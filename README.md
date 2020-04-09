@@ -49,7 +49,7 @@ Index:
 |---|---|
 |[Hastebin](https://hastebin.com/about.md) | **[&#10004;]** install works |
 |[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server) | [&#9760;] some issue |
-|[json-server](https://github.com/typicode/json-server) | [&#9760;] some issue |
+|[json-server](https://github.com/typicode/json-server) | **[&#10004;]** install works |
 |[Kanboard](https://kanboard.net/) | **[&#10004;]** install works |
 |[KeeWeb](https://github.com/keeweb/keeweb) | **[&#10004;] works** | this is a static KeyPassX ProgressiveWebapp |
 |[Koken](http://koken.me/) | **[&#10004;]** install works |
