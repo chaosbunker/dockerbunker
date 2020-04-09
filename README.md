@@ -37,7 +37,7 @@ Index:
 |[Dillinger](https://dillinger.io/) | **[&#10004;]** installation works |
 |[Drone CI](https://github.com/drone/drone) | **[&#10004;] works** | Continuous Delivery system |
 |[Fathom Analytics](https://github.com/usefathom/fathom) | **[&#10004;]** installation works |
-|[Firefly III](https://github.com/firefly-iii/firefly-iii) | > [&#9760;] some issue |
+|[Firefly III](https://github.com/firefly-iii/firefly-iii) | **[&#10004;]** installation works |
 |[Firefox Sync Server](https://github.com/mozilla-services/syncserver) | **[&#10004;]** installation works |
 |[Ghost Blog](https://ghost.org/) | **[&#10004;]** installation works |
 |[GitBucket](https://github.com/gitbucket/gitbucket) | **[&#10004;]** installation works |

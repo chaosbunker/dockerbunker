@@ -10,7 +10,7 @@ declare -a containers=( "fireflyiii-service-dockerbunker" "fireflyiii-db-dockerb
 declare -A volumes=( [${SERVICE_NAME}-db-vol-1]="/var/lib/mysql" [${SERVICE_NAME}-data-vol-1]="/var/www/firefly-iii/storage/export" [${SERVICE_NAME}-data-vol-2]="/var/www/firefly-iii/storage/upload" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
 declare -a add_to_network=( "fireflyiii-service-dockerbunker" )
-declare -A IMAGES=( [db]="mariadb:10.3" [service]="jc5x/firefly-iii" )
+declare -A IMAGES=( [db]="mariadb:10.3" [service]="jc5x/firefly-iii:release-5.1.1" )
 
 # service specific functions
 # to setup save service specific docker-variables to environment file
@@ -31,16 +31,17 @@ configure() {
 
 	LOG_CHANNEL=daily
 	APP_LOG_LEVEL=notice
+	APP_DEBUG=true
+	APP_KEY=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32)
+	APP_ENV=local
+	APP_URL=${SERVICE_DOMAIN}
 
-	FF_DB_HOST=db
-	FF_DB_NAME=firefly
-	FF_DB_USER=firefly
-	FF_DB_PASSWORD=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32)
-	FF_APP_KEY=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32)
-	FF_APP_ENV=local
-	FF_DB_CONNECTION=mysql
-	FF_TZ=Europe/Berlin
-	FF_APP_LOG_LEVEL=debug
+	DB_HOST=db
+	DB_DATABASE=firefly
+	DB_USERNAME=firefly
+	DB_PASSWORD=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32)
+	DB_CONNECTION=mysql
+	TZ=Europe/Berlin
 	USE_PROXIES=127.0.0.1
 	TRUSTED_PROXIES=**
 
