@@ -36,7 +36,7 @@ Index:
 |[GitBucket](https://github.com/gitbucket/gitbucket) | **[&#10004;]** install works |
 |[Gitea](https://gitea.io/en-us/) | **[&#10004;] works** | Git Server |
 |[Gitlab CE](https://gitlab.com/) | [&#9760;] some issue |
-|[Gogs](https://gogs.io/) | [&#9760;] some issue |
+|[Gogs](https://gogs.io/) | **[&#10004;]** install works |
 
 | H - N |
 |---|---|
