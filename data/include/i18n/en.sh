@@ -92,7 +92,7 @@ export PRINT_REMVEHTML_DIRECTORY="Remove HTML directory"
 export PRINT_CONTAINER_MISSING="container missing"
 export PRINT_RETURN_TO_PREVIOUSE_MENU="Return to previous menu"
 
-export PRINT_MENU_REINSTALL_SERVICE="export PRINT_MENU_REINSTALL_SERVICE"
+export PRINT_MENU_REINSTALL_SERVICE="Reinstall service"
 export PRINT_MENU_BACKUP_SERVICE="Backup Service"
 export PRINT_MENU_UPGRADE_IMAGE="Upgrade Image(s)"
 export PRINT_MENU_DESTROY_SERVICE="Destroy"
