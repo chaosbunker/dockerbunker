@@ -21,55 +21,55 @@ Index:
 
 #### <span id="services">Services:</span>
 
-* [&#10004;] install works
+* [&#10004;] installation works
   > means that the installation worked but the service was not further tested
-* [&#9760;] some issue
+* > [&#9760;] some issue
   > got some isse by installation or by service execution via browser
 * [&#10004;] works
   > is tested in live-environment
 
 | A - G |
 |---|---|
-|[Bitbucket](https://www.atlassian.com/software/bitbucket) | [&#9760;] some issue |
-|[Commento](https://github.com/adtac/commento) | **[&#10004;]** install works |
-|[cryptpad](https://cryptpad.fr/) | **[&#10004;]** install works |
-|[CS50 IDE](https://manual.cs50.net/ide/offline) | [&#9760;] some issue |
-|[Dillinger](https://dillinger.io/) | **[&#10004;]** install works |
+|[Bitbucket](https://www.atlassian.com/software/bitbucket) | > [&#9760;] some issue |
+|[Commento](https://github.com/adtac/commento) | **[&#10004;]** installation works |
+|[cryptpad](https://cryptpad.fr/) | **[&#10004;]** installation works |
+|[CS50 IDE](https://manual.cs50.net/ide/offline) | > [&#9760;] some issue |
+|[Dillinger](https://dillinger.io/) | **[&#10004;]** installation works |
 |[Drone CI](https://github.com/drone/drone) | **[&#10004;] works** | Continuous Delivery system |
-|[Fathom Analytics](https://github.com/usefathom/fathom) | **[&#10004;]** install works |
-|[Firefly III](https://github.com/firefly-iii/firefly-iii) | [&#9760;] some issue |
-|[Firefox Sync Server](https://github.com/mozilla-services/syncserver) | **[&#10004;]** install works |
-|[Ghost Blog](https://ghost.org/) | **[&#10004;]** install works |
-|[GitBucket](https://github.com/gitbucket/gitbucket) | **[&#10004;]** install works |
+|[Fathom Analytics](https://github.com/usefathom/fathom) | **[&#10004;]** installation works |
+|[Firefly III](https://github.com/firefly-iii/firefly-iii) | > [&#9760;] some issue |
+|[Firefox Sync Server](https://github.com/mozilla-services/syncserver) | **[&#10004;]** installation works |
+|[Ghost Blog](https://ghost.org/) | **[&#10004;]** installation works |
+|[GitBucket](https://github.com/gitbucket/gitbucket) | **[&#10004;]** installation works |
 |[Gitea](https://gitea.io/en-us/) | **[&#10004;] works** | Git Server |
-|[Gitlab CE](https://gitlab.com/) | [&#9760;] some issue |
-|[Gogs](https://gogs.io/) | **[&#10004;]** install works |
+|[Gitlab CE](https://gitlab.com/) | > [&#9760;] some issue |
+|[Gogs](https://gogs.io/) | **[&#10004;]** installation works |
 
 | H - N |
 |---|---|
-|[Hastebin](https://hastebin.com/about.md) | **[&#10004;]** install works |
-|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server) | [&#9760;] some issue |
-|[json-server](https://github.com/typicode/json-server) | **[&#10004;]** install works |
-|[Kanboard](https://kanboard.net/) | **[&#10004;]** install works |
+|[Hastebin](https://hastebin.com/about.md) | **[&#10004;]** installation works |
+|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server) | > [&#9760;] some issue |
+|[json-server](https://github.com/typicode/json-server) | **[&#10004;]** installation works |
+|[Kanboard](https://kanboard.net/) | **[&#10004;]** installation works |
 |[KeeWeb](https://github.com/keeweb/keeweb) | **[&#10004;] works** | this is a static KeyPassX ProgressiveWebapp |
-|[Koken](http://koken.me/) | **[&#10004;]** install works |
-|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized) | [&#9760;] some issue |
-|[Mailpile](https://www.mailpile.is/) | **[&#10004;]** install works |
-|[Mastodon](https://github.com/tootsuite/mastodon) | **[&#10004;]** install works |
-|[Matomo Analytics](https://github.com/matomo-org/docker) | **[&#10004;]** install works |
+|[Koken](http://koken.me/) | **[&#10004;]** installation works |
+|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized) | > [&#9760;] some issue |
+|[Mailpile](https://www.mailpile.is/) | **[&#10004;]** installation works |
+|[Mastodon](https://github.com/tootsuite/mastodon) | **[&#10004;]** installation works |
+|[Matomo Analytics](https://github.com/matomo-org/docker) | **[&#10004;]** installation works |
 |[Mozilla send](https://send.firefox.com/) | **[&#10004;] works** | Simple, private file sharing from the makers of Firefox |
 |[Nextcloud](https://github.com/nextcloud/docker) | **[&#10004;] works** | self-hosted cloud-server|
 
 | O - Z |
 |---|---|
-|[Open Project](https://www.openproject.org/) | [&#9760;] some issue |
-|[Padlock Cloud](https://github.com/padlock/padlock-cloud) | [&#9760;] some issue |
-|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) | [&#9760;] some issue |
-|[Seafile Pro (broken)](https://github.com/haiwen/seafile) | [&#9760;] some issue |
-|[Searx](https://github.com/asciimoo/searx.git) | **[&#10004;]** install works |
-|[sFTP Server](https://github.com/atmoz/sftp) | [&#9760;] some issue |
+|[Open Project](https://www.openproject.org/) | > [&#9760;] some issue |
+|[Padlock Cloud](https://github.com/padlock/padlock-cloud) | > [&#9760;] some issue |
+|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) | > [&#9760;] some issue |
+|[Seafile Pro (broken)](https://github.com/haiwen/seafile) | > [&#9760;] some issue |
+|[Searx](https://github.com/asciimoo/searx.git) | **[&#10004;]** installation works |
+|[sFTP Server](https://github.com/atmoz/sftp) | > [&#9760;] some issue |
 |[Wekan](https://github.com/wekan/wekan) | **[&#10004;] works** | open source kanban |
-|[Wordpress](https://wordpress.org/) | **[&#10004;]** install works |
+|[Wordpress](https://wordpress.org/) | **[&#10004;]** installation works |
 
 
 #### <span id="other_build_in_services">Other build in Services</span>
