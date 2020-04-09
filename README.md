@@ -6,21 +6,28 @@ Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWm
 
 #### Services which work:
 
-| Service | Status |
-|---|---|
-|[Drone CI](https://github.com/drone/drone)| |
-|[Firefox Sync Server](https://github.com/mozilla-services/syncserver)| |
-|[Gitea](https://gitea.io/en-us/)| [&#10004;] i use it live |
-|[Gitlab CE](https://gitlab.com/)| |
-|[Gogs](https://gogs.io/)| |
-|[KeeWeb](https://github.com/keeweb/keeweb)| [&#10004;] i use it live |
-|[Mozilla send](https://send.firefox.com/)| [&#10004;] i use it live |
-|[Nextcloud](https://github.com/nextcloud/docker)| [&#10004;] i use it live |
-|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)| |
-|[Wekan](https://github.com/wekan/wekan)| |
+| Service | Status | Description |
+|---|---|--- |
+|[Drone CI](https://github.com/drone/drone)| **[&#10004;] works** | Continuous Delivery system |
+|[Firefox Sync Server](https://github.com/mozilla-services/syncserver)| | Run-Your-Own Firefox Sync Server |
+|[Gitea](https://gitea.io/en-us/)| **[&#10004;] works** | Git Server |
+|[Gitlab CE](https://gitlab.com/)| should work | Git Server |
+|[Gogs](https://gogs.io/)| should work | Git Server |
+|[KeeWeb](https://github.com/keeweb/keeweb)| **[&#10004;] works** | this is a static KeyPassX ProgressiveWebapp |
+|[Mozilla send](https://send.firefox.com/)| **[&#10004;] works** | Simple, private file sharing from the makers of Firefox |
+|[Nextcloud](https://github.com/nextcloud/docker)| **[&#10004;] works** | self-hosted cloud-server|
+|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)| | Open Source team communications |
+|[Wekan](https://github.com/wekan/wekan)| should work | open source kanban |
 
+#### Other Buildin Services
 
-**Fair warning:** While all services appeared fully functional at the time I implemented them, I cannot guarantee that they still all are functional. Sometimes I just added something I was playing around with and hadn't tested every part of it. If something turns out to be not working, it often times broke because of changes that were made to the software and it most cases it's trivial to make it work again. I **marked bold** all the apps I am personally using with `dockerbunker`, as well as those that I recently tested and expect to work without issues. That being said, use this at your own risk. And if you do use `dockerbunker` and notice that something doesn't work, please file an issue .. or even better, submit a pull request. Contributions are welcome:)
+| Service | Status | Description |
+|---|---|--- |
+|proxy-pass| **[&#10004;] works** | Use Dockerbunker as reverse-proxy, to work with your external Service/Server |
+|static-sites| **[&#10004;] works** | use some static HTML sites (within build/service-name/web) |
+
+**Fair warning:**
+While all services appeared fully functional at the time I implemented them, I cannot guarantee that they still all are functional. Sometimes I just added something I was playing around with and hadn't tested every part of it. If something turns out to be not working, it often times broke because of changes that were made to the software and it most cases it's trivial to make it work again. I **marked bold** all the apps I am personally using with `dockerbunker`, as well as those that I recently tested and expect to work without issues. That being said, use this at your own risk. And if you do use `dockerbunker` and notice that something doesn't work, please file an issue .. or even better, submit a pull request. Contributions are welcome:)
 
 ## Prerequisites
 
@@ -68,17 +75,46 @@ Now when selecting the same service again in the `dockerbunker` menu, there will
 ```
 Nextcloud
 1) Reconfigure service
-2) PRINT_MENU_REINSTALL_SERVICE
-3) $PRINT_OPTAIN_LS_CERT (<-- only visible if using self-signed cert)
+2) Reinstall service
+3) Obtain Let's Encrypt certificate (<-- only visible if using self-signed cert)
 4) Restart container(s)
 5) Stop container(s) (<- only visible when containers are running, otherwise offers "Start Containers"
-6) PRINT_MENU_BACKUP_SERVICE
+6) Backup Service
 7) Restore Service (<- only visible if backup(s) for service are found)
-8) $PRINT_MENU_UPGRADE_IMAGE
+8) Upgrade Image(s)
 9) Destroy "Nextcloud"
 ```
 
+### add custom services
+
+You can add some services by your own.
+
+1. To do so, only copy another service which match your new service the best. copy ```/data/services/some-service``` and rename it to your needed service.
+2. setup your service parameter wihtin ```service.sh```
+3. add oder update your ```docker run``` commands if needed for your service
+4. update the nginx-reverse-proxy settings within ```nginx/service.conf```
+
+
 When destroying a service everything related to the service will be removed. Only Let's Encrypt certificates will be retained.
+
+### add custom static website
+
+1. start the ```static-sites``` service
+2. add your specific domain and the other parameter
+3. after that, dockerbunker installs your static-site to ```/build/web/service-name/index.html```
+4. now, you have to add your staic-site files into ```/build/web/service-name/```
+5. thats it, your static site should work
+
+### add your external service
+
+to add your external service, and use it via dockerbunker as a reverse-proxy.
+
+1. copy/paste nginx-default-proxy-pass.config ```proxy-pass/nginx/service.conf``` and edit to work with your service
+2. start the ```proxy-pass``` service
+3. add your specific domain and the other parameter
+4. run the setup process
+5. thats it, your reverse proxy should work
+
 
 ### SSL
 
