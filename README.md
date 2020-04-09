@@ -7,6 +7,7 @@ Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWm
 Index:
 * [Services](#services)
 * [Other build in Services](#other_build_in_services)
+* [Upgrade Dockerbunker-v1 to -v2](#upgrade_dockerbunker_v1_to_v2)
 * [Prerequisites](#prerequisites)
 * [How to get started](#how_to_get_started)
 * [Ddd custom services](#add_custom_services)
@@ -42,6 +43,22 @@ Index:
 
 **Fair warning:**
 While all services appeared fully functional at the time I implemented them, I cannot guarantee that they still all are functional. Sometimes I just added something I was playing around with and hadn't tested every part of it. If something turns out to be not working, it often times broke because of changes that were made to the software and it most cases it's trivial to make it work again. I **marked bold** all the apps I am personally using with `dockerbunker`, as well as those that I recently tested and expect to work without issues. That being said, use this at your own risk. And if you do use `dockerbunker` and notice that something doesn't work, please file an issue .. or even better, submit a pull request. Contributions are welcome:)
+
+## <span id="upgrade_dockerbunker_v1_to_v2">Upgrade Dockerbunker-v1 to -v2</span>
+
+There are some big changes with the docker-v2 and ith wont be run without manually changes.
+
+0. At first **Backup your dockerbunker sytem**
+
+### Environment TODOs:
+
+1. move all Environment-Files into ```/build``` folder, e.g. ```/build/conf```, ```/build/web```, ```/build/backup``` and ```/build/env```
+2. update your environment Variables within ```build/env/dockerbunker.env``` (take a look at the default Variables within ```data/include/init.sh```)
+
+### Service TODOs:
+
+1. now, service entry-point (```service-name/ìnit.sh```) and service setup (```service-name/service.sh```) was splitted
+2. edit your ```service-name/service.sh``` to match your old settings
 
 ## <span id="prerequisites">Prerequisites</span>
 
