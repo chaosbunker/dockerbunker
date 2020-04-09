@@ -24,7 +24,7 @@ Index:
 * [&#10004;] installation works
   > means that the installation worked but the service was not further tested
 * > [&#9760;] some issue
-  > got some isse by installation or by service execution via browser
+  got some isse by installation or by service execution via browser
 * [&#10004;] works
   > is tested in live-environment
 
