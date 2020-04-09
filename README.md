@@ -4,7 +4,21 @@
 
 Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWmh) to see `dockerbunker`in action.
 
-#### Services which work:
+Index:
+* [Services](#services)
+* [Other build in Services](#other_build_in_services)
+* [Prerequisites](#prerequisites)
+* [How to get started](#how_to_get_started)
+* [Ddd custom services](#add_custom_services)
+* [add custom static website](#add_custom_static_website)
+* [add your external service](#add_your_external_service)
+* [add your external SSL](#ssl)
+* [Backup & Restore](#backup_restore)
+* [Good to know](#good_to_know)
+* [Why I made this](#why_i_made_this)
+
+
+#### <span id="services">Services:</span>
 
 | Service | Status | Description |
 |---|---|--- |
@@ -19,7 +33,7 @@ Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWm
 |[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)| | Open Source team communications |
 |[Wekan](https://github.com/wekan/wekan)| should work | open source kanban |
 
-#### Other Buildin Services
+#### <span id="other_build_in_services">Other build in Services</span>
 
 | Service | Status | Description |
 |---|---|--- |
@@ -29,7 +43,7 @@ Have a look at [this asciicast](https://asciinema.org/a/PGkj249ZRCtYKKSmpgqymBWm
 **Fair warning:**
 While all services appeared fully functional at the time I implemented them, I cannot guarantee that they still all are functional. Sometimes I just added something I was playing around with and hadn't tested every part of it. If something turns out to be not working, it often times broke because of changes that were made to the software and it most cases it's trivial to make it work again. I **marked bold** all the apps I am personally using with `dockerbunker`, as well as those that I recently tested and expect to work without issues. That being said, use this at your own risk. And if you do use `dockerbunker` and notice that something doesn't work, please file an issue .. or even better, submit a pull request. Contributions are welcome:)
 
-## Prerequisites
+## <span id="prerequisites">Prerequisites</span>
 
 - Docker
 - Bash 4+
@@ -49,7 +63,7 @@ While all services appeared fully functional at the time I implemented them, I c
 
 		`echo 'PATH="/usr/local/bin:$PATH"' >> ~/.bash_profile`
 
-## How to get started:
+## <span id="how_to_get_started">How to get started</span>
 
 1. Get docker
 
@@ -85,7 +99,7 @@ Nextcloud
 9) Destroy "Nextcloud"
 ```
 
-### add custom services
+### <span id="add_custom_services">Ddd custom services</span>
 
 You can add some services by your own.
 
@@ -97,7 +111,7 @@ You can add some services by your own.
 
 When destroying a service everything related to the service will be removed. Only Let's Encrypt certificates will be retained.
 
-### add custom static website
+### <span id="add_custom_static_website">add custom static website</span>
 
 1. start the ```static-sites``` service
 2. add your specific domain and the other parameter
@@ -105,7 +119,7 @@ When destroying a service everything related to the service will be removed. Onl
 4. now, you have to add your staic-site files into ```/build/web/service-name/```
 5. thats it, your static site should work
 
-### add your external service
+### <span id="add_your_external_service">add your external service</span>
 
 to add your external service, and use it via dockerbunker as a reverse-proxy.
 
@@ -116,7 +130,7 @@ to add your external service, and use it via dockerbunker as a reverse-proxy.
 5. thats it, your reverse proxy should work
 
 
-### SSL
+### <span id="ssl">add your external SSL</span>
 
 When configuring a service, a self-signed certificate is generated and stored in `build/conf/nginx/ssl/${SERVICE_HOSTNAME}`. Please move your own trusted certificate and key in that directory as `cert.pem` and `key.pem` after configuration of the service is complete.
 
@@ -124,7 +138,7 @@ If you choose to use [Let's Encrypt](https://letsencrypt.org/) during setup, cer
 
 It is possible to add additional domains to the certificate before obtaining the certificate and these domains will also automatically be added to the corresponding nginx configuration.
 
-#### Backup & Restore
+#### <span id="backup_restore">Backup & Restore</span>
 
 When backing up a service, a timestamped directory will be created in `build/backup/${SERVICE_NAME}`. The following things will get backed up into (or restored from) that directory:
 
@@ -134,12 +148,13 @@ When backing up a service, a timestamped directory will be created in `build/bac
 - environment file(s) (from build/env/${SERVICE_NAME}*)
 - ssl certificate" (from build/conf/nginx/ssl/${SERVICE_DOMAIN} and, if applicable build/conf/nginx/ssl/letsencrypt)
 
-#### Good to know:
+#### <span id="good_to_know">Good to know</span>
+
 All credentials that are set by the user or that are automatically generated are stored in build/env/${SERVICE_NAME}.env.
 
 Please refer to the documentation of each web-app (regarding default credentials, configuration etc.)
 
-#### Why I made this
+#### <span id="why_i_made_this">Why I made this</span>
 
 I know that it is not really ideal and recommended to do something like this with shell scripts. `dockerbunker` is an idea that went a bit out of control. It was inspired by [@DFabric's](https://github.com/DFabric/) [DPlatform-DockerShip](https://github.com/DFabric/DPlatform-DockerShip). You can read more about why I made dockerbunker [here](https://chaosbunker.com/post/dockerbunker) (tl;dr: I enjoyed the process)
 
