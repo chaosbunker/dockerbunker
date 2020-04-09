@@ -21,25 +21,56 @@ Index:
 
 #### <span id="services">Services:</span>
 
-| Service | Status | Description |
-|---|---|--- |
-|[Drone CI](https://github.com/drone/drone)| **[&#10004;] works** | Continuous Delivery system |
-|[Firefox Sync Server](https://github.com/mozilla-services/syncserver)| | Run-Your-Own Firefox Sync Server |
-|[Gitea](https://gitea.io/en-us/)| **[&#10004;] works** | Git Server |
-|[Gitlab CE](https://gitlab.com/)| should work | Git Server |
-|[Gogs](https://gogs.io/)| should work | Git Server |
-|[KeeWeb](https://github.com/keeweb/keeweb)| **[&#10004;] works** | this is a static KeyPassX ProgressiveWebapp |
-|[Mozilla send](https://send.firefox.com/)| **[&#10004;] works** | Simple, private file sharing from the makers of Firefox |
-|[Nextcloud](https://github.com/nextcloud/docker)| **[&#10004;] works** | self-hosted cloud-server|
-|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)| | Open Source team communications |
-|[Wekan](https://github.com/wekan/wekan)| should work | open source kanban |
+| A - G |
+|---|---|
+|[Bitbucket](https://www.atlassian.com/software/bitbucket) | [&#9760;] some issue |
+|[Commento](https://github.com/adtac/commento) | [&#9760;] some issue |
+|[cryptpad](https://cryptpad.fr/) | **[&#10004;]** install works |
+|[CS50 IDE](https://manual.cs50.net/ide/offline) | [&#9760;] some issue |
+|[Dillinger](https://dillinger.io/) | **[&#10004;]** install works |
+|[Drone CI](https://github.com/drone/drone) | **[&#10004;] works** | Continuous Delivery system |
+|[Fathom Analytics](https://github.com/usefathom/fathom) | **[&#10004;]** install works |
+|[Firefly III](https://github.com/firefly-iii/firefly-iii) | [&#9760;] some issue |
+|[Firefox Sync Server](https://github.com/mozilla-services/syncserver) | **[&#10004;]** install works |
+|[Ghost Blog](https://ghost.org/) | **[&#10004;]** install works |
+|[GitBucket](https://github.com/gitbucket/gitbucket) | **[&#10004;]** install works |
+|[Gitea](https://gitea.io/en-us/) | **[&#10004;] works** | Git Server |
+|[Gitlab CE](https://gitlab.com/) | [&#9760;] some issue |
+|[Gogs](https://gogs.io/) | [&#9760;] some issue |
+
+| H - N |
+|---|---|
+|[Hastebin](https://hastebin.com/about.md) | **[&#10004;]** install works |
+|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server) | [&#9760;] some issue |
+|[json-server](https://github.com/typicode/json-server) | [&#9760;] some issue |
+|[Kanboard](https://kanboard.net/) | **[&#10004;]** install works |
+|[KeeWeb](https://github.com/keeweb/keeweb) | **[&#10004;] works** | this is a static KeyPassX ProgressiveWebapp |
+|[Koken](http://koken.me/) | **[&#10004;]** install works |
+|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized) | [&#9760;] some issue |
+|[Mailpile](https://www.mailpile.is/) | **[&#10004;]** install works |
+|[Mastodon](https://github.com/tootsuite/mastodon) | [&#9760;] some issue |
+|[Matomo Analytics](https://github.com/matomo-org/docker) | **[&#10004;]** install works |
+|[Mozilla send](https://send.firefox.com/) | **[&#10004;] works** | Simple, private file sharing from the makers of Firefox |
+|[Nextcloud](https://github.com/nextcloud/docker) | **[&#10004;] works** | self-hosted cloud-server|
+
+| O - Z |
+|---|---|
+|[Open Project](https://www.openproject.org/) | [&#9760;] some issue |
+|[Padlock Cloud](https://github.com/padlock/padlock-cloud) | [&#9760;] some issue |
+|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) | [&#9760;] some issue |
+|[Seafile Pro (broken)](https://github.com/haiwen/seafile) | [&#9760;] some issue |
+|[Searx](https://github.com/asciimoo/searx.git) | [&#9760;] some issue |
+|[sFTP Server](https://github.com/atmoz/sftp) | [&#9760;] some issue |
+|[Wekan](https://github.com/wekan/wekan) | **[&#10004;] works** | open source kanban |
+|[Wordpress](https://wordpress.org/) | **[&#10004;]** install works |
+
 
 #### <span id="other_build_in_services">Other build in Services</span>
 
 | Service | Status | Description |
 |---|---|--- |
-|[proxy-pass](data/services/proxy-pass)| **[&#10004;] works** | Use Dockerbunker as reverse-proxy, to work with your external Service/Server |
-|[static-sites](data/services/static-sites)| **[&#10004;] works** | use some static HTML sites (within build/service-name/web) |
+|[proxy-pass](data/services/proxy-pass) | **[&#10004;] works** | Use Dockerbunker as reverse-proxy, to work with your external Service/Server |
+|[static-sites](data/services/static-sites) | **[&#10004;] works** | use some static HTML sites (within build/service-name/web) |
 
 **Fair warning:**
 While all services appeared fully functional at the time I implemented them, I cannot guarantee that they still all are functional. Sometimes I just added something I was playing around with and hadn't tested every part of it. If something turns out to be not working, it often times broke because of changes that were made to the software and it most cases it's trivial to make it work again. I **marked bold** all the apps I am personally using with `dockerbunker`, as well as those that I recently tested and expect to work without issues. That being said, use this at your own risk. And if you do use `dockerbunker` and notice that something doesn't work, please file an issue .. or even better, submit a pull request. Contributions are welcome:)
