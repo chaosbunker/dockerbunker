@@ -66,7 +66,7 @@ Index:
 |[Padlock Cloud](https://github.com/padlock/padlock-cloud) | [&#9760;] some issue |
 |[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) | [&#9760;] some issue |
 |[Seafile Pro (broken)](https://github.com/haiwen/seafile) | [&#9760;] some issue |
-|[Searx](https://github.com/asciimoo/searx.git) | [&#9760;] some issue |
+|[Searx](https://github.com/asciimoo/searx.git) | **[&#10004;]** install works |
 |[sFTP Server](https://github.com/atmoz/sftp) | [&#9760;] some issue |
 |[Wekan](https://github.com/wekan/wekan) | **[&#10004;] works** | open source kanban |
 |[Wordpress](https://wordpress.org/) | **[&#10004;]** install works |
