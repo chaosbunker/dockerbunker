@@ -9,7 +9,7 @@ declare -a containers=( "${SERVICE_NAME}-postgres-dockerbunker" "${SERVICE_NAME}
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" "${SERVICE_NAME}-streaming-dockerbunker" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/mastodon/public/system" [${SERVICE_NAME}-data-vol-2]="/mastodon/public/assets" [${SERVICE_NAME}-data-vol-3]="/mastodon/public/packs" [${SERVICE_NAME}-postgres-vol-1]="/var/lib/postgresql/data" [${SERVICE_NAME}-elasticsearch-vol-1]="/usr/share/elasticsearch/data" [${SERVICE_NAME}-redis-vol-1]="/data" )
 declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
-declare -A IMAGES=( [service]="tootsuite/mastodon:v2.9.3" [redis]="redis:5.0-alpine" [postgres]="postgres:9.6-alpine" [elasticsearch]="docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.3" )
+declare -A IMAGES=( [service]="tootsuite/mastodon:v2.9.4" [redis]="redis:5.0-alpine" [postgres]="postgres:9.6-alpine" [elasticsearch]="docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.3" )
 
 if [[ $1 == "make_admin" ]];then
 	if [[ -z $2 || $3 ]];then
@@ -145,7 +145,6 @@ setup() {
 
 	post_setup_routine
 
-	echo -e "\nAfter signing up on ${SERVICE_DOMAIN} make your user an admin by running\n\n\
-${SERVICES_DIR}/${SERVICE_NAME}/./service.sh make_admin username\n"
+	echo -e "\nAfter signing up on ${SERVICE_DOMAIN} make your user an admin by running\n\n\ ${SERVICES_DIR}/${SERVICE_NAME}/service.sh make_admin username\n"
 
 }

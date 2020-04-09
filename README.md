@@ -55,7 +55,7 @@ Index:
 |[Koken](http://koken.me/) | **[&#10004;]** install works |
 |[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized) | [&#9760;] some issue |
 |[Mailpile](https://www.mailpile.is/) | **[&#10004;]** install works |
-|[Mastodon](https://github.com/tootsuite/mastodon) | [&#9760;] some issue |
+|[Mastodon](https://github.com/tootsuite/mastodon) | **[&#10004;]** install works |
 |[Matomo Analytics](https://github.com/matomo-org/docker) | **[&#10004;]** install works |
 |[Mozilla send](https://send.firefox.com/) | **[&#10004;] works** | Simple, private file sharing from the makers of Firefox |
 |[Nextcloud](https://github.com/nextcloud/docker) | **[&#10004;] works** | self-hosted cloud-server|
