@@ -11,7 +11,7 @@ for service in "${sorted[@]}";do
 	|| [[ "${STATIC_SERVICES[@]}" =~ "${service}" ]] ;then
     if elementInArray "$service" "${STOPPED_SERVICES[@]}";then
       # style service as STOPPED
-      service_status="$(printf "\e[32m${service}\e[0m \e[31m(Stopped)\e[0m")"
+      service_status="$(printf "\e[32m${service}\e[0m \e[31m$PRINT_STOPPED_MESSAGE\e[0m")"
     else
       # style service as INSTALLED
       service_status="$(printf "\e[32m${service}\e[0m")"
@@ -34,15 +34,15 @@ for service in "${sorted[@]}";do
 done
 
 # setup service meta-navigation
-startall=$(printf "\e[1;4;33mStart all stopped containers\e[0m")
-stopall=$(printf "\e[1;4;33mStop all running containers\e[0m")
-startnginx=$(printf "\e[1;4;33mStart nginx container\e[0m")
-stopnginx=$(printf "\e[1;4;33mStop nginx container\e[0m")
-restartnginx=$(printf "\e[1;4;33mRestart nginx container\e[0m")
-renewcerts=$(printf "\e[1;4;33mRenew Let's Encrypt certificates\e[0m")
-restartall=$(printf "\e[1;4;33mRestart all containers\e[0m")
-destroyall=$(printf "\e[1;4;33mDestroy everything\e[0m")
-exitmenu=$(printf "\e[1;4;33mExit\e[0m")
+startall=$(printf "\e[1;4;33m$PRINT_START_ALL_STOPPED_CONTAINERS\e[0m")
+stopall=$(printf "\e[1;4;33m$PRINT_STOP_ALL_RUNNING_CONTAINERS\e[0m")
+startnginx=$(printf "\e[1;4;33m$PRINT_START_NGINX_CONTAINER\e[0m")
+stopnginx=$(printf "\e[1;4;33m$PRINT_STOP_NGINX_CONTAINER\e[0m")
+restartnginx=$(printf "\e[1;4;33m$PRINT_RESTART_NGINX_CONTAINER\e[0m")
+restartall=$(printf "\e[1;4;33m$PRINT_RESTART_ALL_CONTAINERS\e[0m")
+destroyall=$(printf "\e[1;4;33m$PRINT_DESTROY_EVERYTHING\e[0m")
+renewcerts=$(printf "\e[1;4;33m$PRINT_RENEW_LE_CERTs\e[0m")
+exitmenu=$(printf "\e[1;4;33m$PRINT_EXIT\e[0m")
 
 # add generell menu-entrys
 [[ $(docker ps -q --filter "status=running" --filter name=^/nginx-dockerbunker$) ]] \
@@ -78,10 +78,10 @@ count="${#AVAILABLE_SERVICES[@]}"
 
 # print menu
 echo ""
-echo "Please select the service you want to manage"
+echo "$PRINT_SERVICE_MANAGE_MESSAGE"
 echo ""
-[[ ${INSTALLED_SERVICES[@]} ]] || [[ ${STATIC_SITES[@]} ]] && echo -e " \e[32mGreen\e[0m: Installed"
-[[ ${CONFIGURED_SERVICES[@]} ]] && echo -e " \e[33mOrange\e[0m: Configured"
+[[ ${INSTALLED_SERVICES[@]} ]] || [[ ${STATIC_SITES[@]} ]] && echo -e " \e[32m$PRINT_GREEN\e[0m: $PRINT_INSTALLED"
+[[ ${CONFIGURED_SERVICES[@]} ]] && echo -e " \e[33m$PRINT_ORANGE\e[0m: $PRINT_CONFIGURED"
 echo ""
 
 select choice in "${AVAILABLE_SERVICES[@]}"  "$exitmenu"
@@ -113,7 +113,7 @@ do
     break
     ;;
     "$renewcerts")
-    echo -e "\n\e[3m\xe2\x86\x92 Renew Let's Encrypt certificates\e[0m\n"
+    echo -e "\n\e[3m\xe2\x86\x92 $PRINT_RENEW_LE_CERTs\e[0m\n"
     "${BASE_DIR}"/certbot.sh
     restart_nginx
     say_done
@@ -142,30 +142,30 @@ do
     break
     ;;
     "$destroyall")
-    echo -e "\n\e[3m\xe2\x86\x92 Destroy everything\e[0m"
+    echo -e "\n\e[3m\xe2\x86\x92 $PRINT_DESTROY_ALL\e[0m"
     echo ""
-    echo -e "\e[1mReset dockerbunker to its initial state\e[0m"
+    echo -e "\e[1m$PRINT_RESET_DOCKERBUNKER\e[0m"
     echo ""
-    echo "The following will be removed:"
+    echo "$PRINT_FOLLWONING_WILL_REMOVED"
     echo ""
-    echo "- All dockerbunker container(s)"
-    echo "- All dockerbunker volume(s)"
-    echo "- All environment file(s)"
-    echo "- All nginx configuration files"
-    echo "- All SSL Certificates"
+    echo "- $PRINT_ALL $PRINT_CONATIENRS"
+    echo "- $PRINT_ALL $PRINT_VOLUMES"
+    echo "- $PRINT_ALL $PRINT_ENVIRONMENT_FILES"
+    echo "- $PRINT_ALL $PRINT_NGINX_CONFIG_FILES"
+    echo "- $PRINT_ALL $PRINT_SSL_CERT"
     echo ""
-    prompt_confirm "Continue?" \
+    prompt_confirm "$PRINT_PROMPT_CONFIRM_QUESTION" \
     && destroy_all=1 destroy_all
     say_done
     exit 0
     ;;
     $choice)
     if [[ -z $choice ]];then
-      echo "Please choose a number from 1 to $count"
+      echo "$PRINT_PLEASE_CHOOSE_A_NUMBER $count"
     else
       service="$(echo -e "${choice,,}" | tr -d '[:space:]')"
       echo ""
-      echo -e "\n\e[3m\xe2\x86\x92 Checking service status"
+      echo -e "\n\e[3m\xe2\x86\x92 $PRINT_CHECKING_SERVICE_STATUS"
       echo ""
       source "${BASE_DIR}/data/services/${SERVICES_ARR[$choice]}/init.sh"
       break

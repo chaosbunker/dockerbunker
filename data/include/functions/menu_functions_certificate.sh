@@ -1,7 +1,7 @@
 remove_ssl_certificate() {
 	if [[ ${SERVICE_DOMAIN[0]} ]];then
 		[[ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ]] \
-			&& echo -en "\n\e[1mRemoving SSL Certificates\e[0m" \
+			&& echo -en "\n\e[1m$PRINT_REMOVE_SSL_CERTIFICATE\e[0m" \
 			&& rm -r "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} \
 			&& exit_response
 		[[ -f "${CONF_DIR}"/nginx/ssl/letsencrypt/renewal/${SERVICE_DOMAIN[0]}.conf ]] \
@@ -15,7 +15,7 @@ remove_ssl_certificate() {
 
 get_le_cert() {
 	if ! [[ $1 == "renew" ]];then
-		echo -e "\n\e[3m\xe2\x86\x92 Obtain Let's Encrypt certificate\e[0m"
+		echo -e "\n\e[3m\xe2\x86\x92 $PRINT_OPTAIN_LS_CERT\e[0m"
 		[[ -z ${LE_EMAIL} ]] && get_le_email
 		if [[ ${STATIC} ]];then
 			sed -i "s/SSL_CHOICE=.*/SSL_CHOICE=le/" "${ENV_DIR}"/static/${SERVICE_DOMAIN[0]}.env
@@ -37,7 +37,7 @@ get_le_cert() {
 		fi
 		letsencrypt issue
 	else
-		echo -e "\n\e[3m\xe2\x86\x92 Renew Let's Encrypt certificate\e[0m"
+		echo -e "\n\e[3m\xe2\x86\x92 $PRINT_RENEW_LE_CERT\e[0m"
 		export prevent_nginx_restart=1
 		bash "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh letsencrypt issue
 	fi
@@ -46,17 +46,17 @@ get_le_cert() {
 add_ssl_menuentry() {
 	if [[ $SSL_CHOICE == "le" ]] && [[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]];then
 		# in this case le cert has been obtained previously and everything is as expected
-		insert $1 "Renew Let's Encrypt certificate" $2
+		insert $1 "$PRINT_RENEW_LE_CERT" $2
 	elif ! [[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]] && [[ -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
 		# in this case neither a self-signed nor a le cert could be found. nginx container will refuse to restart until it can find a certificate in /etc/nginx/ssl/${SERVICE_DOMAIN} - so offer to put one there either via LE or generate new self-signed
-		insert $1 "Generate self-signed certificate" $2
-		insert $1 "Obtain Let's Encrypt certificate" $2
+		insert $1 "$PRINT_GENERATE_SS_CERT" $2
+		insert $1 "$PRINT_OPTAIN_LS_CERT" $2
 	elif [[ -f "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]];then
 		# in this case only a self-signed cert is found and a previous cert for the domain might be present in the le directories (if so it will be used and linked to)
-		insert $1 "Obtain Let's Encrypt certificate" $2
+		insert $1 "$PRINT_OPTAIN_LS_CERT" $2
 	else
 		# not sure when this should be the case, but if it does happen, bot options are available
-		insert $1 "Generate self-signed certificate" $2
-		insert $1 "Obtain Let's Encrypt certificate" $2
+		insert $1 "$PRINT_GENERATE_SS_CERT" $2
+		insert $1 "$PRINT_OPTAIN_LS_CERT" $2
 	fi
 }

@@ -15,8 +15,8 @@
 #######
 
 options_menu() {
-	exitmenu=$(printf "\e[1;4;33mExit\e[0m")
-	returntopreviousmenu=$(printf "\e[1;4;33mReturn to previous menu\e[0m")
+	exitmenu=$(printf "\e[1;4;33m$PRINT_EXIT\e[0m")
+	returntopreviousmenu=$(printf "\e[1;4;33m$PRINT_RETURN_TO_PREVIOUSE_MENU\e[0m")
 
 	container_check=1
 
@@ -24,11 +24,11 @@ options_menu() {
 	if elementInArray "${SERVICE_NAME}" "${INSTALLED_SERVICES[@]}";then
 		for container in "${containers[@]}";do
 			RUNNING=$(docker ps -a -q --filter name=^/${container}$)
-			echo "Status: $RUNNING"
+			echo "$PRINT_STATUS:  $RUNNING"
 			if [[ -z ${RUNNING} ]];then
-				echo -e "\n\e[3m$container container missing\e[0m\n"
+				echo -e "\n\e[3m$container $PRINT_CONTAINER_MISSING\e[0m\n"
 				missingContainers=( "$container" )
-				prompt_confirm "Restore $container?"
+				prompt_confirm "$PRINT_RESTORE $container?"
 				if [[ $? == 0 ]];then
 					restore_container
 				fi
@@ -38,27 +38,27 @@ options_menu() {
 		done
 	fi
 	if [[ $RUNNING ]];then
-		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Upgrade Image(s)" "Destroy \"${SERVICE_NAME}\"" "${returntopreviousmenu}" "$exitmenu" )
+		menu=( "$PRINT_MENU_RECONFIGURE_SERVICE" "$PRINT_MENU_REINSTALL_SERVICE" "$PRINT_MENU_BACKUP_SERVICE" "$PRINT_MENU_UPGRADE_IMAGE" "$PRINT_MENU_DESTROY_SERVICE  \"${SERVICE_NAME}\"" "${returntopreviousmenu}" "$exitmenu" )
 		add_ssl_menuentry menu 2
 		if elementInArray "${SERVICE_NAME}" "${STOPPED_SERVICES[@]}";then
-			insert menu "Start container(s)" 3
+			insert menu "$PRINT_MENU_START_CONTAINERS" 3
 		else
-			insert menu "Restart container(s)" 3
-			insert menu "Stop container(s)" 4
+			insert menu "$PRINT_MENU_RESTART_CONTAINERS" 3
+			insert menu "$PRINT_MENU_STOP_CONTAINERS" 4
 		fi
 		[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
 		&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
-		&& insert menu "Restore Service" 6
+		&& insert menu "$PRINT_MENU_RESTORE_SERVICE" 6
 	elif [[ ${missingContainers[@]} ]];then
-		echo -e "\n\n\e[3m\xe2\x86\x92 \e[3mThe following containers are missing\e[0m"
+		echo -e "\n\n\e[3m\xe2\x86\x92 \e[3m$PRINT_CONTAINERS_ARE_MISSING\e[0m"
 		for container in "${missingContainers[@]}";do echo -e "\n    - $container";done
-		menu=( "Restore missing containers" "Reconfigure service" "Start container(s)" "Stop container(s)" "Reinstall service" "Backup Service" "Restore Service" "Upgrade Image(s)" "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
+		menu=( "$PRINT_MENU_RESTORE_MISSING_CONTAINER" "$PRINT_MENU_RECONFIGURE_SERVICE" "$PRINT_MENU_START_CONTAINERS" "$PRINT_MENU_STOP_CONTAINERS" "$PRINT_MENU_REINSTALL_SERVICE" "$PRINT_MENU_BACKUP_SERVICE" "$PRINT_MENU_RESTORE_SERVICE" "$PRINT_MENU_UPGRADE_IMAGE" "$PRINT_MENU_DESTROY_SERVICE  \"${SERVICE_NAME}\"" "$exitmenu" )
 	elif [[ $RUNNING = false ]];then
-		menu=( "Reconfigure service" "Reinstall service" "Backup Service" "Start container(s)" "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
+		menu=( "$PRINT_MENU_RECONFIGURE_SERVICE" "$PRINT_MENU_REINSTALL_SERVICE" "$PRINT_MENU_BACKUP_SERVICE" "$PRINT_MENU_START_CONTAINERS" "$PRINT_MENU_DESTROY_SERVICE  \"${SERVICE_NAME}\"" "$exitmenu" )
 		add_ssl_menuentry menu 2
 		[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
 		&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
-		&& insert menu "Restore Service" 3
+		&& insert menu "$PRINT_MENU_RESTORE_SERVICE" 3
 	else
 		if ! elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& ! elementInArray "${SERVICE_NAME}" "${INSTALLED_SERVICES[@]}" \
@@ -66,32 +66,32 @@ options_menu() {
 			[[ ${STATIC} \
 			&& $(ls -A "${ENV_DIR}"/static) ]] \
 			&& [[ "${STATIC_SERVICES[@]}" =~ "${SERVICE_NAME}" ]] \
-			&& menu=( "Configure Site" "Manage Sites" "$exitmenu" ) \
-			|| menu=( "Configure Service" "$exitmenu" )
+			&& menu=( "$PRINT_MENU_CONFIGURE_SITES" "$PRINT_MENU_MANAGE_SITES" "$exitmenu" ) \
+			|| menu=( "$PRINT_MENU_CONFIGURE_SERVICE" "$exitmenu" )
 			[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
 			&& [[ ${BACKUP_DIR}/${SERVICE_NAME} ]] \
 			&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
-			&& insert menu "Restore Service" 1
+			&& insert menu "$PRINT_MENU_RESTORE_SERVICE" 1
 		elif ! elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& ! elementInArray "${SERVICE_NAME}" "${INSTALLED_SERVICES[@]}";then
-			menu=( "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
+			menu=( "$PRINT_MENU_DESTROY_SERVICE  \"${SERVICE_NAME}\"" "$exitmenu" )
 			[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
 			&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
-			&& insert menu "Restore Service" 1
+			&& insert menu "$PRINT_MENU_RESTORE_SERVICE" 1
 			error="Environment file found but ${SERVICE_NAME} is not marked as configured or installed. Please destroy first!"
 		elif elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& [[ ! -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
 			error="Service marked as configured, but configuration file is missing. Please destroy first."
-			menu=( "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
+			menu=( "$PRINT_MENU_DESTROY_SERVICE  \"${SERVICE_NAME}\"" "$exitmenu" )
 			[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
 			&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
-			&& insert menu "Restore Service" 1
+			&& insert menu "$PRINT_MENU_RESTORE_SERVICE" 1
 		elif elementInArray "${SERVICE_NAME}" "${CONFIGURED_SERVICES[@]}" \
 		&& [[ -f "${ENV_DIR}"/${SERVICE_NAME}.env ]];then
-			menu=( "Reconfigure service" "Setup service" "Destroy \"${SERVICE_NAME}\"" "$exitmenu" )
+			menu=( "$PRINT_MENU_RECONFIGURE_SERVICE" "$PRINT_MENU_SETUP_SERVICE" "$PRINT_MENU_DESTROY_SERVICE  \"${SERVICE_NAME}\"" "$exitmenu" )
 			[[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
 			&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]] \
-			&& insert menu "Restore Service" 2
+			&& insert menu "$PRINT_MENU_RESTORE_SERVICE" 2
 		fi
 	fi
 
@@ -103,120 +103,120 @@ options_menu() {
 	select choice in "${menu[@]}"
 	do
 		case $choice in
-			"Configure Site")
-			echo -e "\n\e[3m\xe2\x86\x92 Configure ${SERVICE_NAME}\e[0m\n"
+			"$PRINT_MENU_CONFIGURE_SITES")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_CONFIGURE ${SERVICE_NAME}\e[0m\n"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh configure
 			say_done
 			sleep 0.2
 			break
 			;;
-			"Configure Service")
-			echo -e "\n\e[3m\xe2\x86\x92 Configure ${SERVICE_NAME}\e[0m\n"
+			"$PRINT_MENU_CONFIGURE_SERVICE")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_CONFIGURE ${SERVICE_NAME}\e[0m\n"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh configure
 			sleep 0.2
 			break
 			;;
-			"Manage Sites")
-			echo -e "\n\e[3m\xe2\x86\x92 Manage sites\e[0m"
+			"$PRINT_MENU_MANAGE_SITES")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_MENU_MANAGE_SITES\e[0m"
 			static_menu
 			sleep 0.2
 			break
 			;;
-			"Reconfigure service")
-			echo -e "\n\e[3m\xe2\x86\x92 Reconfigure ${SERVICE_NAME}\e[0m"
+			"$PRINT_MENU_RECONFIGURE_SERVICE")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_RECONFIGURE ${SERVICE_NAME}\e[0m"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh reconfigure
 			break
 			;;
-			"Setup service")
+			"$PRINT_MENU_SETUP_SERVICE")
 			# Set up nginx container if not yet present
 			setup_nginx
-			echo -e "\n\e[3m\xe2\x86\x92 Setup ${SERVICE_NAME}\e[0m"
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_SETUP ${SERVICE_NAME}\e[0m"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh setup
 			sleep 0.2
 			break
 			;;
-			"Reinstall service")
-			echo -e "\n\e[3m\xe2\x86\x92 Reinstall ${SERVICE_NAME}\e[0m"
+			"$PRINT_MENU_REINSTALL_SERVICE")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_REINSTALL ${SERVICE_NAME}\e[0m"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh reinstall
 			say_done
 			sleep 0.2
 			break
 			;;
-			"Restore missing containers")
-			echo -e "\n\e[3m\xe2\x86\x92 Restoring containers\e[0m"
+			"$PRINT_MENU_RESTORE_MISSING_CONTAINER")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_RESTROING_CONTAINERS\e[0m"
 			for container in ${missingContainers[@]};do
 				restore_container
 			done
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 			;;
-			"Upgrade Image(s)")
-			echo -e "\n\e[3m\xe2\x86\x92 Upgrade ${SERVICE_NAME} images\e[0m"
+			"$PRINT_MENU_UPGRADE_IMAGE")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_UPGRADE ${SERVICE_NAME} images\e[0m"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh upgrade
 			say_done
 			sleep 0.2
 			break
 			;;
-			"Backup Service")
-			echo -e "\n\e[3m\xe2\x86\x92 Backup Service\e[0m"
+			"$PRINT_MENU_BACKUP_SERVICE")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_MENU_BACKUP_SERVICE\e[0m"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh backup
 			say_done
 			sleep 0.2
 			break
 			;;
-			"Restore Service")
-			echo -e "\n\e[3m\xe2\x86\x92 Restore Service\e[0m"
+			"$PRINT_MENU_RESTORE_SERVICE")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_MENU_RESTORE_SERVICE\e[0m"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh restore
 			say_done
 			sleep 0.2
 			break
 			;;
-			"Generate self-signed certificate")
+			"$PRINT_GENERATE_SS_CERT")
 			generate_certificate
 			restart_nginx
 			say_done
 			sleep 0.2
 			break
 			;;
-			"Obtain Let's Encrypt certificate")
+			"$PRINT_OPTAIN_LS_CERT")
 			get_le_cert
 			say_done
 			sleep 0.2
 			exit
 			;;
-			"Renew Let's Encrypt certificate")
+			"$PRINT_RENEW_LE_CERT")
 			get_le_cert renew
 			say_done
 			sleep 0.2
 			exit
 			;;
-			"Restart container(s)")
-			echo -e "\n\e[3m\xe2\x86\x92 Restart ${SERVICE_NAME} Containers\e[0m"
+			"$PRINT_MENU_RESTART_CONTAINERS")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_RESTART ${SERVICE_NAME} $PRINT_CONATIENRS\e[0m"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh restart_containers
 			say_done
 			sleep 0.2
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 			break
 			;;
-			"Start container(s)")
-			echo -e "\n\e[3m\xe2\x86\x92 Start ${SERVICE_NAME} Containers\e[0m"
+			"$PRINT_MENU_START_CONTAINERS")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_START ${SERVICE_NAME} $PRINT_CONATIENRS\e[0m"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh start_containers
 			say_done
 			sleep 0.2
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 			break
 			;;
-			"Stop container(s)")
-			echo -e "\n\e[3m\xe2\x86\x92 Stop ${SERVICE_NAME} Containers\e[0m"
+			"$PRINT_MENU_STOP_CONTAINERS")
+			echo -e "\n\e[3m\xe2\x86\x92 Stop ${SERVICE_NAME} $PRINT_CONATIENRS\e[0m"
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh stop_containers
 			say_done
 			sleep 0.2
 			${SERVICES_DIR}/${SERVICE_NAME}/init.sh
 			break
 			;;
-			"Destroy \"${SERVICE_NAME}\"")
-			echo -e "\n\e[3m\xe2\x86\x92 Destroy ${SERVICE_NAME}\e[0m"
+			"$PRINT_MENU_DESTROY_SERVICE  \"${SERVICE_NAME}\"")
+			echo -e "\n\e[3m\xe2\x86\x92 $PRINT_DESTROY ${SERVICE_NAME}\e[0m"
 			echo ""
-			echo "The following will be removed:"
+			echo "$PRINT_FOLLWONING_WILL_REMOVED"
 			echo ""
 
 			for container in ${containers[@]};do
@@ -255,8 +255,8 @@ options_menu() {
 
 			echo ""
 
-			prompt_confirm "Continue?" \
-			&& prompt_confirm "Are you sure?" \
+			prompt_confirm "$PRINT_PROMPT_CONFIRM_QUESTION" \
+			&& prompt_confirm "$PRINT_PROMPT_CONFIRM_SHURE" \
 			&& . "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh destroy_service
 
 			say_done
@@ -270,7 +270,7 @@ options_menu() {
 			exit 0
 			;;
 			*)
-			echo "Invalid option."
+			echo "$PRINT_INVALID_OPTION_MESSAGE"
 			;;
 		esac
 	done
@@ -308,7 +308,7 @@ stop_all() {
 destroy_all() {
 	# destroy_service() is calling restart_nginx, we don't want this happening after each service is destroyed
 	[[ -z ${CONF_DIR} || -z ${ENV_DIR} || -z ${SERVICES_DIR} ]] \
-	&& echo "Something went wrong. Exiting."
+	&& echo "$PRINT_SOMETHING_WENT_WRONG"
 
 	export prevent_nginx_restart=1
 	export destroy_all=1
@@ -318,7 +318,7 @@ destroy_all() {
 	[[ $(docker ps -a -q --filter name=^/nginx-dockerbunker$) ]] && all_services+=( "nginx" )
 
 	if [[ ${all_services[0]} ]]; then
-		printf "\nThe following Services will be removed:"
+		printf "\n$PRINT_THE_FOLLOWING_SERVICES_WILL_BE_REMOVED"
 
 		for i in "${all_services[@]}"; do
 			if [[ "$i" == ${all_services[-1]} ]];then
@@ -330,12 +330,12 @@ destroy_all() {
 		printf "\n\n"
 	fi
 
-	prompt_confirm "Continue?"
+	prompt_confirm "$PRINT_PROMPT_CONFIRM_QUESTION"
 
-	[[ $? == 1 ]] && echo "Exiting..." && exit 0
+	[[ $? == 1 ]] && echo "$PRINT_EXITING" && exit 0
 
 	for service in "${all_services[@]}"; do
-		echo -e "\n\e[3m\xe2\x86\x92 Destroying $service\e[0m"
+		echo -e "\n\e[3m\xe2\x86\x92 $PRINT_DESTROY $service\e[0m"
 
 		[[ -f "${SERVER_DIR}"/$service/init.sh ]] \
 		&& "${SERVER_DIR}/$service"/init.sh destroy_service
@@ -392,7 +392,7 @@ upgrade() {
 
 reinstall() {
 	echo ""
-	prompt_confirm "Keep volumes?" && export keep_volumes=1
+	prompt_confirm "$PRINT_PROMPT_CONFIRM_KEEP_VOLUMES" && export keep_volumes=1
 
 	disconnect_from_dockerbunker_network
 
@@ -409,10 +409,10 @@ reconfigure() {
 	reconfigure=1
 	if [[ $safe_to_keep_volumes_when_reconfiguring ]];then
 		echo ""
-		prompt_confirm "Keep volumes?" && keep_volumes=1
+		prompt_confirm "$PRINT_PROMPT_CONFIRM_KEEP_VOLUMES" && keep_volumes=1
 	else
 		echo ""
-		prompt_confirm "All volumes will be removed. Continue?" || exit 0
+		prompt_confirm "$PRINT_ALL_VOLUMES_WILL_BE_REMOVED" || exit 0
 	fi
 
 	disconnect_from_dockerbunker_network
@@ -442,7 +442,7 @@ reconfigure() {
 
 static_menu() {
 	! [[ ${STATIC_SITES[@]} ]] \
-	&& echo -e "\n\e[1mNo existing sites found\e[0m" \
+	&& echo -e "\n\e[1m$PRINT_NO_EXISTING_SITE_FOUND\e[0m" \
 	&& exec "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh
 
 	# Display all static sites in a menu
@@ -483,36 +483,36 @@ static_menu() {
 			if [[ -f "${BASE_DIR}"/build/env/static/${static}.env ]];then
 				source "${BASE_DIR}"/build/env/static/${static}.env
 			else
-				echo "No environment file found for $static. Exiting."
+				echo "$PRINT_NO_ENVORINMENT_FILE_FOUND $static. $PRINT_EXITING."
 				exit 1
 			fi
 			echo ""
-			static_choices=( "Remove site" "$returntopreviousmenu" )
+			static_choices=( "$PRINT_MENU_REMOVE_SITE" "$returntopreviousmenu" )
 			add_ssl_menuentry static_choices 1
 			select static_choice in "${static_choices[@]}"
 			do
 				case $static_choice in
-					"Remove site")
-					echo -e "\n\e[4mRemove site\e[0m"
-					prompt_confirm "Remove $static" && prompt_confirm "Are you sure?" && destroy_service
+					"$PRINT_MENU_REMOVE_SITE")
+					echo -e "\n\e[4m$PRINT_MENU_REMOVE_SITE\e[0m"
+					prompt_confirm "$PRINT_REMOVE $static" && prompt_confirm "$PRINT_PROMPT_CONFIRM_SHURE" && destroy_service
 					say_done
 					sleep 0.2
 					break
 					;;
-					"Generate self-signed certificate")
+					"$PRINT_GENERATE_SS_CERT")
 					generate_certificate
 					restart_nginx
 					say_done
 					sleep 0.2
 					break
 					;;
-					"Obtain Let's Encrypt certificate")
+					"$PRINT_OPTAIN_LS_CERT")
 					get_le_cert
 					say_done
 					sleep 0.2
 					break
 					;;
-					"Renew Let's Encrypt certificate")
+					"$PRINT_RENEW_LE_CERT")
 					get_le_cert renew
 					say_done
 					sleep 0.2
@@ -522,7 +522,7 @@ static_menu() {
 					static_menu
 					;;
 					*)
-					echo "Invalid option."
+					echo "$PRINT_INVALID_OPTION_MESSAGE"
 					;;
 				esac
 			done
@@ -538,7 +538,7 @@ static_menu() {
 			*)
 
 			static=""
-			echo "Please choose a number from 1 to $((${#current_static_services[@]}+1))"
+			echo "$PRINT_PLEASE_CHOOSE_A_NUMBER $((${#current_static_services[@]}+1))"
 
 			;;
 		esac
@@ -551,7 +551,7 @@ backup() {
 	mkdir -p ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}
 
 	# compressing volumes
-	echo -e "\n\e[1mCompressing volumes\e[0m"
+	echo -e "\n\e[1m$PRINT_COMPESSING_VOLUMES\e[0m"
 	for volume in ${!volumes[@]};do
 		docker run --rm -i -v ${volume}:/${volumes[$volume]##*/} -v ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}:/backup debian:jessie tar cvfz /backup/${volume}.tar.gz /${volumes[$volume]##*/} 2>/dev/null | cut -b1-$(tput cols) | sed -u 'i\\o033[2K' | stdbuf -o0 tr '\n' '\r';echo -e "\033[2K\c"
 		echo -en "- $volume"
@@ -561,7 +561,7 @@ backup() {
 	if [ -d "${CONF_DIR}"/${SERVICE_NAME} ];then
 		! [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/conf ] \
 		&& mkdir ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/conf
-		echo -en "\n\e[1mBacking up configuration files\e[0m"
+		echo -en "\n\e[1m$PRINT_BACKING_UP_CONFIG_FILES\e[0m"
 		sleep 0.2
 		cp -r "${CONF_DIR}"/${SERVICE_NAME}/* ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/conf
 		exit_response
@@ -570,7 +570,7 @@ backup() {
 	if [[ ${SERVICE_DOMAIN[0]} ]] && [ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ];then
 		! [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl ] \
 		&& mkdir ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/ssl
-		echo -en "\n\e[1mBacking up SSL certificate\e[0m"
+		echo -en "\n\e[1m$PRINT_BACKING_UP_CERT\e[0m"
 		sleep 0.2
 		[[ -d "${CONF_DIR}"/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]] \
 		&& mkdir -p \
@@ -587,21 +587,21 @@ backup() {
 	if [ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ];then
 		! [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/nginx ] \
 		&& mkdir -p ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/nginx
-		echo -en "\n\e[1mBacking up nginx configuration\e[0m"
+		echo -en "\n\e[1m$PRINT_BACKING_UP_NGINX_CONF\e[0m"
 		sleep 0.2
 		cp -r "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}* ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}/nginx
 		exit_response
 	fi
 
 	if [ -f "${ENV_DIR}"/${SERVICE_NAME}.env ];then
-		echo -en "\n\e[1mBacking up environemt file(s)\e[0m"
+		echo -en "\n\e[1m$PRINT_BACKING_UP_ENV_FILE\e[0m"
 		sleep 0.2
 		[[ -f "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env ]] \
 		&& cp "${ENV_DIR}"/${SERVICE_SPECIFIC_MX}mx.env ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}
 		cp "${ENV_DIR}"/${SERVICE_NAME}.env ${BACKUP_DIR}/${SERVICE_NAME}/${NOW}
 		exit_response
 	else
-		echo -e "\n\e[3mCould not find environment file(s) for ${SERVICE_NAME}.\e[0m"
+		echo -e "\n\e[3m$PRINT_COULD_NOT_FIND_ENV_FILE ${SERVICE_NAME}.\e[0m"
 	fi
 }
 
@@ -629,32 +629,32 @@ restore() {
 	if [[ -d ${BACKUP_DIR}/${SERVICE_NAME} ]] \
 	&& [[ $(ls -A ${BACKUP_DIR}/${SERVICE_NAME}) ]];then
 		echo ""
-		echo -e "\e[4mPlease choose a backup\e[0m"
+		echo -e "\e[4m$PRINT_COOSE_A_BACKUP\e[0m"
 
-		## Show the menu. This will list all backups and the string "back to previous menu"
-		select backup in "${backups[@]}" "Back to previous menu"
+		## Show the menu. This will list all backups and the string "$PRINT_MENU_PRVIOUSE_MENU"
+		select backup in "${backups[@]}" "$PRINT_MENU_PRVIOUSE_MENU"
 		do
 			case $backup in
 				## If the choice is one of the backups (if it matches $string)
 				$string)
 				! [[ -f ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env ]] \
-				&& echo -e "\n\e[3mCould not find ${SERVICE_NAME}.env in ${backup}\e[0m" \
+				&& echo -e "\n\e[3m$PRINT_COULD_NOT_FIND ${SERVICE_NAME}.env in ${backup}\e[0m" \
 				&& return
 				# destroy current service if found
 				if [[ $(docker ps -q -a --filter name=^/"${SERVICE_NAME}-service-dockerbunker"$) ]];then
-					echo -e "\n\e[3m\xe2\x86\x92 Destroying ${SERVICE_NAME}\e[0m"
+					echo -e "\n\e[3m\xe2\x86\x92 $PRINT_DESTROY ${SERVICE_NAME}\e[0m"
 					destroy_service
 				fi
 
 				source ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env
 
 				! [[ $(docker ps -q --filter name=^/nginx-dockerbunker$) ]] && setup_nginx
-				echo -e "\n\e[3m\xe2\x86\x92 Restoring ${SERVICE_NAME}\e[0m"
+				echo -e "\n\e[3m\xe2\x86\x92 $PRINT_RESTORE ${SERVICE_NAME}\e[0m"
 				for volume in ${!volumes[@]};do
 					[[ $(docker volume ls --filter name=^${volume}$) ]] \
 					&& docker volume create $volume >/dev/null
 					docker run --rm -i -v ${volume}:/${volumes[$volume]##*/} -v ${BACKUP_DIR}/${SERVICE_NAME}/${backup}:/backup debian:jessie tar xvfz /backup/${volume}.tar.gz 2>/dev/null | cut -b1-$(tput cols) | sed -u 'i\\o033[2K' | stdbuf -o0 tr '\n' '\r';echo -e "\033[2K\c"
-					echo -en "\n\e[1mDecompressing $volume\e[0m"
+					echo -en "\n\e[1m$PRINT_DECOMPRESSING $volume\e[0m"
 					exit_response
 				done
 				sleep 0.2
@@ -662,7 +662,7 @@ restore() {
 				if [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/conf ];then
 					! [ -d "${CONF_DIR}"/${SERVICE_NAME} ] \
 					&& mkdir "${CONF_DIR}"/${SERVICE_NAME}
-					echo -en "\n\e[1mRestoring configuration files\e[0m"
+					echo -en "\n\e[1m$PRINT_RESTORING_CONFIGURATION\e[0m"
 					sleep 0.2
 					cp -r ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/conf/* "${CONF_DIR}"/${SERVICE_NAME}
 					exit_response
@@ -671,7 +671,7 @@ restore() {
 				if [ -f ${BACKUP_DIR}/${SERVICE_NAME}/$backup/nginx/${SERVICE_DOMAIN}.conf ];then
 					! [[ -d "${CONF_DIR}"/nginx/conf.inactive.d ]] \
 					&& mkdir "${CONF_DIR}"/nginx/conf.inactive.d
-					echo -en "\n\e[1mRestoring nginx configuration\e[0m"
+					echo -en "\n\e[1m$PRINT_RESTORING_NGINX_CONF\e[0m"
 					cp -r ${BACKUP_DIR}/${SERVICE_NAME}/$backup/nginx/${SERVICE_DOMAIN}* "${CONF_DIR}"/nginx/conf.inactive.d
 					exit_response
 				fi
@@ -681,7 +681,7 @@ restore() {
 				if [[ ${SERVICE_DOMAIN[0]} ]] && [ -d ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/ssl ];then
 					! [ -d "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]} ] \
 					&& mkdir -p "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}
-					echo -en "\n\e[1mRestoring SSL certificate\e[0m"
+					echo -en "\n\e[1m$PRINT_RESTORING_SSL_CERT\e[0m"
 					sleep 0.2
 					[[ -d ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]} ]] \
 					&& mkdir -p \
@@ -696,7 +696,7 @@ restore() {
 				fi
 
 				if [ -f ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_NAME}.env ];then
-					echo -en "\n\e[1mRestoring environemt file(s)\e[0m"
+					echo -en "\n\e[1m$PRINT_RESTORING_ENV\e[0m"
 					sleep 0.2
 					[[ -f ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_SPECIFIC_MX}mx.env ]] \
 					&& cp ${BACKUP_DIR}/${SERVICE_NAME}/${backup}/${SERVICE_SPECIFIC_MX}mx.env "${ENV_DIR}"
@@ -710,17 +710,17 @@ restore() {
 				exit 0
 				;;
 
-				"Back to previous menu")
+				"$PRINT_MENU_PRVIOUSE_MENU")
 				"${SERVICES_DIR}"/${SERVICE_NAME}/init.sh
 				;;
 				*)
 				backup=""
-				echo "Please choose a number from 1 to $((${#backups[@]}+1))";;
+				echo "$PRINT_PLEASE_CHOOSE_A_NUMBER $((${#backups[@]}+1))";;
 			esac
 		done
 	else
 		echo -e "\n\e[1mNo ${SERVICE_NAME} backup found\e[0m"
-		echo -e "\n\e[3m\xe2\x86\x92 Checking service status"
+		echo -e "\n\e[3m\xe2\x86\x92 $PRINT_CHECKING_SERVICE_STATUS"
 		exec "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh
 	fi
 }

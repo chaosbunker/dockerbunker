@@ -10,15 +10,20 @@ elif [[ -r /etc/debian_version ]];then
 	fi
 fi
 
-# if docker is missing install it
-[[ $docker_missing ]] \
-	&& echo -e "\n\e[3m\xe2\x86\x92 \e[1mCould not find docker.\e[3m\n\nMost systems can install Docker by running:\n\nwget -qO- https://get.docker.com/ | sh\n";
-
-# Find base dir
+# setup basedir
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# initialize variables and functions
-source "${BASE_DIR}"/data/include/init.sh
+# path to used print language
+source "${BASE_DIR}/data/include/i18n/en.sh"
 
-# initialize menu
-source "${BASE_DIR}"/data/include/init_menu.sh
+# if docker is missing install it
+if [[ $docker_missing ]]; then
+	echo -e "\n\e[31m\xe2\x86\x92 $PRINT_MISSING_DOCKER\n";
+else
+
+	# initialize variables and functions
+	source "${BASE_DIR}"/data/include/init.sh
+
+	# initialize menu
+	source "${BASE_DIR}"/data/include/init_menu.sh
+fi

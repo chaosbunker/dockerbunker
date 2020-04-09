@@ -12,41 +12,40 @@
 
 # start/stop/restart nginx container
 restart_nginx() {
-	echo -en "\n\e[1mRestarting nginx container\e[0m"
+	echo -en "\n\e[1m$PRINT_RESTART_NGINX\e[0m"
 	docker exec -it nginx-dockerbunker nginx -t >/dev/null \
 		&& docker restart ${NGINX_CONTAINER} >/dev/null
 	exit_response
 	if [[ $? == 1 ]];then
 		echo ""
 		docker exec -it nginx-dockerbunker nginx -t
-		echo -e "\n\e[3m\xe2\x86\x92 \e[3m\`nginx -t\` failed. Trying to add missing containers to dockerbunker-network.\e[0m"
+		echo -e "\n\e[3m\xe2\x86\x92 \e[3m$PRINT_RESTART_NGINX_TEST_ERROR\e[0m"
 		for container in ${CONTAINERS_IN_DOCKERBUNKER_NETWORK[@]};do
 			connect_containers_to_network ${container}
 		done
-		echo -en "\n\e[1mRestarting nginx container\e[0m"
+		echo -en "\n\e[1m$PRINT_RESTART_NGINX\e[0m"
 		docker exec -it nginx-dockerbunker nginx -t >/dev/null \
 			&& docker restart ${NGINX_CONTAINER} >/dev/null
 		exit_response
 		if [[ $? == 1 ]];then
 			echo ""
 			docker exec -it nginx-dockerbunker nginx -t
-			echo -e "\n\`nginx -t\` failed again. Please resolve issue and try again."
+			echo -e "\n\e[3m\xe2\x86\x92 \e[3m$PRINT_RESTART_NGINX_TEST_ERROR_AGAIN\e[0m"
 		fi
 	fi
 }
 
 start_nginx() {
-	echo -en "\n\e[1mStarting nginx container\e[0m"
+	echo -en "\n\e[1m$PRINT_START_NGINX\e[0m"
 	docker start ${NGINX_CONTAINER} >/dev/null
 	exit_response
 }
 
 stop_nginx() {
-	echo -en "\n\e[1mStopping nginx container\e[0m"
+	echo -en "\n\e[1m$PRINT_STOP_NGINX\e[0m"
 	docker stop ${NGINX_CONTAINER} >/dev/null
 	exit_response
 }
-
 
 # all functions starting/stopping/restarting containers of individual services. This is offered in every service specific menu.
 deactivate_nginx_conf() {
@@ -66,7 +65,7 @@ deactivate_nginx_conf() {
 		&& mkdir "${CONF_DIR}"/nginx/conf.inactive.d
 
 	if [[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]];then
-	echo -en "\n\e[1mDeactivating nginx configuration\e[0m"
+	echo -en "\n\e[1m$PRINT_DEACTIVATE_NGINX_CONF\e[0m"
 		[[ -d "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]} ]] \
 			&& mv "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]} "${CONF_DIR}"/nginx/conf.inactive.d/
 		mv "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf "${CONF_DIR}"/nginx/conf.inactive.d/
@@ -99,7 +98,7 @@ activate_nginx_conf() {
 remove_nginx_conf() {
 	if [[ ${SERVICE_DOMAIN[0]} ]];then
 		if [[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf || -f "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]}.conf ]];then
-			echo -en "\n\e[1mRemoving nginx configuration\e[0m"
+			echo -en "\n\e[1m$PRINT_REMOVE_NGINX_CONF\e[0m"
 			[[ -d "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]} ]] \
 				&& rm -r "${CONF_DIR}"/nginx/conf.inactive.d/${SERVICE_DOMAIN[0]} \
 				|| true
@@ -119,13 +118,13 @@ remove_nginx_conf() {
 
 remove_networks() {
 	if [[ ${networks[0]} ]];then
-		echo -e "\n\e[1mRemoving networks\e[0m"
+		echo -e "\n\e[1m$PRINT_REMOVE_NETWORKS\e[0m"
 		for network in "${networks[@]}";do
 			[[ $(docker network ls -q --filter name=^${network}$) ]] \
 				&& echo -en "- $network" \
 				&& docker network rm $network >/dev/null \
 				&& exit_response \
-				|| echo "- $network (not found)"
+				|| echo "- $network $PRINT_NOT_FOUND_MESSAGE"
 		done
 	fi
 }

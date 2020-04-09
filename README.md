@@ -68,13 +68,13 @@ Now when selecting the same service again in the `dockerbunker` menu, there will
 ```
 Nextcloud
 1) Reconfigure service
-2) Reinstall service
-3) Obtain Let's Encrypt certificate (<-- only visible if using self-signed cert)
+2) PRINT_MENU_REINSTALL_SERVICE
+3) $PRINT_OPTAIN_LS_CERT (<-- only visible if using self-signed cert)
 4) Restart container(s)
 5) Stop container(s) (<- only visible when containers are running, otherwise offers "Start Containers"
-6) Backup Service
+6) PRINT_MENU_BACKUP_SERVICE
 7) Restore Service (<- only visible if backup(s) for service are found)
-8) Upgrade Image(s)
+8) $PRINT_MENU_UPGRADE_IMAGE
 9) Destroy "Nextcloud"
 ```
 

@@ -14,7 +14,7 @@
 docker_pull() {
 	for image in ${IMAGES[@]};do
 		[[ "$image" != "dockerbunker/${SERVICE_NAME}" ]] \
-			&& echo -e "\n\e[1mPulling $image\e[0m" \
+			&& echo -e "\n\e[1m$PRINT_PULLING $image\e[0m" \
 			&& docker pull $image
 	done
 }
@@ -24,13 +24,13 @@ docker_run() {
 }
 
 docker_run_all() {
-	echo -e "\n\e[1mStarting up containers\e[0m"
+	echo -e "\n\e[1m$PRINT_STARTING_CONTAINERS\e[0m"
 	for container in "${containers[@]}";do
 		! [[ $(docker ps -q --filter name="^/${container}$") ]] \
 			&& echo -en "- $container" \
 			&& ${container//-/_} \
 			&& exit_response \
-			|| echo "- $container (already running)"
+			|| echo "- $container $PRINT_ALREADY_RUNNING"
 	done
 	connect_containers_to_network
 }
@@ -57,7 +57,7 @@ pull_and_compare() {
 	if [[ ${DOCKER_COMPOSE} ]];then
 		pushd "${SERVICE_HOME}" >/dev/null
 		echo ""
-		echo -e "\e[1mPulling new images\e[0m"
+		echo -e "\e[1m$PRINT_PULLING_NEW_IMAGES\e[0m"
 		echo ""
 		docker-compose pull
 	else
@@ -67,7 +67,7 @@ pull_and_compare() {
 	if [[ -f "${BASE_DIR}"/.image_shas.tmp ]];then
 		source "${BASE_DIR}"/.image_shas.tmp
 	else
-		echo -e "\n\e[31mCould not find digests of current images.\nExiting.\e[0m"
+		echo -e "\n\e[31m$PRINT_COULD_NOT_FIND_IMAGE_DIGEST.\n$PRINT_EXITING.\e[0m"
 		exit 1
 	fi
 	# compare sha256 and delete old unused images
@@ -88,9 +88,9 @@ pull_and_compare() {
 	if [[ ${DOCKER_COMPOSE} ]] \
 	&& [[ ${old_images_to_delete[0]} ]];then
 		pushd "${SERVICE_HOME}" >/dev/null
-		echo -e "\n\e[1mTaking down ${SERVICE_NAME}\e[0m"
+		echo -e "\n\e[1m$PRINT_TAKING_DOWN_SERVICE ${SERVICE_NAME}\e[0m"
 		docker-compose down
-		echo -e "\n\e[1mBringing ${SERVICE_NAME} back up\e[0m"
+		echo -e "\n\e[1m$PRINT_BRINGIN_UP_SERVICE ${SERVICE_NAME}\e[0m"
 		docker-compose up -d
 		popd >/dev/null
 	fi
@@ -106,7 +106,7 @@ pull_and_compare() {
 	done
 
 	[[ -z ${old_images_to_delete[0]} ]] && [[ -z ${missing_containers[0]} ]] \
-		&& echo -e "\n\e[1mImage(s) did not change.\e[0m" \
+		&& echo -e "\n\e[1m$PRINT_IMAGES_DID_NOT_CHANGE\e[0m" \
 		&& rm "${BASE_DIR}"/.image_shas.tmp \
 		&& exit 0
 }
@@ -115,23 +115,23 @@ delete_old_images() {
 	if [[ -f "${BASE_DIR}"/.image_shas.tmp ]];then
 		source "${BASE_DIR}"/.image_shas.tmp
 	else
-		echo -en "\n\e[31mCould not find digests of current images.\nExiting.\e[0m"
+		echo -en "\n\e[31m$PRINT_COULD_NOT_FIND_IMAGE_DIGEST\n$PRINT_EXITING\e[0m"
 		return
 	fi
 
 	[[ -z ${old_images_to_delete[0]} ]] \
 		&& return
 
-	prompt_confirm "Delete all old images?"
+	prompt_confirm "$PRINT_PROMPT_DELETE_OLD_IMAGES"
 	if [[ $? == 0 ]];then
 		echo ""
 		for image in "${old_images_to_delete[@]}";do
-				echo -en "\e[1m[DELETING]\e[0m $image"
+				echo -en "\e[1m$PRINT_DELETING\e[0m $image"
 				docker rmi $image >/dev/null
 				exit_response
 		done
 		for image in ${unchanged_images_to_keep[@]};do
-			echo -en "\e[1m[KEEPING]\e[0m $image (did not change)"
+			echo -en "\e[1m$PRINT_KEEPING\e[0m $image $PRINT_DID_NOT_CHANGE"
 		done
 		echo ""
 	fi
@@ -140,13 +140,13 @@ delete_old_images() {
 
 create_volumes() {
 	if [[ ${volumes[@]} && ! ${DOCKER_COMPOSE} ]];then
-		echo -e "\n\e[1mCreating volumes\e[0m"
+		echo -e "\n\e[1m$PRINT_CREATING_VOLUMES\e[0m"
 		for volume in "${!volumes[@]}";do
 			[[ ! $(docker volume ls -q --filter name=^${volume}$) ]] \
 				&& echo -en "- $volume" \
 				&& docker volume create $volume >/dev/null \
 				&& exit_response \
-				|| echo "- $volume (already exists)"
+				|| echo "- $volume $PRINT_ALREADY_EXISTS"
 		done
 	fi
 }

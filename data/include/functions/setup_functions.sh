@@ -59,7 +59,7 @@ post_setup_routine() {
 	fi
 }
 
-# only relevant if the menu shows "Configure service", although the service has already been configured or installed. This should only happen if things are messed up.
+# only relevant if the menu shows "$PRINT_MENU_CONFIGURE_SERVICE", although the service has already been configured or installed. This should only happen if things are messed up.
 pre_configure_routine() {
 	if [[ "${CONFIGURED_SERVICES[@]}" =~ ${SERVICE_NAME} ]] || [[ -f "${ENV_DIR}/${SERVICE_NAME}" ]]|| [[ "${INSTALLED_SERVICES[@]}" =~ ${SERVICE_NAME} ]];then
 		prompt_confirm  "Existing configuration found. Destroy containers and reconfigure?" && destroy || echo "Exiting..";exit

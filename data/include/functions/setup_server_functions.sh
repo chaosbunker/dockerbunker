@@ -22,7 +22,7 @@ create_networks() {
 
 # set nginx service.config
 set_nginx_config() {
-	prompt_confirm "Use default Service Nginx.Config File?: ${SERVICE_SERVER_CONFIG}" && custom_server_config=1;
+	prompt_confirm "$PRINT_PROMPT_CONFIRM_USE_DEFAULT_NGINX_CONF: ${SERVICE_SERVER_CONFIG}" && custom_server_config=1;
 
 	if [[ -z $custom_server_config ]];then
 		SERVICE_SERVER_CONFIG+="notexists"
@@ -30,12 +30,12 @@ set_nginx_config() {
 		# loop if file not exists
 		while [[ true ]];do
 			if [[ -f "${SERVICE_SERVER_CONFIG}" ]]; then
-				echo -e "\e[32m[Path is valid]\e[0m";
+				echo -e "\e[32m$PRINT_INVALID_PATH_MESSAGE\e[0m";
 				break;
 			else
-				echo -e "\e[31m[Invalid Path]\e[0m";
+				echo -e "\e[31m$PRINT_INVALID_PATH_MESSAGE\e[0m";
 
-				read -p "Set new Service Config Path: " -ei "/nginx/service.conf" CUSTOM_SERVICE_SERVER_CONFIG
+				read -p "$PRINT_PROMPT_CONFIRM_SET_NEW_NGINX_SERVICE_PATH: " -ei "/nginx/service.conf" CUSTOM_SERVICE_SERVER_CONFIG
 				SERVICE_SERVER_CONFIG="${SERVICES_DIR}/${SERVICE_NAME}${CUSTOM_SERVICE_SERVER_CONFIG}"
 			fi
 		done
@@ -76,7 +76,7 @@ basic_nginx() {
 			done
 		fi
 
-		echo -en "\n\e[1mMoving nginx configuration in place\e[0m"
+		echo -en "\n\e[1m$PRINT_MOVING_NGINX_CONFIG\e[0m"
 		if [[ -f "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf ]];then
 			mv "${SERVICES_DIR}"/${SERVICE_NAME}/nginx/${SERVICE_DOMAIN[0]}.conf "${CONF_DIR}"/nginx/conf.d
 			# add basic_auth
@@ -99,7 +99,7 @@ basic_nginx() {
 			exit_response
 
 		else
-			! [[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]] && echo "Nginx configuration file could not be found. Exiting." && exit 1
+			! [[ -f "${CONF_DIR}"/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf ]] && echo "$PRINT_NGINX_CONFIG_ISSUE" && exit 1
 		fi
 	fi
 }

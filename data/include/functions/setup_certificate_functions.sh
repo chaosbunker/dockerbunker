@@ -8,15 +8,15 @@
 
 # Services that need to be connected to a fqdn will have the variable $PROMPT_SSL set. In that case this function asks if the user wants to get an SSL certificate from Let's Encrypt or keep using the self signed certificate that will be generated during configuration
 configure_ssl() {
-	prompt_confirm "Use Letsencrypt instead of a self-signed certificate?"
+	prompt_confirm "$PRINT_PROMPT_CONFIRM_USE_LETSENCRYPT"
 	if [[ $? == 0 ]];then
 		SSL_CHOICE="le"
 		if [[ $LE_EMAIL ]]; then
 			prompt_confirm "Use ${LE_EMAIL} for Let's Encrypt?"
 			if [[ $? == 1 ]];then
-				read -p "Enter E-mail Adress for Let's Encrypt: " LE_EMAIL
+				read -p "$PRINT_ENTER_LETSENCRYPT_EMAIL " LE_EMAIL
 				if ! [[ $(grep ${LE_EMAIL} "${ENV_DIR}"/dockerbunker.env) ]];then
-					prompt_confirm "Use this address globally for every future service configured to obtain a Let's Encrypt certificate?"
+					prompt_confirm "$PRINT_ENTER_LETSENCRYPT_EMAIL_GLOBAL"
 					if [[ $? == 0 && ! $(grep ${LE_EMAIL} "${ENV_DIR}"/dockerbunker.env) ]];then
 						sed -i "s/LE_EMAIL=.*/LE_EMAIL="${LE_EMAIL}"/" "${ENV_DIR}"/dockerbunker.env
 					fi
@@ -33,7 +33,7 @@ configure_ssl() {
 generate_certificate() {
 	[[ -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem ]] && rm "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem
 	[[ -L "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem ]] && rm "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem
-	echo -en "\n\e[1mGenerating self-signed certificate for ${SERVICE_DOMAIN[0]}\e[0m"
+	echo -en "\n\e[1m$PRINT_GENERATING_SSL_CERT ${SERVICE_DOMAIN[0]}\e[0m"
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem -out "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem -subj "/C=XY/ST=hidden/L=nowhere/O=${SERVICE_NAME}/OU=IT Department/CN=${SERVICE_DOMAIN[0]}" >/dev/null 2>&1
 	exit_response
 }
@@ -42,16 +42,16 @@ generate_certificate() {
 letsencrypt() {
 	echo ""
 	add_domains() {
-		prompt_confirm "Include other domains in certificate beside ${SERVICE_DOMAIN[*]}?"
+		prompt_confirm "$PRINT_INCLUDE_OTHER_DOMAINS_IN_CERT ${SERVICE_DOMAIN[*]}?"
 		if [[ $? == 0 ]];then
 			unset fqdn_is_valid
 			unset domains
 			while [[ -z $fqdn_is_valid ]];do
 				if [[ $invalid ]];then
-					echo -e "\nPlease enter a valid domain!\n"
+					echo -e "\n$PRINT_CERT_DOMAIN_INVALID\n"
 				fi
 				unset invalid
-				read -p "Enter domains, separated by spaces: ${SERVICE_DOMAIN[*]} " -ei "" domains
+				read -p "$PRINT_CERT_DOMAIN_INPUT_MESSGE: ${SERVICE_DOMAIN[*]} " -ei "" domains
 				if [[ -z $domains ]];then
 					domains=( ${SERVICE_DOMAIN[*]} )
 					break
@@ -77,7 +77,7 @@ letsencrypt() {
 		fi
 	}
 	issue() {
-		[[ -z $1 ]] && ! [[ $(docker ps -q --filter name=^/${SERVICE_NAME}-service-dockerbunker$) ]] && echo "${SERVICE_NAME} container not running. Exiting." && exit 1
+		[[ -z $1 ]] && ! [[ $(docker ps -q --filter name=^/${SERVICE_NAME}-service-dockerbunker$) ]] && echo "${SERVICE_NAME} $PRINT_CONTAINER_NOT_RUNNING." && exit 1
 			for value in $*;do
 				[[ ( $value == "letsencrypt" || $value == "issue" || $value == "static" ) ]] || domains+=( "$value" )
 			done
@@ -106,10 +106,10 @@ letsencrypt() {
 				--agree-tos
 		if [[ $? == 0 ]];then
 			if ! [[ -L "build/conf/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem" ]];then
-				echo -en "\n\e[1mBacking up self-signed certificate\e[0m"
+				echo -en "\n\e[1m$PRINT_BACKING_UP_CERT\e[0m"
 				mv "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.{pem,pem.backup} && \
 					mv "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.{pem,pem.backup} && exit_response || exit_response
-				echo -en "\n\e[1mSymlinking letsencrypt certificate\e[0m"
+				echo -en "\n\e[1m$PRINT_SYMLINK_LETSENCRYPT_CERT\e[0m"
 				ln -sf "/etc/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]}/fullchain.pem" "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem && \
 					ln -sf "/etc/nginx/ssl/letsencrypt/live/${SERVICE_DOMAIN[0]}/privkey.pem" "${CONF_DIR}"/nginx/ssl/${SERVICE_DOMAIN[0]}/key.pem && exit_response || exit_response
 			fi
@@ -128,7 +128,7 @@ letsencrypt() {
 		restart_nginx
 	}
 
-	echo -e "\e[1mObtain certificate from Let's Encrypt\e[0m"
+	echo -e "\e[1m$PRINT_OPTAIN_LS_CERT\e[0m"
 	if [[ ( "$1" == "issue" ) ]] || [[ ( "$1" == "letsencrypt" && "$2" == "issue" ) ]];then
 			add_domains
 			issue ${domains[@]}

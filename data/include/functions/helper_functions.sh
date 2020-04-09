@@ -20,13 +20,15 @@
 
 # get user input
 prompt_confirm() {
+	# PROMPT_CONFIRM_PARAMETER="$()"
+
 	while true; do
-		read -rs -n 1 -p "${1:-Continue?} [Y/n]: " REPLY
+		read -rs -n 1 -p "${1:-$PRINT_PROMPT_CONFIRM_QUESTION} [Y/n]: " REPLY
 		[[ $REPLY ]] || REPLY="Y"
 		case $REPLY in
-			[yY]) echo -e "\e[32m[Yes]\e[0m"; return 0 ;;
-			[nN]) echo -e "\e[32m[No]\e[0m"; return 1 ;;
-			*) echo -e "\e[31m[Invalid Input]\e[0m"
+			[yY]) echo -e "\e[32m$PRINT_PROMPT_CONFIRM_YES\e[0m"; return 0 ;;
+			[nN]) echo -e "\e[32m$PRINT_PROMPT_CONFIRM_YES\e[0m"; return 1 ;;
+			*) echo -e "\e[31m$PRINT_PROMPT_CONFIRM_ERROR\e[0m"
 		esac
 	done
 }
@@ -34,7 +36,7 @@ prompt_confirm() {
 # Displays green checkmark or red [failed] to indicate if a step successfully ran or failed
 exit_response() {
 	if [[ $? != 0 ]]; then
-		echo -e " \e[31m[failed]\e[0m"
+		echo -e " \e[31m$PRINT_FAIL_MESSAGE\e[0m"
 		return 1
 	else
 		echo -e " \e[32m\xE2\x9C\x94\e[0m"
@@ -74,11 +76,11 @@ validate_fqdn() {
 	done
 	validate_fqdn=$(echo $1 | ${g}grep -P "(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}$)")
 	if elementInArray "${domain}" "${existing_domains[@]}" && [[ -z $reconfigure ]];then
-		echo -e "\n\e[3m$domain is already in use\e[0m\n"
+		echo -e "\n\e[3m$domain $PRINT_VALIDATE_FQDN_USE\e[0m\n"
 	elif [[ $validate_fqdn  ]];then
 		fqdn_is_valid=1
 	else
-		echo -e "\n\e[3m$domain is not a valid domain\e[0m\n"
+		echo -e "\n\e[3m$domain $PRINT_VALIDATE_FQDN_INVALID\e[0m\n"
 	fi
 }
 
@@ -228,5 +230,5 @@ collectImageNamesAndCorrespondingSha256() {
 }
 
 say_done() {
-	echo -e "\n\e[1mDone.\e[0m"
+	echo -e "\n\e[1m$PRINT_DONE_MESSAGE\e[0m"
 }
