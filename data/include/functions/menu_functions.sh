@@ -23,7 +23,7 @@ options_menu() {
 	# if service is marked as installed, make sure all containers exist and offer to run them if necessary
 	if elementInArray "${SERVICE_NAME}" "${INSTALLED_SERVICES[@]}";then
 		for container in "${containers[@]}";do
-			RUNNING=$(docker ps -a -q --filter name=^/${container}$)
+			RUNNING=$(docker ps -a --format '{{.Status}}' --filter name=^/${container}$)
 			echo "$PRINT_STATUS:  $RUNNING"
 			if [[ -z ${RUNNING} ]];then
 				echo -e "\n\e[3m$container $PRINT_CONTAINER_MISSING\e[0m\n"
@@ -33,7 +33,7 @@ options_menu() {
 					restore_container
 				fi
 			fi
-			RUNNING=$(docker ps -a -q --filter name=^/${container}$)
+			RUNNING=$(docker ps -a --format '{{.Status}}' --filter name=^/${container}$)
 			[[ ${RUNNING} ]] && missingContainers=( "${missingContainers[@]}/$container" )
 		done
 	fi
@@ -220,7 +220,7 @@ options_menu() {
 			echo ""
 
 			for container in ${containers[@]};do
-				[[ $(docker ps -a -q --filter name=^/${container}$) ]]  \
+				[[ $(docker ps -a --format '{{.Status}}' --filter name=^/${container}$) ]]  \
 				&& containers_found+=( $container )
 			done
 
@@ -315,7 +315,7 @@ destroy_all() {
 
 	all_services=( "${INSTALLED_SERVICES[@]}" "${CONFIGURED_SERVICES[@]}" )
 
-	[[ $(docker ps -a -q --filter name=^/nginx-dockerbunker$) ]] && all_services+=( "nginx" )
+	[[ $(docker ps -a --format '{{.Status}}' --filter name=^/nginx-dockerbunker$) ]] && all_services+=( "nginx" )
 
 	if [[ ${all_services[0]} ]]; then
 		printf "\n$PRINT_THE_FOLLOWING_SERVICES_WILL_BE_REMOVED"
@@ -720,7 +720,7 @@ restore() {
 		done
 	else
 		echo -e "\n\e[1mNo ${SERVICE_NAME} backup found\e[0m"
-		echo -e "\n\e[3m\xe2\x86\x92 $PRINT_CHECKING_SERVICE_STATUS"
+		echo -e "\n\e[3m\xe2\x86\x92 $PRINT_CHECKING_SERVICE_STATUS ${SERVICE_NAME}"
 		exec "${SERVICES_DIR}"/${SERVICE_NAME}/init.sh
 	fi
 }
