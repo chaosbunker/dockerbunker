@@ -13,9 +13,15 @@
 
 docker_pull() {
 	for image in ${IMAGES[@]};do
-		[[ "$image" != "dockerbunker/${SERVICE_NAME}" ]] \
-			&& echo -e "\n\e[1m$PRINT_PULLING $image\e[0m" \
-			&& docker pull $image
+		# if image exists local, dont run docker pull
+		if [[ $(docker images "${image}" | tail -n +2) ]]; then
+		else
+			# pull docker image from the internet
+			if [[ "$image" != "dockerbunker/${SERVICE_NAME}" ]]; then
+				echo -e "\n\e[1m$PRINT_PULLING $image\e[0m"
+				docker pull $image
+			fi
+		fi
 	done
 }
 
