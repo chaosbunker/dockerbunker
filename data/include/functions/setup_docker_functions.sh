@@ -12,15 +12,33 @@
 #######
 
 docker_pull() {
-	for image in ${IMAGES[@]};do
-		# if image exists local, dont run docker pull
-		if [[ $(docker images "${image}" | tail -n +2) ]]; then
-		else
-			# pull docker image from the internet
-			if [[ "$image" != "dockerbunker/${SERVICE_NAME}" ]]; then
-				echo -e "\n\e[1m$PRINT_PULLING $image\e[0m"
-				docker pull $image
+	# here we loop trought this associative array an get key width $image and values width ${IMAGES[$image]}
+
+	for image in "${!IMAGES[@]}"; do
+		if [[ ! $(docker images "${IMAGES[$image]}" | tail -n +2) ]]; then
+			# if image exists local, dont run docker pull / docker build
+
+			if [[ $image == *"Dockerfile"* ]]; then
+				# use local installed docker image, if we set IMAGES Key Dockerfile*
+				# Dockerfile_Name will be used to find DockerFile within ${SERVICES_DIR}/${SERVICE_NAME}/ Folder
+
+				if [[ -f ${SERVICES_DIR}/${SERVICE_NAME}/${image} ]]; then
+					# build docker localy from data/services/service/Dockerfile
+					echo -e "\n\e[1mTry to Build Docker-Image from following Dockerfile ${SERVICES_DIR}/${SERVICE_NAME}/${image}\e[0m"
+
+					docker build -t "${IMAGES[$image]}" - < "${SERVICES_DIR}/${SERVICE_NAME}/${image}"
+				fi
+
+			else
+
+				# pull docker image from the internet
+				if [[ "$image" != "dockerbunker/${SERVICE_NAME}" ]]; then
+					echo -e "\n\e[1m$PRINT_PULLING ${IMAGES[$image]}\e[0m"
+					docker pull ${IMAGES[$image]}
+				fi
+
 			fi
+
 		fi
 	done
 }
