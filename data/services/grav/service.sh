@@ -8,7 +8,7 @@
 declare -A WEB_SERVICES
 declare -a containers=( "${SERVICE_NAME}-service-dockerbunker" )
 declare -a add_to_network=( "${SERVICE_NAME}-service-dockerbunker" )
-declare -a networks=( "dockerbunker-grav" )
+declare -a networks=( "dockerbunker-${SERVICE_NAME}" )
 declare -A volumes=( [${SERVICE_NAME}-data-vol-1]="/var/www/html" )
 declare -A IMAGES=( [Dockerfile_Grav]="grav:localbuild" )
 
