@@ -68,6 +68,7 @@ Index:
 |[Seafile Pro (broken)](https://github.com/haiwen/seafile) | > [&#9760;] some issue |
 |[Searx](https://github.com/asciimoo/searx.git) | **[&#10004;]** installation works |
 |[sFTP Server](https://github.com/atmoz/sftp) | > [&#9760;] some issue |
+|[Strapi](https://github.com/strapi/strapi) | **[&#9760;] works** | The most advanced open-source headless CMS to build powerful APIs with no effort. |
 |[Wekan](https://github.com/wekan/wekan) | **[&#10004;] works** | open source kanban |
 |[Wordpress](https://wordpress.org/) | **[&#10004;]** installation works |
 
