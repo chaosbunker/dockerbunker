@@ -24,9 +24,14 @@ docker_pull() {
 
 				if [[ -f ${SERVICES_DIR}/${SERVICE_NAME}/${image} ]]; then
 					# build docker localy from data/services/service/Dockerfile
-					echo -e "\n\e[1mTry to Build Docker-Image from following Dockerfile ${SERVICES_DIR}/${SERVICE_NAME}/${image}\e[0m"
+					echo -e "\n\e[1mTry to Build Docker-Image from following Dockerfile ${SERVICES_DIR}/${SERVICE_NAME}/${image} with name ${IMAGES[$image]}\e[0m"
 
-					docker build -t "${IMAGES[$image]}" - < "${SERVICES_DIR}/${SERVICE_NAME}/${image}"
+					if [[ -n "$DockerfileBuildCommand" ]]; then
+						# run the command
+						"${DockerfileBuildCommand[@]}"
+					else
+						docker build -t "${IMAGES[$image]}" - < "${SERVICES_DIR}/${SERVICE_NAME}/${image}"
+					fi
 				fi
 
 			else
