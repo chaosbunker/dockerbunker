@@ -25,6 +25,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-install opcache \
     && docker-php-ext-configure intl \
     && docker-php-ext-install intl \
+		&& docker-php-ext-install exif \
+    && docker-php-ext-enable exif \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-install zip \
