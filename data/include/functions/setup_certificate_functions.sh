@@ -66,10 +66,11 @@ letsencrypt() {
 				invalid=1
 			done
 
+			# replace old domains with new domains within dockerbunker config files
 			if [[ ${STATIC} ]];then
-				[[ ${domains[1]} ]] && sed -i "s/server_name.*/server_name ${domains[*]}\;/" "build/conf/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf" && sed -i "s/^SERVICE\_DOMAIN.*/SERVICE\_DOMAIN\=\(\ ${domains[*]}\ \)/" "build/env/static/${SERVICE_DOMAIN[0]}.env"
+				[[ ${domains[1]} ]] && sed -i "s/server_name.*/server_name $(echo ${domains[*]})\;/" "build/conf/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf" && sed -i "s/^SERVICE\_DOMAIN.*/SERVICE\_DOMAIN\=\(\ $(echo ${domains[*]})\ \)/" "build/env/static/${SERVICE_DOMAIN[0]}.env"
 			else
-				[[ ${domains[1]} ]] && sed -i "s/server_name.*/server_name ${domains[*]}\;/" "build/conf/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf" && sed -i "s/^SERVICE\_DOMAIN.*/SERVICE\_DOMAIN\=\(\ ${domains[*]}\ \)/" "build/env/${SERVICE_NAME}.env"
+				[[ ${domains[1]} ]] && sed -i "s/server_name.*/server_name $(echo ${domains[*]})\;/" "build/conf/nginx/conf.d/${SERVICE_DOMAIN[0]}.conf" && sed -i "s/^SERVICE\_DOMAIN.*/SERVICE\_DOMAIN\=\(\ $(echo ${domains[*]})\ \)/" "build/env/${SERVICE_NAME}.env"
 			fi
 			expand="--expand "
 		else
@@ -84,7 +85,7 @@ letsencrypt() {
 			for domain in ${domains[@]};do
 				[[ ${domain} != ${SERVICE_DOMAIN[0]} ]] && validate_fqdn $domain || fqdn_is_valid=1
 				if [[ $fqdn_is_valid ]];then
-					[[ ! "${le_domains[@]}" =~ $domain ]] && le_domains+=( "-d $domain" )
+					[[ ! "${le_domains[@]}" =~ $domain ]] && le_domains+=( "$domain" )
 				else
 					exit
 				fi
@@ -93,6 +94,8 @@ letsencrypt() {
 			[[ "${domains[@]}" =~ ${SERVICE_DOMAIN[0]} ]] || ( echo -e "Please include your chosen ${SERVICE_NAME} domain ${SERVICE_DOMAIN[0]}";exit 1 )
 			[[ ! -d "${CONF_DIR}"/nginx/ssl/letsencrypt ]] && mkdir "${CONF_DIR}"/nginx/ssl/letsencrypt
 		[[ ( "${domains[@]}" =~ "${SERVICE_DOMAIN[0]}" && "${domains[0]}" =~ "${SERVICE_DOMAIN[0]}" ) ]] \
+		  && le_domains_array_string=${le_domains[@]} \
+			&& le_domains_array_string=$(echo ${le_domains_array_string// /,}) \
 			&& echo "" \
 			&& docker run --rm -it --name=certbot \
 				--network ${NETWORK} \
@@ -101,8 +104,9 @@ letsencrypt() {
 				certbot/certbot \
 				certonly --noninteractive \
 				--webroot -w /var/www/html \
-				${le_domains[@]} \
-				--email ${LE_EMAIL} ${expand}\
+				--cert-name ${le_domains[1]} \
+				-d ${le_domains_array_string} \
+				--email ${LE_EMAIL} \
 				--agree-tos
 		if [[ $? == 0 ]];then
 			if ! [[ -L "build/conf/nginx/ssl/${SERVICE_DOMAIN[0]}/cert.pem" ]];then
