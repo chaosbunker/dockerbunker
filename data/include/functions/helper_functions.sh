@@ -74,7 +74,7 @@ validate_fqdn() {
 	for conf_file in $(ls "${CONF_DIR}"/nginx/conf.d);do
 		existing_domains+=( ${conf_file%.conf*} )
 	done
-	validate_fqdn=$(echo $1 | ${g}grep -P "(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}$)")
+	validate_fqdn=$(echo $1 | ${g}grep -P "(?=^.{1,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}$)")
 	if elementInArray "${domain}" "${existing_domains[@]}" && [[ -z $reconfigure ]];then
 		echo -e "\n\e[3m$domain $PRINT_VALIDATE_FQDN_USE\e[0m\n"
 	elif [[ $validate_fqdn  ]];then
