@@ -28,58 +28,59 @@ Index:
 * [&#10004;] works
   > is tested in live-environment
 
-| A - G | Description |
-|---|---|--- |
-|[Bitbucket](https://www.atlassian.com/software/bitbucket) | > [&#9760;] some issue | |
-|[Commento](https://github.com/adtac/commento) | **[&#10004;]** installation works | |
-|[cryptpad](https://cryptpad.fr/) | **[&#10004;]** installation works | |
-|[CS50 IDE](https://manual.cs50.net/ide/offline) | > [&#9760;] some issue | |
-|[Dillinger](https://dillinger.io/) | **[&#10004;]** installation works | |
-|[Drone CI](https://github.com/drone/drone) | **[&#10004;] works** | Continuous Delivery system |
-|[Fathom Analytics](https://github.com/usefathom/fathom) | **[&#10004;]** installation works | |
-|[Firefly III](https://github.com/firefly-iii/firefly-iii) | **[&#10004;]** installation works | |
-|[Firefox Sync Server](https://github.com/mozilla-services/syncserver) | **[&#10004;]** installation works | |
-|[Ghost Blog](https://ghost.org/) | **[&#10004;]** installation works | |
-|[GitBucket](https://github.com/gitbucket/gitbucket) | **[&#10004;]** installation works | |
-|[Gitea](https://gitea.io/en-us/) | **[&#10004;] works** | Git Server |
-|[Gitlab CE](https://gitlab.com/) | > [&#9760;] some issue | |
-|[Gogs](https://gogs.io/) | **[&#10004;]** installation works | |
-|[Grav](https://github.com/getgrav/grav) | **[&#10004;] works** | Grav is a Fast, Simple, and Flexible, file-based Web-platform. |
+| A - G | State | Description |
+| --------------------------------------------------------------------- | --------------------------------- | |
+| [Bitbucket](https://www.atlassian.com/software/bitbucket) | > [&#9760;] some issue | |
+| [Commento](https://github.com/adtac/commento) | **[&#10004;]** installation works | |
+| [cryptpad](https://cryptpad.fr/) | **[&#10004;]** installation works | |
+| [CS50 IDE](https://manual.cs50.net/ide/offline) | > [&#9760;] some issue | |
+| [Dillinger](https://dillinger.io/) | **[&#10004;]** installation works | |
+| [Drone CI](https://github.com/drone/drone) | **[&#10004;] works** | Continuous Delivery system |
+| [Fathom Analytics](https://github.com/usefathom/fathom) | **[&#10004;]** installation works | |
+| [Firefly III](https://github.com/firefly-iii/firefly-iii) | **[&#10004;]** installation works | |
+| [Firefox Sync Server](https://github.com/mozilla-services/syncserver) | **[&#10004;]** installation works | |
+| [Ghost Blog](https://ghost.org/) | **[&#10004;]** installation works | |
+| [GitBucket](https://github.com/gitbucket/gitbucket) | **[&#10004;]** installation works | |
+| [Gitea](https://gitea.io/en-us/) | **[&#10004;] works** | Git Server |
+| [Gitlab CE](https://gitlab.com/) | > [&#9760;] some issue | |
+| [Gogs](https://gogs.io/) | **[&#10004;]** installation works | |
+| [Grav](https://github.com/getgrav/grav) | **[&#10004;] works** | Grav is a Fast, Simple, and Flexible, file-based Web-platform. |
 
-| H - N | Description |
-|---|---|--- |
-|[Hastebin](https://hastebin.com/about.md) | **[&#10004;]** installation works | |
-|[IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server) | > [&#9760;] some issue | |
-|[json-server](https://github.com/typicode/json-server) | **[&#10004;]** installation works | |
-|[Kanboard](https://kanboard.net/) | **[&#10004;]** installation works | |
-|[KeeWeb](https://github.com/keeweb/keeweb) | **[&#10004;] works** | this is a static KeyPassX ProgressiveWebapp |
-|[Koken](http://koken.me/) | **[&#10004;]** installation works | |
-|[Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized) | > [&#9760;] some issue | |
-|[Mailpile](https://www.mailpile.is/) | **[&#10004;]** installation works | |
-|[Mastodon](https://github.com/tootsuite/mastodon) | **[&#10004;]** installation works | |
-|[Matomo Analytics](https://github.com/matomo-org/docker) | **[&#10004;]** installation works | |
-|[Mozilla send](https://send.firefox.com/) | **[&#10004;] works** | Simple, private file sharing from the makers of Firefox |
-|[Nextcloud](https://github.com/nextcloud/docker) | **[&#10004;] works** | self-hosted cloud-server|
+| H - N | State | Description |
+| --------------------------------------------------------------------- | --------------------------------- | |
+| [Hastebin](https://hastebin.com/about.md) | **[&#10004;]** installation works | |
+| [IPsec VPN Server](https://github.com/hwdsl2/docker-ipsec-vpn-server) | > [&#9760;] some issue | |
+| [json-server](https://github.com/typicode/json-server) | **[&#10004;]** installation works | |
+| [Kanboard](https://kanboard.net/) | **[&#10004;]** installation works | |
+| [KeeWeb](https://github.com/keeweb/keeweb) | **[&#10004;] works** | this is a static KeyPassX ProgressiveWebapp |
+| [Koken](http://koken.me/) | **[&#10004;]** installation works | |
+| [Mailcow Dockerized](https://github.com/mailcow/mailcow-dockerized) | > [&#9760;] some issue | |
+| [Mailpile](https://www.mailpile.is/) | **[&#10004;]** installation works | |
+| [Mastodon](https://github.com/tootsuite/mastodon) | **[&#10004;]** installation works | |
+| [Matomo Analytics](https://github.com/matomo-org/docker) | **[&#10004;]** installation works | |
+| [Mozilla send](https://send.firefox.com/) | **[&#10004;] works** | Simple, private file sharing from the makers of Firefox |
+| [Nextcloud](https://github.com/nextcloud/docker) | **[&#10004;] works** | self-hosted cloud-server |
 
-| O - Z | Description |
-|---|---|--- |
-|[Open Project](https://www.openproject.org/) | > [&#9760;] some issue | |
-|[Padlock Cloud](https://github.com/padlock/padlock-cloud) | > [&#9760;] some issue | |
-|[Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) | > [&#9760;] some issue | |
-|[Seafile Pro (broken)](https://github.com/haiwen/seafile) | > [&#9760;] some issue | |
-|[Searx](https://github.com/asciimoo/searx.git) | **[&#10004;]** installation works | |
-|[sFTP Server](https://github.com/atmoz/sftp) | > [&#9760;] some issue | |
-|[Strapi](https://github.com/strapi/strapi) | **[&#9760;] works** | The most advanced open-source headless CMS to build powerful APIs with no effort. |
-|[Wekan](https://github.com/wekan/wekan) | **[&#10004;] works** | open source kanban |
-|[Wordpress](https://wordpress.org/) | **[&#10004;]** installation works | |
-
+| O - Z | State | Description |
+| --------------------------------------------------------- | --------------------------------- | |
+| [Open Project](https://www.openproject.org/) | > [&#9760;] some issue | |
+| [Padlock Cloud](https://github.com/padlock/padlock-cloud) | > [&#9760;] some issue | |
+| [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) | > [&#9760;] some issue | |
+| [Seafile Pro (broken)](https://github.com/haiwen/seafile) | > [&#9760;] some issue | |
+| [Searx](https://github.com/asciimoo/searx.git) | **[&#10004;]** installation works | |
+| [sFTP Server](https://github.com/atmoz/sftp) | > [&#9760;] some issue | |
+| [Strapi](https://github.com/strapi/strapi) | **[&#9760;] works** | The most advanced open-source headless CMS to build powerful APIs with no effort. |
+| [Wekan](https://github.com/wekan/wekan) | **[&#10004;] works** | open source kanban |
+| [Wordpress](https://wordpress.org/) | **[&#10004;]** installation works | |
 
 #### <span id="other_build_in_services">Other build in Services</span>
 
-| Service | Status | Description |
-|---|---|--- |
-|[proxy-pass](data/services/proxy-pass) | **[&#10004;] works** | Use Dockerbunker as reverse-proxy, to work with your external Service/Server |
-|[static-sites](data/services/static-sites) | **[&#10004;] works** | use some static HTML sites (within build/service-name/web) |
+| Service                                    | Status               | Description                                                                  |
+| ------------------------------------------ | -------------------- | ---------------------------------------------------------------------------- |
+| [proxy-pass](data/services/proxy-pass)     | **[&#10004;] works** | Use Dockerbunker as reverse-proxy, to work with your external Service/Server |
+| [static-sites](data/services/static-sites) | **[&#10004;] works** | use some static HTML sites (within build/service-name/web)                   |
+
+
 
 **Fair warning:**
 While all services appeared fully functional at the time I implemented them, I cannot guarantee that they still all are functional. Sometimes I just added something I was playing around with and hadn't tested every part of it. If something turns out to be not working, it often times broke because of changes that were made to the software and it most cases it's trivial to make it work again. I **marked bold** all the apps I am personally using with `dockerbunker`, as well as those that I recently tested and expect to work without issues. That being said, use this at your own risk. And if you do use `dockerbunker` and notice that something doesn't work, please file an issue .. or even better, submit a pull request. Contributions are welcome:)
