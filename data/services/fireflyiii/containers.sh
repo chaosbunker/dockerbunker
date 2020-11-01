@@ -6,7 +6,7 @@ fireflyiii_db_dockerbunker() {
 		--env-file="${SERVICE_ENV}" \
 		-v ${SERVICE_NAME}-db-vol-1:${volumes[${SERVICE_NAME}-db-vol-1]} \
 		--health-cmd="mysqladmin ping --host localhost --silent" --health-interval=10s --health-retries=5 --health-timeout=30s \
-		-e MYSQL_PASSWORD=${FF_DB_PASSWORD} \
+		-e MYSQL_PASSWORD=${DB_PASSWORD} \
 	${IMAGES[db]} >/dev/null
 }
 

@@ -1,13 +1,34 @@
+#######
 # Helper functions that are used in multiple other functions
+#
+# function: prompt_confirm
+# function: exit_response
+# function: insert
+# function: elementInArray
+# function: validate_fqdn
+# function: is_ip_valid
+# function: remove_from_WEB_SERVICES
+# function: remove_from_CONFIGURED_SERVICES
+# function: remove_from_STATIC_SITES
+# function: remove_from_INSTALLED_SERVICES
+# function: remove_from_STOPPED_SERVICES
+# function: remove_from_CONTAINERS_IN_DOCKERBUNKER_NETWORK
+# function: collectAllImageNamesFromDockerComposeFile
+# function: collectImageNamesAndCorrespondingSha256
+# function: say_done
+#######
 
 # get user input
 prompt_confirm() {
+	# PROMPT_CONFIRM_PARAMETER="$()"
+
 	while true; do
-		read -rs -n 1 -p "${1:-Continue?} [y/n]: " REPLY
+		read -rs -n 1 -p "${1:-$PRINT_PROMPT_CONFIRM_QUESTION} [Y/n]: " REPLY
+		[[ $REPLY ]] || REPLY="Y"
 		case $REPLY in
-			[yY]) echo -e "\e[32m[Yes]\e[0m"; return 0 ;;
-			[nN]) echo -e "\e[32m[No]\e[0m"; return 1 ;;
-			*) echo -e "\e[31m[Invalid Input]\e[0m"
+			[yY]) echo -e "\e[32m$PRINT_PROMPT_CONFIRM_YES\e[0m"; return 0 ;;
+			[nN]) echo -e "\e[32m$PRINT_PROMPT_CONFIRM_NO\e[0m"; return 1 ;;
+			*) echo -e "\e[31m$PRINT_PROMPT_CONFIRM_ERROR\e[0m"
 		esac
 	done
 }
@@ -15,7 +36,7 @@ prompt_confirm() {
 # Displays green checkmark or red [failed] to indicate if a step successfully ran or failed
 exit_response() {
 	if [[ $? != 0 ]]; then
-		echo -e " \e[31m[failed]\e[0m"
+		echo -e " \e[31m$PRINT_FAIL_MESSAGE\e[0m"
 		return 1
 	else
 		echo -e " \e[32m\xE2\x9C\x94\e[0m"
@@ -53,20 +74,43 @@ validate_fqdn() {
 	for conf_file in $(ls "${CONF_DIR}"/nginx/conf.d);do
 		existing_domains+=( ${conf_file%.conf*} )
 	done
-	validate_fqdn=$(echo $1 | ${g}grep -P "(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}$)")
+	validate_fqdn=$(echo $1 | ${g}grep -P "(?=^.{1,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}$)")
 	if elementInArray "${domain}" "${existing_domains[@]}" && [[ -z $reconfigure ]];then
-		echo -e "\n\e[3m$domain is already in use\e[0m\n"
+		echo -e "\n\e[3m$domain $PRINT_VALIDATE_FQDN_USE\e[0m\n"
 	elif [[ $validate_fqdn  ]];then
 		fqdn_is_valid=1
 	else
-		echo -e "\n\e[3m$domain is not a valid domain\e[0m\n"
+		echo -e "\n\e[3m$domain $PRINT_VALIDATE_FQDN_INVALID\e[0m\n"
 	fi
+}
+
+# Test an IP address for validity:
+# Usage:
+#      valid_ip IP_ADDRESS
+#      if [[ $? -eq 0 ]]; then echo good; else echo bad; fi
+#   OR
+#      if valid_ip IP_ADDRESS; then echo good; else echo bad; fi
+# script found at https://www.linuxjournal.com/content/validating-ip-address-bash-script
+function is_ip_valid() {
+	local  ip=$1
+	local  stat=1
+
+	if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+		OIFS=$IFS
+		IFS='.'
+		ip=($ip)
+		IFS=$OIFS
+		[[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
+		&& ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
+		stat=$?
+	fi
+	return $stat
 }
 
 # remove services from relevant arrays in dockerbunker.env after they have been installed/destroyed/configured/started etc..
 remove_from_WEB_SERVICES() {
 	for key in "${!WEB_SERVICES[@]}";do
-		if [[ "$key" =~ "${PROPER_NAME}" ]];then
+		if [[ "$key" =~ "${SERVICE_NAME}" ]];then
 			unset WEB_SERVICES["$key"]
 		fi
 	done
@@ -75,7 +119,7 @@ remove_from_WEB_SERVICES() {
 }
 
 remove_from_CONFIGURED_SERVICES() {
-	CONFIGURED_SERVICES=("${CONFIGURED_SERVICES[@]/"${PROPER_NAME}"}");
+	CONFIGURED_SERVICES=("${CONFIGURED_SERVICES[@]/"${SERVICE_NAME}"}");
 	for key in "${!CONFIGURED_SERVICES[@]}";do
 		if [[ "${CONFIGURED_SERVICES[$key]}" == "" ]];then
 			unset CONFIGURED_SERVICES[$key]
@@ -90,6 +134,8 @@ remove_from_CONFIGURED_SERVICES() {
 
 remove_from_STATIC_SITES() {
 	STATIC_SITES=("${STATIC_SITES[@]/"${SERVICE_DOMAIN[0]}"}");
+
+	# remove Static-Site from environemen Variable
 	for key in "${!STATIC_SITES[@]}";do
 		if [[ "${STATIC_SITES[$key]}" == "" ]];then
 			unset STATIC_SITES[$key]
@@ -97,13 +143,27 @@ remove_from_STATIC_SITES() {
 				unset ${STATIC_SITES[@]}
 			fi
 		fi
-	sed -i '/STATIC_SITES/d' "${ENV_DIR}/dockerbunker.env"
-	declare -p STATIC_SITES >> "${ENV_DIR}/dockerbunker.env"
+		sed -i '/STATIC_SITES/d' "${ENV_DIR}/dockerbunker.env"
+		declare -p STATIC_SITES >> "${ENV_DIR}/dockerbunker.env"
+	done
+
+	# Remove Static-Site from STATIC_SERVICES environment Variable, to hide service-state in menu
+	STATIC_SERVICES=("${STATIC_SERVICES[@]/"${SERVICE_NAME}-${SERVICE_DOMAIN[0]}"}");
+
+	for key in "${!STATIC_SERVICES[@]}";do
+		if [[ "${STATIC_SERVICES[$key]}" == "" ]];then
+			unset STATIC_SERVICES[$key]
+			if [[ -z "${STATIC_SERVICES[@]}" ]];then
+				unset ${STATIC_SERVICES[@]}
+			fi
+		fi
+		sed -i '/STATIC_SERVICES/d' "${ENV_DIR}/dockerbunker.env"
+		declare -p STATIC_SERVICES >> "${ENV_DIR}/dockerbunker.env"
 	done
 }
 
 remove_from_INSTALLED_SERVICES() {
-	INSTALLED_SERVICES=("${INSTALLED_SERVICES[@]/"${PROPER_NAME}"}");
+	INSTALLED_SERVICES=("${INSTALLED_SERVICES[@]/"${SERVICE_NAME}"}");
 	for key in "${!INSTALLED_SERVICES[@]}";do
 		if [[ "${INSTALLED_SERVICES[$key]}" == "" ]];then
 			unset INSTALLED_SERVICES[$key]
@@ -117,7 +177,7 @@ remove_from_INSTALLED_SERVICES() {
 }
 
 remove_from_STOPPED_SERVICES() {
-	STOPPED_SERVICES=("${STOPPED_SERVICES[@]/"${PROPER_NAME}"}");
+	STOPPED_SERVICES=("${STOPPED_SERVICES[@]/"${SERVICE_NAME}"}");
 	for key in "${!STOPPED_SERVICES[@]}";do
 		if [[ "${STOPPED_SERVICES[$key]}" == "" ]];then
 			unset STOPPED_SERVICES[$key]
@@ -170,6 +230,5 @@ collectImageNamesAndCorrespondingSha256() {
 }
 
 say_done() {
-	echo -e "\n\e[1mDone.\e[0m"
+	echo -e "\n\e[1m$PRINT_DONE_MESSAGE\e[0m"
 }
-
